@@ -1,0 +1,5 @@
+Simple RAG alone is not sufficient for this task. Codebases aren’t like most PDFs, docs, or other similar data types. They are graphs—complex puzzles where each piece is interlinked. So Greptile does a few things past simple RAG:
+
+(1) Instead of directly embedding code, we parse the AST of the codebase, recursively generate docstrings for each node in the tree, and then embed the docstrings.
+
+(2) Alongside vector similarity search and keyword search, we do “agentic search” where an agent reviews the relevance of the search results, and scans the source code to follow references that might lead to something important. Then it returns the relevant sources.
