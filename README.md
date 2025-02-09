@@ -6,7 +6,7 @@ My implementation of an LLM-pipeline for codebases
 ### TODO:
 
  - [ ] AST-Chunker 
-	 - [ x ] Base Implementation
+	 - [x] Base Implementation
 	 - [ ] AST-store db
 	 - [ ] AST-Remote-repo mapping logic
  - [ ] Github API - Integration
