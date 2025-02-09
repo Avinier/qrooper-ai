@@ -1,7 +1,8 @@
-# Qode-Store
+## Qode-Store
 My implementation of an LLM-pipeline for codebases
 
 ------------
+
 ### TODO:
 
  - [ ] AST-Chunker 
