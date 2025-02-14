@@ -1,4 +1,4 @@
 PLAYGROUND.txt
-./attic
-./temp_code
-./cache
+attic/
+temp_code/
+cache/
