@@ -1,4 +1,8 @@
 PLAYGROUND.txt
+
 attic/
 temp_code/
-cache/
+temp_extracted/
+chunks/
+
+*.zip
