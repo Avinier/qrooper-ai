@@ -4,5 +4,6 @@ attic/
 temp_code/
 temp_extracted/
 chunks/
+ast-output/
 
 *.zip

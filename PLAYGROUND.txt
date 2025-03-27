@@ -6,3 +6,108 @@ Simple RAG alone is not sufficient for this task. Codebases aren’t like most P
 
 How does it compare with something like Bloop, which also uses a combination of a syntax tree, Embeddings, FTS and LLMs?
 
+
+
+
+
+###QODE-STORE IMPLEMENTATION###
+# import zipfile
+# import time
+# import shutil
+# import tempfile
+# from pathlib import Path
+# from typing import List, Tuple
+#
+# try:
+#     from ast_chunker import CodeChunker
+# except ImportError:
+#     raise RuntimeError("Required module 'ast_chunker' not found")
+#
+#
+# def is_binary(file_path: Path) -> bool:
+#     """Check if a file is binary by looking for null bytes."""
+#     with file_path.open('rb') as f:
+#         return b'\0' in f.read(1024)
+#
+#
+# def process_zip(
+#         zip_path: str,
+#         output_dir: str = "chunks",
+#         max_file_size: int = 1_000_000,
+#         chunk_size: int = 40,
+#         overlap: int = 10,
+#         max_chunk_size: int = 1024
+# ) -> List[Tuple[str, dict, str]]:
+#     """
+#     Process a ZIP archive into code chunks with metadata.
+#
+#     Args:
+#         zip_path: Path to input ZIP file
+#         output_dir: Output directory for chunks
+#         max_file_size: Maximum file size to process (bytes)
+#         chunk_size: Target chunk size in tokens/lines
+#         overlap: Chunk overlap size
+#         max_chunk_size: Maximum allowed chunk size
+#     """
+#
+#     # Validate input
+#     if not Path(zip_path).exists():
+#         raise FileNotFoundError(f"ZIP file not found: {zip_path}")
+#
+#     start_time = time.time()
+#     chunker = CodeChunker()
+#     results = []
+#
+#     with tempfile.TemporaryDirectory() as extract_dir:
+#         extract_path = Path(extract_dir)
+#
+#         # Extract ZIP
+#         try:
+#             with zipfile.ZipFile(zip_path, 'r') as zf:
+#                 zf.extractall(extract_path)
+#         except zipfile.BadZipFile:
+#             raise ValueError(f"Invalid ZIP file: {zip_path}")
+#
+#         # Process files
+#         for file_path in extract_path.rglob("*"):
+#             if not file_path.is_file():
+#                 continue
+#
+#             # Skip binaries and large files
+#             if (file_path.suffix.lower() in {'.png', '.jpg', '.exe', '.zip', '.tar', '.gz', '.whl', '.otf', '.woff',
+#                                              '.jpeg', '.mp3', '.mp4'}
+#                     or file_path.stat().st_size > max_file_size
+#                     or is_binary(file_path)):
+#                 continue
+#
+#             try:
+#                 content = file_path.read_text(encoding='utf-8', errors='replace')
+#                 chunks, metadata, ids = chunker.chunk_file(
+#                     content,
+#                     str(file_path.relative_to(extract_path)),
+#                     max_chunk_size=max_chunk_size,
+#                     chunk_size=chunk_size,
+#                     overlap=overlap
+#                 )
+#                 results.extend(zip(chunks, metadata, ids))
+#             except Exception as e:
+#                 print(f"⚠️ Error processing {file_path}: {e}")
+#
+#     # Save results
+#     output_path = Path(output_dir) / time.strftime("%Y%m%d-%H%M%S")
+#     output_path.mkdir(parents=True, exist_ok=True)
+#
+#     for idx, (chunk, meta, cid) in enumerate(results):
+#         with (output_path / f"chunk_{cid}.txt").open('w', encoding='utf-8') as f:
+#             f.write(f"File: {meta.get('file_path', 'unknown')}\n")
+#             f.write(f"Lines: {meta.get('start', 0)}-{meta.get('end', 0)}\n")
+#             f.write(f"ID: {cid}\n\n{chunk}")
+#
+#     # Print summary
+#     print(f"\n✅ Processed {len(results)} chunks in {time.time() - start_time:.1f}s")
+#     print(f"Saved to: {output_path.resolve()}")
+#
+#     return results
+#
+# if __name__ == "__main__":
+#     process_zip("test1.zip")

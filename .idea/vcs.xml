@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/tree-sitter-grammars/tree-sitter-c" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/tree-sitter-grammars/tree-sitter-cpp" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/tree-sitter-grammars/tree-sitter-go" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/tree-sitter-grammars/tree-sitter-js" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/tree-sitter-grammars/tree-sitter-py" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/tree-sitter-grammars/tree-sitter-rs" vcs="Git" />
+  </component>
+</project>

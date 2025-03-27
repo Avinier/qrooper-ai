@@ -1,9 +1,7 @@
 import asyncio
-import json
-import os
 import requests
 from pathlib import Path
-from filename_evaluator import filename_evaluate
+from llm_calls.filename_evaluator import filename_evaluate
 
 model_name = "accounts/fireworks/models/deepseek-v3"
 api_key = "fw_3ZYVTdrvNUzJcNyGe4P4fjLY"
