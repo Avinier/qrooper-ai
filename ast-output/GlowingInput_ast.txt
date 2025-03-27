@@ -1,0 +1,1712 @@
+AST for temp_dir\ARTGuru-AI-main\app\components\UI\GlowingInput.tsx
+==================================================
+program [import React, { useState } from 'react';
+import { useNavigate } from '@remix-run/react';
+import { Send } from 'lucide-react';
+
+const GlowingInput = ({ className = '', placeholder = 'Enter text...', ...props }) => {
+  const [inputValue, setInputValue] = useState('');
+  const navigate = useNavigate();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (inputValue.trim()) {
+      navigate('/dashboard', { state: { input: inputValue } });
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="relative">
+      <div className="relative flex items-center">
+        <div className="relative w-[50%] flex items-center">
+          <input
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            className={`
+              w-[100%]
+              px-6
+              py-4
+              bg-white
+              rounded-lg
+              text-gray-700
+              transition-transform
+              duration-200
+              focus:outline-none
+              font-subheading
+              pr-12
+              ${className}
+            `}
+            placeholder={placeholder}
+            {...props}
+          />
+          <button
+            type="submit"
+            className="
+              absolute
+              right-3
+              p-2
+              text-gray-400
+              hover:text-gray-600
+              transition-colors
+              duration-200
+              focus:outline-none
+              flex
+              items-center
+              justify-center
+            "
+          >
+            <Send className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+      {/* Glow effect */}
+      <div
+        className="
+          absolute
+          top-4
+          left-0
+          right-0
+          -z-10
+          h-full
+          w-[50%]
+          scale-90
+          transform
+          blur-xl
+          bg-gradient-to-r
+          from-pink-500
+          via-purple-500
+          to-pink-500
+          bg-[length:200%_200%]
+          animate-glow
+        "
+      />
+    </form>
+  );
+};
+
+export default GlowingInput;] (0:0-85:28)
+  import_statement [import React, { useState } from 'react';] (0:0-0:40)
+    import [import] (0:0-0:6)
+    import_clause [React, { useState }] (0:7-0:26)
+      identifier [React] (0:7-0:12)
+      , [,] (0:12-0:13)
+      named_imports [{ useState }] (0:14-0:26)
+        { [{] (0:14-0:15)
+        import_specifier [useState] (0:16-0:24)
+          identifier [useState] (0:16-0:24)
+        } [}] (0:25-0:26)
+    from [from] (0:27-0:31)
+    string ['react'] (0:32-0:39)
+      ' ['] (0:32-0:33)
+      string_fragment [react] (0:33-0:38)
+      ' ['] (0:38-0:39)
+    ; [;] (0:39-0:40)
+  import_statement [import { useNavigate } from '@remix-run/react';] (1:0-1:47)
+    import [import] (1:0-1:6)
+    import_clause [{ useNavigate }] (1:7-1:22)
+      named_imports [{ useNavigate }] (1:7-1:22)
+        { [{] (1:7-1:8)
+        import_specifier [useNavigate] (1:9-1:20)
+          identifier [useNavigate] (1:9-1:20)
+        } [}] (1:21-1:22)
+    from [from] (1:23-1:27)
+    string ['@remix-run/react'] (1:28-1:46)
+      ' ['] (1:28-1:29)
+      string_fragment [@remix-run/react] (1:29-1:45)
+      ' ['] (1:45-1:46)
+    ; [;] (1:46-1:47)
+  import_statement [import { Send } from 'lucide-react';] (2:0-2:36)
+    import [import] (2:0-2:6)
+    import_clause [{ Send }] (2:7-2:15)
+      named_imports [{ Send }] (2:7-2:15)
+        { [{] (2:7-2:8)
+        import_specifier [Send] (2:9-2:13)
+          identifier [Send] (2:9-2:13)
+        } [}] (2:14-2:15)
+    from [from] (2:16-2:20)
+    string ['lucide-react'] (2:21-2:35)
+      ' ['] (2:21-2:22)
+      string_fragment [lucide-react] (2:22-2:34)
+      ' ['] (2:34-2:35)
+    ; [;] (2:35-2:36)
+  lexical_declaration [const GlowingInput = ({ className = '', placeholder = 'Enter text...', ...props }) => {
+  const [inputValue, setInputValue] = useState('');
+  const navigate = useNavigate();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (inputValue.trim()) {
+      navigate('/dashboard', { state: { input: inputValue } });
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="relative">
+      <div className="relative flex items-center">
+        <div className="relative w-[50%] flex items-center">
+          <input
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            className={`
+              w-[100%]
+              px-6
+              py-4
+              bg-white
+              rounded-lg
+              text-gray-700
+              transition-transform
+              duration-200
+              focus:outline-none
+              font-subheading
+              pr-12
+              ${className}
+            `}
+            placeholder={placeholder}
+            {...props}
+          />
+          <button
+            type="submit"
+            className="
+              absolute
+              right-3
+              p-2
+              text-gray-400
+              hover:text-gray-600
+              transition-colors
+              duration-200
+              focus:outline-none
+              flex
+              items-center
+              justify-center
+            "
+          >
+            <Send className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+      {/* Glow effect */}
+      <div
+        className="
+          absolute
+          top-4
+          left-0
+          right-0
+          -z-10
+          h-full
+          w-[50%]
+          scale-90
+          transform
+          blur-xl
+          bg-gradient-to-r
+          from-pink-500
+          via-purple-500
+          to-pink-500
+          bg-[length:200%_200%]
+          animate-glow
+        "
+      />
+    </form>
+  );
+};] (4:0-83:2)
+    const [const] (4:0-4:5)
+    variable_declarator [GlowingInput = ({ className = '', placeholder = 'Enter text...', ...props }) => {
+  const [inputValue, setInputValue] = useState('');
+  const navigate = useNavigate();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (inputValue.trim()) {
+      navigate('/dashboard', { state: { input: inputValue } });
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="relative">
+      <div className="relative flex items-center">
+        <div className="relative w-[50%] flex items-center">
+          <input
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            className={`
+              w-[100%]
+              px-6
+              py-4
+              bg-white
+              rounded-lg
+              text-gray-700
+              transition-transform
+              duration-200
+              focus:outline-none
+              font-subheading
+              pr-12
+              ${className}
+            `}
+            placeholder={placeholder}
+            {...props}
+          />
+          <button
+            type="submit"
+            className="
+              absolute
+              right-3
+              p-2
+              text-gray-400
+              hover:text-gray-600
+              transition-colors
+              duration-200
+              focus:outline-none
+              flex
+              items-center
+              justify-center
+            "
+          >
+            <Send className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+      {/* Glow effect */}
+      <div
+        className="
+          absolute
+          top-4
+          left-0
+          right-0
+          -z-10
+          h-full
+          w-[50%]
+          scale-90
+          transform
+          blur-xl
+          bg-gradient-to-r
+          from-pink-500
+          via-purple-500
+          to-pink-500
+          bg-[length:200%_200%]
+          animate-glow
+        "
+      />
+    </form>
+  );
+}] (4:6-83:1)
+      identifier [GlowingInput] (4:6-4:18)
+      = [=] (4:19-4:20)
+      arrow_function [({ className = '', placeholder = 'Enter text...', ...props }) => {
+  const [inputValue, setInputValue] = useState('');
+  const navigate = useNavigate();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (inputValue.trim()) {
+      navigate('/dashboard', { state: { input: inputValue } });
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="relative">
+      <div className="relative flex items-center">
+        <div className="relative w-[50%] flex items-center">
+          <input
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            className={`
+              w-[100%]
+              px-6
+              py-4
+              bg-white
+              rounded-lg
+              text-gray-700
+              transition-transform
+              duration-200
+              focus:outline-none
+              font-subheading
+              pr-12
+              ${className}
+            `}
+            placeholder={placeholder}
+            {...props}
+          />
+          <button
+            type="submit"
+            className="
+              absolute
+              right-3
+              p-2
+              text-gray-400
+              hover:text-gray-600
+              transition-colors
+              duration-200
+              focus:outline-none
+              flex
+              items-center
+              justify-center
+            "
+          >
+            <Send className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+      {/* Glow effect */}
+      <div
+        className="
+          absolute
+          top-4
+          left-0
+          right-0
+          -z-10
+          h-full
+          w-[50%]
+          scale-90
+          transform
+          blur-xl
+          bg-gradient-to-r
+          from-pink-500
+          via-purple-500
+          to-pink-500
+          bg-[length:200%_200%]
+          animate-glow
+        "
+      />
+    </form>
+  );
+}] (4:21-83:1)
+        formal_parameters [({ className = '', placeholder = 'Enter text...', ...props })] (4:21-4:82)
+          ( [(] (4:21-4:22)
+          required_parameter [{ className = '', placeholder = 'Enter text...', ...props }] (4:22-4:81)
+            object_pattern [{ className = '', placeholder = 'Enter text...', ...props }] (4:22-4:81)
+              { [{] (4:22-4:23)
+              object_assignment_pattern [className = ''] (4:24-4:38)
+                shorthand_property_identifier_pattern [className] (4:24-4:33)
+                = [=] (4:34-4:35)
+                string [''] (4:36-4:38)
+                  ' ['] (4:36-4:37)
+                  ' ['] (4:37-4:38)
+              , [,] (4:38-4:39)
+              object_assignment_pattern [placeholder = 'Enter text...'] (4:40-4:69)
+                shorthand_property_identifier_pattern [placeholder] (4:40-4:51)
+                = [=] (4:52-4:53)
+                string ['Enter text...'] (4:54-4:69)
+                  ' ['] (4:54-4:55)
+                  string_fragment [Enter text...] (4:55-4:68)
+                  ' ['] (4:68-4:69)
+              , [,] (4:69-4:70)
+              rest_pattern [...props] (4:71-4:79)
+                ... [...] (4:71-4:74)
+                identifier [props] (4:74-4:79)
+              } [}] (4:80-4:81)
+          ) [)] (4:81-4:82)
+        => [=>] (4:83-4:85)
+        statement_block [{
+  const [inputValue, setInputValue] = useState('');
+  const navigate = useNavigate();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (inputValue.trim()) {
+      navigate('/dashboard', { state: { input: inputValue } });
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="relative">
+      <div className="relative flex items-center">
+        <div className="relative w-[50%] flex items-center">
+          <input
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            className={`
+              w-[100%]
+              px-6
+              py-4
+              bg-white
+              rounded-lg
+              text-gray-700
+              transition-transform
+              duration-200
+              focus:outline-none
+              font-subheading
+              pr-12
+              ${className}
+            `}
+            placeholder={placeholder}
+            {...props}
+          />
+          <button
+            type="submit"
+            className="
+              absolute
+              right-3
+              p-2
+              text-gray-400
+              hover:text-gray-600
+              transition-colors
+              duration-200
+              focus:outline-none
+              flex
+              items-center
+              justify-center
+            "
+          >
+            <Send className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+      {/* Glow effect */}
+      <div
+        className="
+          absolute
+          top-4
+          left-0
+          right-0
+          -z-10
+          h-full
+          w-[50%]
+          scale-90
+          transform
+          blur-xl
+          bg-gradient-to-r
+          from-pink-500
+          via-purple-500
+          to-pink-500
+          bg-[length:200%_200%]
+          animate-glow
+        "
+      />
+    </form>
+  );
+}] (4:86-83:1)
+          { [{] (4:86-4:87)
+          lexical_declaration [const [inputValue, setInputValue] = useState('');] (5:2-5:51)
+            const [const] (5:2-5:7)
+            variable_declarator [[inputValue, setInputValue] = useState('')] (5:8-5:50)
+              array_pattern [[inputValue, setInputValue]] (5:8-5:35)
+                [ [[] (5:8-5:9)
+                identifier [inputValue] (5:9-5:19)
+                , [,] (5:19-5:20)
+                identifier [setInputValue] (5:21-5:34)
+                ] []] (5:34-5:35)
+              = [=] (5:36-5:37)
+              call_expression [useState('')] (5:38-5:50)
+                identifier [useState] (5:38-5:46)
+                arguments [('')] (5:46-5:50)
+                  ( [(] (5:46-5:47)
+                  string [''] (5:47-5:49)
+                    ' ['] (5:47-5:48)
+                    ' ['] (5:48-5:49)
+                  ) [)] (5:49-5:50)
+            ; [;] (5:50-5:51)
+          lexical_declaration [const navigate = useNavigate();] (6:2-6:33)
+            const [const] (6:2-6:7)
+            variable_declarator [navigate = useNavigate()] (6:8-6:32)
+              identifier [navigate] (6:8-6:16)
+              = [=] (6:17-6:18)
+              call_expression [useNavigate()] (6:19-6:32)
+                identifier [useNavigate] (6:19-6:30)
+                arguments [()] (6:30-6:32)
+                  ( [(] (6:30-6:31)
+                  ) [)] (6:31-6:32)
+            ; [;] (6:32-6:33)
+          lexical_declaration [const handleSubmit = (e) => {
+    e.preventDefault();
+    if (inputValue.trim()) {
+      navigate('/dashboard', { state: { input: inputValue } });
+    }
+  };] (8:2-13:4)
+            const [const] (8:2-8:7)
+            variable_declarator [handleSubmit = (e) => {
+    e.preventDefault();
+    if (inputValue.trim()) {
+      navigate('/dashboard', { state: { input: inputValue } });
+    }
+  }] (8:8-13:3)
+              identifier [handleSubmit] (8:8-8:20)
+              = [=] (8:21-8:22)
+              arrow_function [(e) => {
+    e.preventDefault();
+    if (inputValue.trim()) {
+      navigate('/dashboard', { state: { input: inputValue } });
+    }
+  }] (8:23-13:3)
+                formal_parameters [(e)] (8:23-8:26)
+                  ( [(] (8:23-8:24)
+                  required_parameter [e] (8:24-8:25)
+                    identifier [e] (8:24-8:25)
+                  ) [)] (8:25-8:26)
+                => [=>] (8:27-8:29)
+                statement_block [{
+    e.preventDefault();
+    if (inputValue.trim()) {
+      navigate('/dashboard', { state: { input: inputValue } });
+    }
+  }] (8:30-13:3)
+                  { [{] (8:30-8:31)
+                  expression_statement [e.preventDefault();] (9:4-9:23)
+                    call_expression [e.preventDefault()] (9:4-9:22)
+                      member_expression [e.preventDefault] (9:4-9:20)
+                        identifier [e] (9:4-9:5)
+                        . [.] (9:5-9:6)
+                        property_identifier [preventDefault] (9:6-9:20)
+                      arguments [()] (9:20-9:22)
+                        ( [(] (9:20-9:21)
+                        ) [)] (9:21-9:22)
+                    ; [;] (9:22-9:23)
+                  if_statement [if (inputValue.trim()) {
+      navigate('/dashboard', { state: { input: inputValue } });
+    }] (10:4-12:5)
+                    if [if] (10:4-10:6)
+                    parenthesized_expression [(inputValue.trim())] (10:7-10:26)
+                      ( [(] (10:7-10:8)
+                      call_expression [inputValue.trim()] (10:8-10:25)
+                        member_expression [inputValue.trim] (10:8-10:23)
+                          identifier [inputValue] (10:8-10:18)
+                          . [.] (10:18-10:19)
+                          property_identifier [trim] (10:19-10:23)
+                        arguments [()] (10:23-10:25)
+                          ( [(] (10:23-10:24)
+                          ) [)] (10:24-10:25)
+                      ) [)] (10:25-10:26)
+                    statement_block [{
+      navigate('/dashboard', { state: { input: inputValue } });
+    }] (10:27-12:5)
+                      { [{] (10:27-10:28)
+                      expression_statement [navigate('/dashboard', { state: { input: inputValue } });] (11:6-11:63)
+                        call_expression [navigate('/dashboard', { state: { input: inputValue } })] (11:6-11:62)
+                          identifier [navigate] (11:6-11:14)
+                          arguments [('/dashboard', { state: { input: inputValue } })] (11:14-11:62)
+                            ( [(] (11:14-11:15)
+                            string ['/dashboard'] (11:15-11:27)
+                              ' ['] (11:15-11:16)
+                              string_fragment [/dashboard] (11:16-11:26)
+                              ' ['] (11:26-11:27)
+                            , [,] (11:27-11:28)
+                            object [{ state: { input: inputValue } }] (11:29-11:61)
+                              { [{] (11:29-11:30)
+                              pair [state: { input: inputValue }] (11:31-11:59)
+                                property_identifier [state] (11:31-11:36)
+                                : [:] (11:36-11:37)
+                                object [{ input: inputValue }] (11:38-11:59)
+                                  { [{] (11:38-11:39)
+                                  pair [input: inputValue] (11:40-11:57)
+                                    property_identifier [input] (11:40-11:45)
+                                    : [:] (11:45-11:46)
+                                    identifier [inputValue] (11:47-11:57)
+                                  } [}] (11:58-11:59)
+                              } [}] (11:60-11:61)
+                            ) [)] (11:61-11:62)
+                        ; [;] (11:62-11:63)
+                      } [}] (12:4-12:5)
+                  } [}] (13:2-13:3)
+            ; [;] (13:3-13:4)
+          return_statement [return (
+    <form onSubmit={handleSubmit} className="relative">
+      <div className="relative flex items-center">
+        <div className="relative w-[50%] flex items-center">
+          <input
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            className={`
+              w-[100%]
+              px-6
+              py-4
+              bg-white
+              rounded-lg
+              text-gray-700
+              transition-transform
+              duration-200
+              focus:outline-none
+              font-subheading
+              pr-12
+              ${className}
+            `}
+            placeholder={placeholder}
+            {...props}
+          />
+          <button
+            type="submit"
+            className="
+              absolute
+              right-3
+              p-2
+              text-gray-400
+              hover:text-gray-600
+              transition-colors
+              duration-200
+              focus:outline-none
+              flex
+              items-center
+              justify-center
+            "
+          >
+            <Send className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+      {/* Glow effect */}
+      <div
+        className="
+          absolute
+          top-4
+          left-0
+          right-0
+          -z-10
+          h-full
+          w-[50%]
+          scale-90
+          transform
+          blur-xl
+          bg-gradient-to-r
+          from-pink-500
+          via-purple-500
+          to-pink-500
+          bg-[length:200%_200%]
+          animate-glow
+        "
+      />
+    </form>
+  );] (15:2-82:4)
+            return [return] (15:2-15:8)
+            parenthesized_expression [(
+    <form onSubmit={handleSubmit} className="relative">
+      <div className="relative flex items-center">
+        <div className="relative w-[50%] flex items-center">
+          <input
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            className={`
+              w-[100%]
+              px-6
+              py-4
+              bg-white
+              rounded-lg
+              text-gray-700
+              transition-transform
+              duration-200
+              focus:outline-none
+              font-subheading
+              pr-12
+              ${className}
+            `}
+            placeholder={placeholder}
+            {...props}
+          />
+          <button
+            type="submit"
+            className="
+              absolute
+              right-3
+              p-2
+              text-gray-400
+              hover:text-gray-600
+              transition-colors
+              duration-200
+              focus:outline-none
+              flex
+              items-center
+              justify-center
+            "
+          >
+            <Send className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+      {/* Glow effect */}
+      <div
+        className="
+          absolute
+          top-4
+          left-0
+          right-0
+          -z-10
+          h-full
+          w-[50%]
+          scale-90
+          transform
+          blur-xl
+          bg-gradient-to-r
+          from-pink-500
+          via-purple-500
+          to-pink-500
+          bg-[length:200%_200%]
+          animate-glow
+        "
+      />
+    </form>
+  )] (15:9-82:3)
+              ( [(] (15:9-15:10)
+              ERROR [<form onSubmit={handleSubmit} className="relative">] (16:4-16:55)
+                type_parameters [<form onSubmit={handleSubmit} className="relative">] (16:4-16:55)
+                  < [<] (16:4-16:5)
+                  ERROR [form] (16:5-16:9)
+                    identifier [form] (16:5-16:9)
+                  type_parameter [onSubmit={handleSubmit} className="relative"] (16:10-16:54)
+                    type_identifier [onSubmit] (16:10-16:18)
+                    default_type [={handleSubmit} className="relative"] (16:18-16:54)
+                      = [=] (16:18-16:19)
+                      ERROR [{handleSubmit} className=] (16:19-16:44)
+                        object_type [{handleSubmit}] (16:19-16:33)
+                          { [{] (16:19-16:20)
+                          property_signature [handleSubmit] (16:20-16:32)
+                            property_identifier [handleSubmit] (16:20-16:32)
+                          } [}] (16:32-16:33)
+                        identifier [className] (16:34-16:43)
+                        = [=] (16:43-16:44)
+                      literal_type ["relative"] (16:44-16:54)
+                        string ["relative"] (16:44-16:54)
+                          " ["] (16:44-16:45)
+                          string_fragment [relative] (16:45-16:53)
+                          " ["] (16:53-16:54)
+                  > [>] (16:54-16:55)
+              type_assertion [<div className="relative flex items-center">
+        <div className="relative w-[50%] flex items-center">
+          <input
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            className={`
+              w-[100%]
+              px-6
+              py-4
+              bg-white
+              rounded-lg
+              text-gray-700
+              transition-transform
+              duration-200
+              focus:outline-none
+              font-subheading
+              pr-12
+              ${className}
+            `}
+            placeholder={placeholder}
+            {...props}
+          />
+          <button
+            type="submit"
+            className="
+              absolute
+              right-3
+              p-2
+              text-gray-400
+              hover:text-gray-600
+              transition-colors
+              duration-200
+              focus:outline-none
+              flex
+              items-center
+              justify-center
+            "
+          >
+            <Send className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+      {/* Glow effect */}
+      <div
+        className="
+          absolute
+          top-4
+          left-0
+          right-0
+          -z-10
+          h-full
+          w-[50%]
+          scale-90
+          transform
+          blur-xl
+          bg-gradient-to-r
+          from-pink-500
+          via-purple-500
+          to-pink-500
+          bg-[length:200%_200%]
+          animate-glow
+        "] (17:6-79:9)
+                type_arguments [<div] (17:6-17:10)
+                  < [<] (17:6-17:7)
+                  type_identifier [div] (17:7-17:10)
+                  > [] (17:10-17:10)
+                assignment_expression [className="relative flex items-center">
+        <div className="relative w-[50%] flex items-center">
+          <input
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            className={`
+              w-[100%]
+              px-6
+              py-4
+              bg-white
+              rounded-lg
+              text-gray-700
+              transition-transform
+              duration-200
+              focus:outline-none
+              font-subheading
+              pr-12
+              ${className}
+            `}
+            placeholder={placeholder}
+            {...props}
+          />
+          <button
+            type="submit"
+            className="
+              absolute
+              right-3
+              p-2
+              text-gray-400
+              hover:text-gray-600
+              transition-colors
+              duration-200
+              focus:outline-none
+              flex
+              items-center
+              justify-center
+            "
+          >
+            <Send className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+      {/* Glow effect */}
+      <div
+        className="
+          absolute
+          top-4
+          left-0
+          right-0
+          -z-10
+          h-full
+          w-[50%]
+          scale-90
+          transform
+          blur-xl
+          bg-gradient-to-r
+          from-pink-500
+          via-purple-500
+          to-pink-500
+          bg-[length:200%_200%]
+          animate-glow
+        "] (17:11-79:9)
+                  identifier [className] (17:11-17:20)
+                  = [=] (17:20-17:21)
+                  binary_expression ["relative flex items-center">
+        <div className="relative w-[50%] flex items-center">
+          <input
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            className={`
+              w-[100%]
+              px-6
+              py-4
+              bg-white
+              rounded-lg
+              text-gray-700
+              transition-transform
+              duration-200
+              focus:outline-none
+              font-subheading
+              pr-12
+              ${className}
+            `}
+            placeholder={placeholder}
+            {...props}
+          />
+          <button
+            type="submit"
+            className="
+              absolute
+              right-3
+              p-2
+              text-gray-400
+              hover:text-gray-600
+              transition-colors
+              duration-200
+              focus:outline-none
+              flex
+              items-center
+              justify-center
+            "
+          >
+            <Send className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+      {/* Glow effect */}
+      <div
+        className="
+          absolute
+          top-4
+          left-0
+          right-0
+          -z-10
+          h-full
+          w-[50%]
+          scale-90
+          transform
+          blur-xl
+          bg-gradient-to-r
+          from-pink-500
+          via-purple-500
+          to-pink-500
+          bg-[length:200%_200%]
+          animate-glow
+        "] (17:21-79:9)
+                    string ["relative flex items-center"] (17:21-17:49)
+                      " ["] (17:21-17:22)
+                      string_fragment [relative flex items-center] (17:22-17:48)
+                      " ["] (17:48-17:49)
+                    > [>] (17:49-17:50)
+                    type_assertion [<div className="relative w-[50%] flex items-center">
+          <input
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            className={`
+              w-[100%]
+              px-6
+              py-4
+              bg-white
+              rounded-lg
+              text-gray-700
+              transition-transform
+              duration-200
+              focus:outline-none
+              font-subheading
+              pr-12
+              ${className}
+            `}
+            placeholder={placeholder}
+            {...props}
+          />
+          <button
+            type="submit"
+            className="
+              absolute
+              right-3
+              p-2
+              text-gray-400
+              hover:text-gray-600
+              transition-colors
+              duration-200
+              focus:outline-none
+              flex
+              items-center
+              justify-center
+            "
+          >
+            <Send className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+      {/* Glow effect */}
+      <div
+        className="
+          absolute
+          top-4
+          left-0
+          right-0
+          -z-10
+          h-full
+          w-[50%]
+          scale-90
+          transform
+          blur-xl
+          bg-gradient-to-r
+          from-pink-500
+          via-purple-500
+          to-pink-500
+          bg-[length:200%_200%]
+          animate-glow
+        "] (18:8-79:9)
+                      type_arguments [<div] (18:8-18:12)
+                        < [<] (18:8-18:9)
+                        type_identifier [div] (18:9-18:12)
+                        > [] (18:12-18:12)
+                      assignment_expression [className="relative w-[50%] flex items-center">
+          <input
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            className={`
+              w-[100%]
+              px-6
+              py-4
+              bg-white
+              rounded-lg
+              text-gray-700
+              transition-transform
+              duration-200
+              focus:outline-none
+              font-subheading
+              pr-12
+              ${className}
+            `}
+            placeholder={placeholder}
+            {...props}
+          />
+          <button
+            type="submit"
+            className="
+              absolute
+              right-3
+              p-2
+              text-gray-400
+              hover:text-gray-600
+              transition-colors
+              duration-200
+              focus:outline-none
+              flex
+              items-center
+              justify-center
+            "
+          >
+            <Send className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+      {/* Glow effect */}
+      <div
+        className="
+          absolute
+          top-4
+          left-0
+          right-0
+          -z-10
+          h-full
+          w-[50%]
+          scale-90
+          transform
+          blur-xl
+          bg-gradient-to-r
+          from-pink-500
+          via-purple-500
+          to-pink-500
+          bg-[length:200%_200%]
+          animate-glow
+        "] (18:13-79:9)
+                        identifier [className] (18:13-18:22)
+                        = [=] (18:22-18:23)
+                        binary_expression ["relative w-[50%] flex items-center">
+          <input
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            className={`
+              w-[100%]
+              px-6
+              py-4
+              bg-white
+              rounded-lg
+              text-gray-700
+              transition-transform
+              duration-200
+              focus:outline-none
+              font-subheading
+              pr-12
+              ${className}
+            `}
+            placeholder={placeholder}
+            {...props}
+          />
+          <button
+            type="submit"
+            className="
+              absolute
+              right-3
+              p-2
+              text-gray-400
+              hover:text-gray-600
+              transition-colors
+              duration-200
+              focus:outline-none
+              flex
+              items-center
+              justify-center
+            "
+          >
+            <Send className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+      {/* Glow effect */}
+      <div
+        className="
+          absolute
+          top-4
+          left-0
+          right-0
+          -z-10
+          h-full
+          w-[50%]
+          scale-90
+          transform
+          blur-xl
+          bg-gradient-to-r
+          from-pink-500
+          via-purple-500
+          to-pink-500
+          bg-[length:200%_200%]
+          animate-glow
+        "] (18:23-79:9)
+                          string ["relative w-[50%] flex items-center"] (18:23-18:59)
+                            " ["] (18:23-18:24)
+                            string_fragment [relative w-[50%] flex items-center] (18:24-18:58)
+                            " ["] (18:58-18:59)
+                          > [>] (18:59-18:60)
+                          ERROR [<input
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            className={`
+              w-[100%]
+              px-6
+              py-4
+              bg-white
+              rounded-lg
+              text-gray-700
+              transition-transform
+              duration-200
+              focus:outline-none
+              font-subheading
+              pr-12
+              ${className}
+            `}
+            placeholder={placeholder}
+            {...props}
+          />
+          <button
+            type="submit"] (19:10-41:25)
+                            type_parameters [<input
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            className={`
+              w-[100%]
+              px-6
+              py-4
+              bg-white
+              rounded-lg
+              text-gray-700
+              transition-transform
+              duration-200
+              focus:outline-none
+              font-subheading
+              pr-12
+              ${className}
+            `}
+            placeholder={placeholder}
+            {...props}
+          />] (19:10-39:12)
+                              < [<] (19:10-19:11)
+                              type_parameter [input
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            className={`
+              w-[100%]
+              px-6
+              py-4
+              bg-white
+              rounded-lg
+              text-gray-700
+              transition-transform
+              duration-200
+              focus:outline-none
+              font-subheading
+              pr-12
+              ${className}
+            `] (19:11-36:13)
+                                type_identifier [input] (19:11-19:16)
+                                ERROR [type] (20:12-20:16)
+                                  identifier [type] (20:12-20:16)
+                                default_type [="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            className={`
+              w-[100%]
+              px-6
+              py-4
+              bg-white
+              rounded-lg
+              text-gray-700
+              transition-transform
+              duration-200
+              focus:outline-none
+              font-subheading
+              pr-12
+              ${className}
+            `] (20:16-36:13)
+                                  = [=] (20:16-20:17)
+                                  ERROR ["text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            className={] (20:17-23:23)
+                                    literal_type ["text"] (20:17-20:23)
+                                      string ["text"] (20:17-20:23)
+                                        " ["] (20:17-20:18)
+                                        string_fragment [text] (20:18-20:22)
+                                        " ["] (20:22-20:23)
+                                    identifier [value] (21:12-21:17)
+                                    = [=] (21:17-21:18)
+                                    { [{] (21:18-21:19)
+                                    identifier [inputValue] (21:19-21:29)
+                                    } [}] (21:29-21:30)
+                                    type_identifier [onChange] (22:12-22:20)
+                                    = [=] (22:20-22:21)
+                                    object_type [{(e) => setInputValue(e.target.value)}] (22:21-22:59)
+                                      { [{] (22:21-22:22)
+                                      ERROR [(e) =>] (22:22-22:28)
+                                        formal_parameters [(e)] (22:22-22:25)
+                                          ( [(] (22:22-22:23)
+                                          required_parameter [e] (22:23-22:24)
+                                            identifier [e] (22:23-22:24)
+                                          ) [)] (22:24-22:25)
+                                        => [=>] (22:26-22:28)
+                                      method_signature [setInputValue(e.target.value)] (22:29-22:58)
+                                        property_identifier [setInputValue] (22:29-22:42)
+                                        formal_parameters [(e.target.value)] (22:42-22:58)
+                                          ( [(] (22:42-22:43)
+                                          required_parameter [e.target.value] (22:43-22:57)
+                                            member_expression [e.target.value] (22:43-22:57)
+                                              member_expression [e.target] (22:43-22:51)
+                                                identifier [e] (22:43-22:44)
+                                                . [.] (22:44-22:45)
+                                                property_identifier [target] (22:45-22:51)
+                                              . [.] (22:51-22:52)
+                                              property_identifier [value] (22:52-22:57)
+                                          ) [)] (22:57-22:58)
+                                      } [}] (22:58-22:59)
+                                    identifier [className] (23:12-23:21)
+                                    = [=] (23:21-23:22)
+                                    { [{] (23:22-23:23)
+                                  template_literal_type [`
+              w-[100%]
+              px-6
+              py-4
+              bg-white
+              rounded-lg
+              text-gray-700
+              transition-transform
+              duration-200
+              focus:outline-none
+              font-subheading
+              pr-12
+              ${className}
+            `] (23:23-36:13)
+                                    ` [`] (23:23-23:24)
+                                    template_type [${className}] (35:14-35:26)
+                                      ${ [${] (35:14-35:16)
+                                      type_identifier [className] (35:16-35:25)
+                                      } [}] (35:25-35:26)
+                                    ` [`] (36:12-36:13)
+                              ERROR [}
+            placeholder={placeholder}
+            {...props}
+          /] (36:13-39:11)
+                                } [}] (36:13-36:14)
+                                identifier [placeholder] (37:12-37:23)
+                                = [=] (37:23-37:24)
+                                { [{] (37:24-37:25)
+                                identifier [placeholder] (37:25-37:36)
+                                } [}] (37:36-37:37)
+                                { [{] (38:12-38:13)
+                                ... [...] (38:13-38:16)
+                                identifier [props] (38:16-38:21)
+                                } [}] (38:21-38:22)
+                                / [/] (39:10-39:11)
+                              > [>] (39:11-39:12)
+                            < [<] (40:10-40:11)
+                            identifier [button] (40:11-40:17)
+                            type [type] (41:12-41:16)
+                            = [=] (41:16-41:17)
+                            " ["] (41:17-41:18)
+                            identifier [submit] (41:18-41:24)
+                            " ["] (41:24-41:25)
+                          assignment_expression [className="
+              absolute
+              right-3
+              p-2
+              text-gray-400
+              hover:text-gray-600
+              transition-colors
+              duration-200
+              focus:outline-none
+              flex
+              items-center
+              justify-center
+            "
+          >
+            <Send className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+      {/* Glow effect */}
+      <div
+        className="
+          absolute
+          top-4
+          left-0
+          right-0
+          -z-10
+          h-full
+          w-[50%]
+          scale-90
+          transform
+          blur-xl
+          bg-gradient-to-r
+          from-pink-500
+          via-purple-500
+          to-pink-500
+          bg-[length:200%_200%]
+          animate-glow
+        "] (42:12-79:9)
+                            identifier [className] (42:12-42:21)
+                            = [=] (42:21-42:22)
+                            binary_expression ["
+              absolute
+              right-3
+              p-2
+              text-gray-400
+              hover:text-gray-600
+              transition-colors
+              duration-200
+              focus:outline-none
+              flex
+              items-center
+              justify-center
+            "
+          >
+            <Send className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+      {/* Glow effect */}
+      <div
+        className="
+          absolute
+          top-4
+          left-0
+          right-0
+          -z-10
+          h-full
+          w-[50%]
+          scale-90
+          transform
+          blur-xl
+          bg-gradient-to-r
+          from-pink-500
+          via-purple-500
+          to-pink-500
+          bg-[length:200%_200%]
+          animate-glow
+        "] (42:22-79:9)
+                              string ["
+              absolute
+              right-3
+              p-2
+              text-gray-400
+              hover:text-gray-600
+              transition-colors
+              duration-200
+              focus:outline-none
+              flex
+              items-center
+              justify-center
+            "] (42:22-54:13)
+                                " ["] (42:22-42:23)
+                                string_fragment [
+              absolute
+              right-3
+              p-2
+              text-gray-400
+              hover:text-gray-600
+              transition-colors
+              duration-200
+              focus:outline-none
+              flex
+              items-center
+              justify-center
+            ] (42:23-54:12)
+                                " ["] (54:12-54:13)
+                              > [>] (55:10-55:11)
+                              type_assertion [<Send className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+      {/* Glow effect */}
+      <div
+        className="
+          absolute
+          top-4
+          left-0
+          right-0
+          -z-10
+          h-full
+          w-[50%]
+          scale-90
+          transform
+          blur-xl
+          bg-gradient-to-r
+          from-pink-500
+          via-purple-500
+          to-pink-500
+          bg-[length:200%_200%]
+          animate-glow
+        "] (56:12-79:9)
+                                type_arguments [<Send] (56:12-56:17)
+                                  < [<] (56:12-56:13)
+                                  type_identifier [Send] (56:13-56:17)
+                                  > [] (56:17-56:17)
+                                assignment_expression [className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+      {/* Glow effect */}
+      <div
+        className="
+          absolute
+          top-4
+          left-0
+          right-0
+          -z-10
+          h-full
+          w-[50%]
+          scale-90
+          transform
+          blur-xl
+          bg-gradient-to-r
+          from-pink-500
+          via-purple-500
+          to-pink-500
+          bg-[length:200%_200%]
+          animate-glow
+        "] (56:18-79:9)
+                                  identifier [className] (56:18-56:27)
+                                  = [=] (56:27-56:28)
+                                  binary_expression ["w-5 h-5" />
+          </button>
+        </div>
+      </div>
+      {/* Glow effect */}
+      <div
+        className="
+          absolute
+          top-4
+          left-0
+          right-0
+          -z-10
+          h-full
+          w-[50%]
+          scale-90
+          transform
+          blur-xl
+          bg-gradient-to-r
+          from-pink-500
+          via-purple-500
+          to-pink-500
+          bg-[length:200%_200%]
+          animate-glow
+        "] (56:28-79:9)
+                                    string ["w-5 h-5"] (56:28-56:37)
+                                      " ["] (56:28-56:29)
+                                      string_fragment [w-5 h-5] (56:29-56:36)
+                                      " ["] (56:36-56:37)
+                                    / [/] (56:38-56:39)
+                                    ERROR [>] (56:39-56:40)
+                                      > [>] (56:39-56:40)
+                                    type_assertion [</button>
+        </div>
+      </div>
+      {/* Glow effect */}
+      <div
+        className="
+          absolute
+          top-4
+          left-0
+          right-0
+          -z-10
+          h-full
+          w-[50%]
+          scale-90
+          transform
+          blur-xl
+          bg-gradient-to-r
+          from-pink-500
+          via-purple-500
+          to-pink-500
+          bg-[length:200%_200%]
+          animate-glow
+        "] (57:10-79:9)
+                                      type_arguments [</button>] (57:10-57:19)
+                                        < [<] (57:10-57:11)
+                                        ERROR [/] (57:11-57:12)
+                                          / [/] (57:11-57:12)
+                                        type_identifier [button] (57:12-57:18)
+                                        > [>] (57:18-57:19)
+                                      type_assertion [</div>
+      </div>
+      {/* Glow effect */}
+      <div
+        className="
+          absolute
+          top-4
+          left-0
+          right-0
+          -z-10
+          h-full
+          w-[50%]
+          scale-90
+          transform
+          blur-xl
+          bg-gradient-to-r
+          from-pink-500
+          via-purple-500
+          to-pink-500
+          bg-[length:200%_200%]
+          animate-glow
+        "] (58:8-79:9)
+                                        type_arguments [</div>] (58:8-58:14)
+                                          < [<] (58:8-58:9)
+                                          ERROR [/] (58:9-58:10)
+                                            / [/] (58:9-58:10)
+                                          type_identifier [div] (58:10-58:13)
+                                          > [>] (58:13-58:14)
+                                        type_assertion [</div>
+      {/* Glow effect */}
+      <div
+        className="
+          absolute
+          top-4
+          left-0
+          right-0
+          -z-10
+          h-full
+          w-[50%]
+          scale-90
+          transform
+          blur-xl
+          bg-gradient-to-r
+          from-pink-500
+          via-purple-500
+          to-pink-500
+          bg-[length:200%_200%]
+          animate-glow
+        "] (59:6-79:9)
+                                          type_arguments [</div>] (59:6-59:12)
+                                            < [<] (59:6-59:7)
+                                            ERROR [/] (59:7-59:8)
+                                              / [/] (59:7-59:8)
+                                            type_identifier [div] (59:8-59:11)
+                                            > [>] (59:11-59:12)
+                                          binary_expression [{/* Glow effect */}
+      <div
+        className="
+          absolute
+          top-4
+          left-0
+          right-0
+          -z-10
+          h-full
+          w-[50%]
+          scale-90
+          transform
+          blur-xl
+          bg-gradient-to-r
+          from-pink-500
+          via-purple-500
+          to-pink-500
+          bg-[length:200%_200%]
+          animate-glow
+        "] (60:6-79:9)
+                                            object [{/* Glow effect */}] (60:6-60:25)
+                                              { [{] (60:6-60:7)
+                                              comment [/* Glow effect */] (60:7-60:24)
+                                              } [}] (60:24-60:25)
+                                            < [<] (61:6-61:7)
+                                            ERROR [div] (61:7-61:10)
+                                              identifier [div] (61:7-61:10)
+                                            assignment_expression [className="
+          absolute
+          top-4
+          left-0
+          right-0
+          -z-10
+          h-full
+          w-[50%]
+          scale-90
+          transform
+          blur-xl
+          bg-gradient-to-r
+          from-pink-500
+          via-purple-500
+          to-pink-500
+          bg-[length:200%_200%]
+          animate-glow
+        "] (62:8-79:9)
+                                              identifier [className] (62:8-62:17)
+                                              = [=] (62:17-62:18)
+                                              string ["
+          absolute
+          top-4
+          left-0
+          right-0
+          -z-10
+          h-full
+          w-[50%]
+          scale-90
+          transform
+          blur-xl
+          bg-gradient-to-r
+          from-pink-500
+          via-purple-500
+          to-pink-500
+          bg-[length:200%_200%]
+          animate-glow
+        "] (62:18-79:9)
+                                                " ["] (62:18-62:19)
+                                                string_fragment [
+          absolute
+          top-4
+          left-0
+          right-0
+          -z-10
+          h-full
+          w-[50%]
+          scale-90
+          transform
+          blur-xl
+          bg-gradient-to-r
+          from-pink-500
+          via-purple-500
+          to-pink-500
+          bg-[length:200%_200%]
+          animate-glow
+        ] (62:19-79:8)
+                                                " ["] (79:8-79:9)
+              ERROR [/>
+    </form>] (80:6-81:11)
+                / [/] (80:6-80:7)
+                ERROR [>] (80:7-80:8)
+                  > [>] (80:7-80:8)
+                type_parameters [</form>] (81:4-81:11)
+                  < [<] (81:4-81:5)
+                  ERROR [/] (81:5-81:6)
+                    / [/] (81:5-81:6)
+                  type_parameter [form] (81:6-81:10)
+                    type_identifier [form] (81:6-81:10)
+                  > [>] (81:10-81:11)
+              ) [)] (82:2-82:3)
+            ; [;] (82:3-82:4)
+          } [}] (83:0-83:1)
+    ; [;] (83:1-83:2)
+  export_statement [export default GlowingInput;] (85:0-85:28)
+    export [export] (85:0-85:6)
+    default [default] (85:7-85:14)
+    identifier [GlowingInput] (85:15-85:27)
+    ; [;] (85:27-85:28)

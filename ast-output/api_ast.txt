@@ -1,0 +1,3285 @@
+AST for temp_dir\ARTGuru-AI-main\python_webscraper_integarted_with_astradb\api.py
+==================================================
+module [import os
+from typing import Optional, List
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+from dotenv import load_dotenv
+from youtube_astra_integrator import YouTubeAstraIntegrator
+from instagram_astra_integrator import InstagramAstraIntegrator
+from reddit_astra_integrator import RedditAstraIntegrator
+
+
+# Load environment variables
+load_dotenv()
+
+app = FastAPI(title="Social Media Data Scraper API")
+
+
+# Model classes
+class SearchRequest(BaseModel):
+    keyword: str
+    max_results: Optional[int] = 20
+
+
+class InstagramSearchRequest(BaseModel):
+    hashtag: str
+    amount: Optional[int] = 20
+
+
+class SearchResponse(BaseModel):
+    videos_stored: int
+    videos_failed: int
+    message: str
+
+
+class InstagramResponse(BaseModel):
+    posts_found: int
+    posts_stored: int
+    posts_failed: int
+    file_path: Optional[str]
+    message: str
+
+# Add new model
+class RedditSearchRequest(BaseModel):
+    topic: str
+    limit: Optional[int] = 5
+
+class RedditResponse(BaseModel):
+    posts_found: int
+    posts_stored: int
+    posts_failed: int
+    file_path: Optional[str]
+    message: str
+
+# Initialize credentials
+youtube_api_key = os.getenv('YOUTUBE_API_KEY')
+astra_token = os.getenv('ASTRA_DB_TOKEN')
+astra_endpoint = os.getenv('ASTRA_DB_API_ENDPOINT')
+instagram_username = os.getenv('INSTAGRAM_USERNAME')
+instagram_password = os.getenv('INSTAGRAM_PASSWORD')
+# Add to environment variables
+reddit_client_id = os.getenv('REDDIT_CLIENT_ID')
+reddit_client_secret = os.getenv('REDDIT_CLIENT_SECRET')
+reddit_user_agent = os.getenv('REDDIT_USER_AGENT')
+
+
+if not all([youtube_api_key, astra_token, astra_endpoint]):
+    raise Exception("Missing required environment variables")
+
+# Initialize services
+youtube_integrator = None
+instagram_integrator = None
+
+try:
+    youtube_integrator = YouTubeAstraIntegrator(
+        youtube_api_key=youtube_api_key,
+        astra_token=astra_token,
+        astra_endpoint=astra_endpoint,
+        collection_name="you"
+    )
+except Exception as e:
+    print(f"Error initializing YouTube integrator: {e}")
+
+try:
+    instagram_integrator = InstagramAstraIntegrator(
+        instagram_username=instagram_username,
+        instagram_password=instagram_password,
+        astra_token=astra_token,
+        astra_endpoint=astra_endpoint,
+        collection_name="you"
+    )
+except Exception as e:
+    print(f"Error initializing Instagram integrator: {e}")
+
+
+@app.post("/youtube/search", response_model=SearchResponse)
+async def search_youtube_videos(request: SearchRequest):
+    """
+    Search YouTube videos and store in AstraDB.
+    """
+    if not youtube_integrator:
+        raise HTTPException(status_code=500, detail="YouTube integrator not initialized")
+
+    try:
+        videos_stored = 0
+        videos_failed = 0
+
+        print(f"Searching for YouTube videos with keyword: {request.keyword}")
+
+        search_response = youtube_integrator.youtube.search().list(
+            q=request.keyword,
+            type='video',
+            part='id,snippet',
+            maxResults=request.max_results
+        ).execute()
+
+        video_ids = [item['id']['videoId'] for item in search_response.get('items', [])]
+
+        videos_response = youtube_integrator.youtube.videos().list(
+            part="snippet,statistics,contentDetails",
+            id=','.join(video_ids)
+        ).execute()
+
+        for video_data in videos_response.get('items', []):
+            try:
+                comments = youtube_integrator.get_video_comments(video_data['id'])
+
+                video_info = {
+                    'video_id': video_data['id'],
+                    'title': video_data['snippet']['title'],
+                    'description': video_data['snippet']['description'],
+                    'published_at': video_data['snippet']['publishedAt'],
+                    'channel_title': video_data['snippet']['channelTitle'],
+                    'view_count': int(video_data['statistics'].get('viewCount', 0)),
+                    'like_count': int(video_data['statistics'].get('likeCount', 0)),
+                    'comment_count': int(video_data['statistics'].get('commentCount', 0)),
+                    'comments': comments
+                }
+
+                document = youtube_integrator.prepare_document(video_info)
+                if document:
+                    try:
+                        youtube_integrator.collection.insert_one(document)
+                        videos_stored += 1
+                        print(f"Successfully stored video: {video_info['title']}")
+                    except Exception as store_error:
+                        videos_failed += 1
+                        print(f"Failed to store video in AstraDB: {store_error}")
+
+                youtube_integrator._save_data(video_info, f'video_{video_data["id"]}')
+
+            except Exception as e:
+                videos_failed += 1
+                print(f"Error processing video: {e}")
+
+        return SearchResponse(
+            videos_stored=videos_stored,
+            videos_failed=videos_failed,
+            message=f"YouTube search completed. Stored {videos_stored} videos, failed {videos_failed}"
+        )
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/instagram/search", response_model=InstagramResponse)
+async def search_instagram_posts(request: InstagramSearchRequest):
+    """
+    Search Instagram posts by hashtag and store in AstraDB.
+    """
+    if not instagram_integrator:
+        raise HTTPException(status_code=500, detail="Instagram integrator not initialized")
+
+    try:
+        results = instagram_integrator.search_and_store_hashtag_posts(
+            request.hashtag,
+            request.amount
+        )
+
+        return InstagramResponse(
+            posts_found=results['posts_found'],
+            posts_stored=results['posts_stored'],
+            posts_failed=results['posts_failed'],
+            file_path=results['file_path'],
+            message=f"Found {results['posts_found']} posts, stored {results['posts_stored']} in AstraDB, failed {results['posts_failed']}"
+        )
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# Add to service initialization
+reddit_integrator = None
+try:
+    reddit_integrator = RedditAstraIntegrator(
+        reddit_client_id=reddit_client_id,
+        reddit_client_secret=reddit_client_secret,
+        reddit_user_agent=reddit_user_agent,
+        astra_token=astra_token,
+        astra_endpoint=astra_endpoint,
+        collection_name="you"
+    )
+except Exception as e:
+    print(f"Error initializing Reddit integrator: {e}")
+
+
+# Add new endpoint
+@app.post("/reddit/search", response_model=RedditResponse)
+async def search_reddit_posts(request: RedditSearchRequest):
+    """
+    Search Reddit posts by topic and store in AstraDB.
+    """
+    if not reddit_integrator:
+        raise HTTPException(status_code=500, detail="Reddit integrator not initialized")
+
+    try:
+        results = reddit_integrator.search_and_store_posts(
+            request.topic,
+            request.limit
+        )
+
+        return RedditResponse(
+            posts_found=results['posts_found'],
+            posts_stored=results['posts_stored'],
+            posts_failed=results['posts_failed'],
+            file_path=results['file_path'],
+            message=f"Found {results['posts_found']} posts, stored {results['posts_stored']} in AstraDB, failed {results['posts_failed']}"
+        )
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# Update health check to include Reddit
+@app.get("/health")
+async def health_check():
+    return {
+        "youtube_status": "healthy" if youtube_integrator else "unhealthy",
+        "instagram_status": "healthy" if instagram_integrator else "unhealthy",
+        "reddit_status": "healthy" if reddit_integrator else "unhealthy",
+        "youtube_api": "configured" if youtube_api_key else "missing",
+        "astra_db": "configured" if astra_token and astra_endpoint else "missing",
+        "instagram_auth": "configured" if instagram_username and instagram_password else "missing",
+        "reddit_auth": "configured" if all([reddit_client_id, reddit_client_secret, reddit_user_agent]) else "missing"
+    }
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(app, host="0.0.0.0", port=8000)] (0:0-247:47)
+  import_statement [import os] (0:0-0:9)
+    import [import] (0:0-0:6)
+    dotted_name [os] (0:7-0:9)
+      identifier [os] (0:7-0:9)
+  import_from_statement [from typing import Optional, List] (1:0-1:33)
+    from [from] (1:0-1:4)
+    dotted_name [typing] (1:5-1:11)
+      identifier [typing] (1:5-1:11)
+    import [import] (1:12-1:18)
+    dotted_name [Optional] (1:19-1:27)
+      identifier [Optional] (1:19-1:27)
+    , [,] (1:27-1:28)
+    dotted_name [List] (1:29-1:33)
+      identifier [List] (1:29-1:33)
+  import_from_statement [from fastapi import FastAPI, HTTPException] (2:0-2:42)
+    from [from] (2:0-2:4)
+    dotted_name [fastapi] (2:5-2:12)
+      identifier [fastapi] (2:5-2:12)
+    import [import] (2:13-2:19)
+    dotted_name [FastAPI] (2:20-2:27)
+      identifier [FastAPI] (2:20-2:27)
+    , [,] (2:27-2:28)
+    dotted_name [HTTPException] (2:29-2:42)
+      identifier [HTTPException] (2:29-2:42)
+  import_from_statement [from pydantic import BaseModel] (3:0-3:30)
+    from [from] (3:0-3:4)
+    dotted_name [pydantic] (3:5-3:13)
+      identifier [pydantic] (3:5-3:13)
+    import [import] (3:14-3:20)
+    dotted_name [BaseModel] (3:21-3:30)
+      identifier [BaseModel] (3:21-3:30)
+  import_from_statement [from dotenv import load_dotenv] (4:0-4:30)
+    from [from] (4:0-4:4)
+    dotted_name [dotenv] (4:5-4:11)
+      identifier [dotenv] (4:5-4:11)
+    import [import] (4:12-4:18)
+    dotted_name [load_dotenv] (4:19-4:30)
+      identifier [load_dotenv] (4:19-4:30)
+  import_from_statement [from youtube_astra_integrator import YouTubeAstraIntegrator] (5:0-5:59)
+    from [from] (5:0-5:4)
+    dotted_name [youtube_astra_integrator] (5:5-5:29)
+      identifier [youtube_astra_integrator] (5:5-5:29)
+    import [import] (5:30-5:36)
+    dotted_name [YouTubeAstraIntegrator] (5:37-5:59)
+      identifier [YouTubeAstraIntegrator] (5:37-5:59)
+  import_from_statement [from instagram_astra_integrator import InstagramAstraIntegrator] (6:0-6:63)
+    from [from] (6:0-6:4)
+    dotted_name [instagram_astra_integrator] (6:5-6:31)
+      identifier [instagram_astra_integrator] (6:5-6:31)
+    import [import] (6:32-6:38)
+    dotted_name [InstagramAstraIntegrator] (6:39-6:63)
+      identifier [InstagramAstraIntegrator] (6:39-6:63)
+  import_from_statement [from reddit_astra_integrator import RedditAstraIntegrator] (7:0-7:57)
+    from [from] (7:0-7:4)
+    dotted_name [reddit_astra_integrator] (7:5-7:28)
+      identifier [reddit_astra_integrator] (7:5-7:28)
+    import [import] (7:29-7:35)
+    dotted_name [RedditAstraIntegrator] (7:36-7:57)
+      identifier [RedditAstraIntegrator] (7:36-7:57)
+  comment [# Load environment variables] (10:0-10:28)
+  expression_statement [load_dotenv()] (11:0-11:13)
+    call [load_dotenv()] (11:0-11:13)
+      identifier [load_dotenv] (11:0-11:11)
+      argument_list [()] (11:11-11:13)
+        ( [(] (11:11-11:12)
+        ) [)] (11:12-11:13)
+  expression_statement [app = FastAPI(title="Social Media Data Scraper API")] (13:0-13:52)
+    assignment [app = FastAPI(title="Social Media Data Scraper API")] (13:0-13:52)
+      identifier [app] (13:0-13:3)
+      = [=] (13:4-13:5)
+      call [FastAPI(title="Social Media Data Scraper API")] (13:6-13:52)
+        identifier [FastAPI] (13:6-13:13)
+        argument_list [(title="Social Media Data Scraper API")] (13:13-13:52)
+          ( [(] (13:13-13:14)
+          keyword_argument [title="Social Media Data Scraper API"] (13:14-13:51)
+            identifier [title] (13:14-13:19)
+            = [=] (13:19-13:20)
+            string ["Social Media Data Scraper API"] (13:20-13:51)
+              string_start ["] (13:20-13:21)
+              string_content [Social Media Data Scraper API] (13:21-13:50)
+              string_end ["] (13:50-13:51)
+          ) [)] (13:51-13:52)
+  comment [# Model classes] (16:0-16:15)
+  class_definition [class SearchRequest(BaseModel):
+    keyword: str
+    max_results: Optional[int] = 20] (17:0-19:35)
+    class [class] (17:0-17:5)
+    identifier [SearchRequest] (17:6-17:19)
+    argument_list [(BaseModel)] (17:19-17:30)
+      ( [(] (17:19-17:20)
+      identifier [BaseModel] (17:20-17:29)
+      ) [)] (17:29-17:30)
+    : [:] (17:30-17:31)
+    block [keyword: str
+    max_results: Optional[int] = 20] (18:4-19:35)
+      expression_statement [keyword: str] (18:4-18:16)
+        assignment [keyword: str] (18:4-18:16)
+          identifier [keyword] (18:4-18:11)
+          : [:] (18:11-18:12)
+          type [str] (18:13-18:16)
+            identifier [str] (18:13-18:16)
+      expression_statement [max_results: Optional[int] = 20] (19:4-19:35)
+        assignment [max_results: Optional[int] = 20] (19:4-19:35)
+          identifier [max_results] (19:4-19:15)
+          : [:] (19:15-19:16)
+          type [Optional[int]] (19:17-19:30)
+            generic_type [Optional[int]] (19:17-19:30)
+              identifier [Optional] (19:17-19:25)
+              type_parameter [[int]] (19:25-19:30)
+                [ [[] (19:25-19:26)
+                type [int] (19:26-19:29)
+                  identifier [int] (19:26-19:29)
+                ] []] (19:29-19:30)
+          = [=] (19:31-19:32)
+          integer [20] (19:33-19:35)
+  class_definition [class InstagramSearchRequest(BaseModel):
+    hashtag: str
+    amount: Optional[int] = 20] (22:0-24:30)
+    class [class] (22:0-22:5)
+    identifier [InstagramSearchRequest] (22:6-22:28)
+    argument_list [(BaseModel)] (22:28-22:39)
+      ( [(] (22:28-22:29)
+      identifier [BaseModel] (22:29-22:38)
+      ) [)] (22:38-22:39)
+    : [:] (22:39-22:40)
+    block [hashtag: str
+    amount: Optional[int] = 20] (23:4-24:30)
+      expression_statement [hashtag: str] (23:4-23:16)
+        assignment [hashtag: str] (23:4-23:16)
+          identifier [hashtag] (23:4-23:11)
+          : [:] (23:11-23:12)
+          type [str] (23:13-23:16)
+            identifier [str] (23:13-23:16)
+      expression_statement [amount: Optional[int] = 20] (24:4-24:30)
+        assignment [amount: Optional[int] = 20] (24:4-24:30)
+          identifier [amount] (24:4-24:10)
+          : [:] (24:10-24:11)
+          type [Optional[int]] (24:12-24:25)
+            generic_type [Optional[int]] (24:12-24:25)
+              identifier [Optional] (24:12-24:20)
+              type_parameter [[int]] (24:20-24:25)
+                [ [[] (24:20-24:21)
+                type [int] (24:21-24:24)
+                  identifier [int] (24:21-24:24)
+                ] []] (24:24-24:25)
+          = [=] (24:26-24:27)
+          integer [20] (24:28-24:30)
+  class_definition [class SearchResponse(BaseModel):
+    videos_stored: int
+    videos_failed: int
+    message: str] (27:0-30:16)
+    class [class] (27:0-27:5)
+    identifier [SearchResponse] (27:6-27:20)
+    argument_list [(BaseModel)] (27:20-27:31)
+      ( [(] (27:20-27:21)
+      identifier [BaseModel] (27:21-27:30)
+      ) [)] (27:30-27:31)
+    : [:] (27:31-27:32)
+    block [videos_stored: int
+    videos_failed: int
+    message: str] (28:4-30:16)
+      expression_statement [videos_stored: int] (28:4-28:22)
+        assignment [videos_stored: int] (28:4-28:22)
+          identifier [videos_stored] (28:4-28:17)
+          : [:] (28:17-28:18)
+          type [int] (28:19-28:22)
+            identifier [int] (28:19-28:22)
+      expression_statement [videos_failed: int] (29:4-29:22)
+        assignment [videos_failed: int] (29:4-29:22)
+          identifier [videos_failed] (29:4-29:17)
+          : [:] (29:17-29:18)
+          type [int] (29:19-29:22)
+            identifier [int] (29:19-29:22)
+      expression_statement [message: str] (30:4-30:16)
+        assignment [message: str] (30:4-30:16)
+          identifier [message] (30:4-30:11)
+          : [:] (30:11-30:12)
+          type [str] (30:13-30:16)
+            identifier [str] (30:13-30:16)
+  class_definition [class InstagramResponse(BaseModel):
+    posts_found: int
+    posts_stored: int
+    posts_failed: int
+    file_path: Optional[str]
+    message: str] (33:0-38:16)
+    class [class] (33:0-33:5)
+    identifier [InstagramResponse] (33:6-33:23)
+    argument_list [(BaseModel)] (33:23-33:34)
+      ( [(] (33:23-33:24)
+      identifier [BaseModel] (33:24-33:33)
+      ) [)] (33:33-33:34)
+    : [:] (33:34-33:35)
+    block [posts_found: int
+    posts_stored: int
+    posts_failed: int
+    file_path: Optional[str]
+    message: str] (34:4-38:16)
+      expression_statement [posts_found: int] (34:4-34:20)
+        assignment [posts_found: int] (34:4-34:20)
+          identifier [posts_found] (34:4-34:15)
+          : [:] (34:15-34:16)
+          type [int] (34:17-34:20)
+            identifier [int] (34:17-34:20)
+      expression_statement [posts_stored: int] (35:4-35:21)
+        assignment [posts_stored: int] (35:4-35:21)
+          identifier [posts_stored] (35:4-35:16)
+          : [:] (35:16-35:17)
+          type [int] (35:18-35:21)
+            identifier [int] (35:18-35:21)
+      expression_statement [posts_failed: int] (36:4-36:21)
+        assignment [posts_failed: int] (36:4-36:21)
+          identifier [posts_failed] (36:4-36:16)
+          : [:] (36:16-36:17)
+          type [int] (36:18-36:21)
+            identifier [int] (36:18-36:21)
+      expression_statement [file_path: Optional[str]] (37:4-37:28)
+        assignment [file_path: Optional[str]] (37:4-37:28)
+          identifier [file_path] (37:4-37:13)
+          : [:] (37:13-37:14)
+          type [Optional[str]] (37:15-37:28)
+            generic_type [Optional[str]] (37:15-37:28)
+              identifier [Optional] (37:15-37:23)
+              type_parameter [[str]] (37:23-37:28)
+                [ [[] (37:23-37:24)
+                type [str] (37:24-37:27)
+                  identifier [str] (37:24-37:27)
+                ] []] (37:27-37:28)
+      expression_statement [message: str] (38:4-38:16)
+        assignment [message: str] (38:4-38:16)
+          identifier [message] (38:4-38:11)
+          : [:] (38:11-38:12)
+          type [str] (38:13-38:16)
+            identifier [str] (38:13-38:16)
+  comment [# Add new model] (40:0-40:15)
+  class_definition [class RedditSearchRequest(BaseModel):
+    topic: str
+    limit: Optional[int] = 5] (41:0-43:28)
+    class [class] (41:0-41:5)
+    identifier [RedditSearchRequest] (41:6-41:25)
+    argument_list [(BaseModel)] (41:25-41:36)
+      ( [(] (41:25-41:26)
+      identifier [BaseModel] (41:26-41:35)
+      ) [)] (41:35-41:36)
+    : [:] (41:36-41:37)
+    block [topic: str
+    limit: Optional[int] = 5] (42:4-43:28)
+      expression_statement [topic: str] (42:4-42:14)
+        assignment [topic: str] (42:4-42:14)
+          identifier [topic] (42:4-42:9)
+          : [:] (42:9-42:10)
+          type [str] (42:11-42:14)
+            identifier [str] (42:11-42:14)
+      expression_statement [limit: Optional[int] = 5] (43:4-43:28)
+        assignment [limit: Optional[int] = 5] (43:4-43:28)
+          identifier [limit] (43:4-43:9)
+          : [:] (43:9-43:10)
+          type [Optional[int]] (43:11-43:24)
+            generic_type [Optional[int]] (43:11-43:24)
+              identifier [Optional] (43:11-43:19)
+              type_parameter [[int]] (43:19-43:24)
+                [ [[] (43:19-43:20)
+                type [int] (43:20-43:23)
+                  identifier [int] (43:20-43:23)
+                ] []] (43:23-43:24)
+          = [=] (43:25-43:26)
+          integer [5] (43:27-43:28)
+  class_definition [class RedditResponse(BaseModel):
+    posts_found: int
+    posts_stored: int
+    posts_failed: int
+    file_path: Optional[str]
+    message: str] (45:0-50:16)
+    class [class] (45:0-45:5)
+    identifier [RedditResponse] (45:6-45:20)
+    argument_list [(BaseModel)] (45:20-45:31)
+      ( [(] (45:20-45:21)
+      identifier [BaseModel] (45:21-45:30)
+      ) [)] (45:30-45:31)
+    : [:] (45:31-45:32)
+    block [posts_found: int
+    posts_stored: int
+    posts_failed: int
+    file_path: Optional[str]
+    message: str] (46:4-50:16)
+      expression_statement [posts_found: int] (46:4-46:20)
+        assignment [posts_found: int] (46:4-46:20)
+          identifier [posts_found] (46:4-46:15)
+          : [:] (46:15-46:16)
+          type [int] (46:17-46:20)
+            identifier [int] (46:17-46:20)
+      expression_statement [posts_stored: int] (47:4-47:21)
+        assignment [posts_stored: int] (47:4-47:21)
+          identifier [posts_stored] (47:4-47:16)
+          : [:] (47:16-47:17)
+          type [int] (47:18-47:21)
+            identifier [int] (47:18-47:21)
+      expression_statement [posts_failed: int] (48:4-48:21)
+        assignment [posts_failed: int] (48:4-48:21)
+          identifier [posts_failed] (48:4-48:16)
+          : [:] (48:16-48:17)
+          type [int] (48:18-48:21)
+            identifier [int] (48:18-48:21)
+      expression_statement [file_path: Optional[str]] (49:4-49:28)
+        assignment [file_path: Optional[str]] (49:4-49:28)
+          identifier [file_path] (49:4-49:13)
+          : [:] (49:13-49:14)
+          type [Optional[str]] (49:15-49:28)
+            generic_type [Optional[str]] (49:15-49:28)
+              identifier [Optional] (49:15-49:23)
+              type_parameter [[str]] (49:23-49:28)
+                [ [[] (49:23-49:24)
+                type [str] (49:24-49:27)
+                  identifier [str] (49:24-49:27)
+                ] []] (49:27-49:28)
+      expression_statement [message: str] (50:4-50:16)
+        assignment [message: str] (50:4-50:16)
+          identifier [message] (50:4-50:11)
+          : [:] (50:11-50:12)
+          type [str] (50:13-50:16)
+            identifier [str] (50:13-50:16)
+  comment [# Initialize credentials] (52:0-52:24)
+  expression_statement [youtube_api_key = os.getenv('YOUTUBE_API_KEY')] (53:0-53:46)
+    assignment [youtube_api_key = os.getenv('YOUTUBE_API_KEY')] (53:0-53:46)
+      identifier [youtube_api_key] (53:0-53:15)
+      = [=] (53:16-53:17)
+      call [os.getenv('YOUTUBE_API_KEY')] (53:18-53:46)
+        attribute [os.getenv] (53:18-53:27)
+          identifier [os] (53:18-53:20)
+          . [.] (53:20-53:21)
+          identifier [getenv] (53:21-53:27)
+        argument_list [('YOUTUBE_API_KEY')] (53:27-53:46)
+          ( [(] (53:27-53:28)
+          string ['YOUTUBE_API_KEY'] (53:28-53:45)
+            string_start ['] (53:28-53:29)
+            string_content [YOUTUBE_API_KEY] (53:29-53:44)
+            string_end ['] (53:44-53:45)
+          ) [)] (53:45-53:46)
+  expression_statement [astra_token = os.getenv('ASTRA_DB_TOKEN')] (54:0-54:41)
+    assignment [astra_token = os.getenv('ASTRA_DB_TOKEN')] (54:0-54:41)
+      identifier [astra_token] (54:0-54:11)
+      = [=] (54:12-54:13)
+      call [os.getenv('ASTRA_DB_TOKEN')] (54:14-54:41)
+        attribute [os.getenv] (54:14-54:23)
+          identifier [os] (54:14-54:16)
+          . [.] (54:16-54:17)
+          identifier [getenv] (54:17-54:23)
+        argument_list [('ASTRA_DB_TOKEN')] (54:23-54:41)
+          ( [(] (54:23-54:24)
+          string ['ASTRA_DB_TOKEN'] (54:24-54:40)
+            string_start ['] (54:24-54:25)
+            string_content [ASTRA_DB_TOKEN] (54:25-54:39)
+            string_end ['] (54:39-54:40)
+          ) [)] (54:40-54:41)
+  expression_statement [astra_endpoint = os.getenv('ASTRA_DB_API_ENDPOINT')] (55:0-55:51)
+    assignment [astra_endpoint = os.getenv('ASTRA_DB_API_ENDPOINT')] (55:0-55:51)
+      identifier [astra_endpoint] (55:0-55:14)
+      = [=] (55:15-55:16)
+      call [os.getenv('ASTRA_DB_API_ENDPOINT')] (55:17-55:51)
+        attribute [os.getenv] (55:17-55:26)
+          identifier [os] (55:17-55:19)
+          . [.] (55:19-55:20)
+          identifier [getenv] (55:20-55:26)
+        argument_list [('ASTRA_DB_API_ENDPOINT')] (55:26-55:51)
+          ( [(] (55:26-55:27)
+          string ['ASTRA_DB_API_ENDPOINT'] (55:27-55:50)
+            string_start ['] (55:27-55:28)
+            string_content [ASTRA_DB_API_ENDPOINT] (55:28-55:49)
+            string_end ['] (55:49-55:50)
+          ) [)] (55:50-55:51)
+  expression_statement [instagram_username = os.getenv('INSTAGRAM_USERNAME')] (56:0-56:52)
+    assignment [instagram_username = os.getenv('INSTAGRAM_USERNAME')] (56:0-56:52)
+      identifier [instagram_username] (56:0-56:18)
+      = [=] (56:19-56:20)
+      call [os.getenv('INSTAGRAM_USERNAME')] (56:21-56:52)
+        attribute [os.getenv] (56:21-56:30)
+          identifier [os] (56:21-56:23)
+          . [.] (56:23-56:24)
+          identifier [getenv] (56:24-56:30)
+        argument_list [('INSTAGRAM_USERNAME')] (56:30-56:52)
+          ( [(] (56:30-56:31)
+          string ['INSTAGRAM_USERNAME'] (56:31-56:51)
+            string_start ['] (56:31-56:32)
+            string_content [INSTAGRAM_USERNAME] (56:32-56:50)
+            string_end ['] (56:50-56:51)
+          ) [)] (56:51-56:52)
+  expression_statement [instagram_password = os.getenv('INSTAGRAM_PASSWORD')] (57:0-57:52)
+    assignment [instagram_password = os.getenv('INSTAGRAM_PASSWORD')] (57:0-57:52)
+      identifier [instagram_password] (57:0-57:18)
+      = [=] (57:19-57:20)
+      call [os.getenv('INSTAGRAM_PASSWORD')] (57:21-57:52)
+        attribute [os.getenv] (57:21-57:30)
+          identifier [os] (57:21-57:23)
+          . [.] (57:23-57:24)
+          identifier [getenv] (57:24-57:30)
+        argument_list [('INSTAGRAM_PASSWORD')] (57:30-57:52)
+          ( [(] (57:30-57:31)
+          string ['INSTAGRAM_PASSWORD'] (57:31-57:51)
+            string_start ['] (57:31-57:32)
+            string_content [INSTAGRAM_PASSWORD] (57:32-57:50)
+            string_end ['] (57:50-57:51)
+          ) [)] (57:51-57:52)
+  comment [# Add to environment variables] (58:0-58:30)
+  expression_statement [reddit_client_id = os.getenv('REDDIT_CLIENT_ID')] (59:0-59:48)
+    assignment [reddit_client_id = os.getenv('REDDIT_CLIENT_ID')] (59:0-59:48)
+      identifier [reddit_client_id] (59:0-59:16)
+      = [=] (59:17-59:18)
+      call [os.getenv('REDDIT_CLIENT_ID')] (59:19-59:48)
+        attribute [os.getenv] (59:19-59:28)
+          identifier [os] (59:19-59:21)
+          . [.] (59:21-59:22)
+          identifier [getenv] (59:22-59:28)
+        argument_list [('REDDIT_CLIENT_ID')] (59:28-59:48)
+          ( [(] (59:28-59:29)
+          string ['REDDIT_CLIENT_ID'] (59:29-59:47)
+            string_start ['] (59:29-59:30)
+            string_content [REDDIT_CLIENT_ID] (59:30-59:46)
+            string_end ['] (59:46-59:47)
+          ) [)] (59:47-59:48)
+  expression_statement [reddit_client_secret = os.getenv('REDDIT_CLIENT_SECRET')] (60:0-60:56)
+    assignment [reddit_client_secret = os.getenv('REDDIT_CLIENT_SECRET')] (60:0-60:56)
+      identifier [reddit_client_secret] (60:0-60:20)
+      = [=] (60:21-60:22)
+      call [os.getenv('REDDIT_CLIENT_SECRET')] (60:23-60:56)
+        attribute [os.getenv] (60:23-60:32)
+          identifier [os] (60:23-60:25)
+          . [.] (60:25-60:26)
+          identifier [getenv] (60:26-60:32)
+        argument_list [('REDDIT_CLIENT_SECRET')] (60:32-60:56)
+          ( [(] (60:32-60:33)
+          string ['REDDIT_CLIENT_SECRET'] (60:33-60:55)
+            string_start ['] (60:33-60:34)
+            string_content [REDDIT_CLIENT_SECRET] (60:34-60:54)
+            string_end ['] (60:54-60:55)
+          ) [)] (60:55-60:56)
+  expression_statement [reddit_user_agent = os.getenv('REDDIT_USER_AGENT')] (61:0-61:50)
+    assignment [reddit_user_agent = os.getenv('REDDIT_USER_AGENT')] (61:0-61:50)
+      identifier [reddit_user_agent] (61:0-61:17)
+      = [=] (61:18-61:19)
+      call [os.getenv('REDDIT_USER_AGENT')] (61:20-61:50)
+        attribute [os.getenv] (61:20-61:29)
+          identifier [os] (61:20-61:22)
+          . [.] (61:22-61:23)
+          identifier [getenv] (61:23-61:29)
+        argument_list [('REDDIT_USER_AGENT')] (61:29-61:50)
+          ( [(] (61:29-61:30)
+          string ['REDDIT_USER_AGENT'] (61:30-61:49)
+            string_start ['] (61:30-61:31)
+            string_content [REDDIT_USER_AGENT] (61:31-61:48)
+            string_end ['] (61:48-61:49)
+          ) [)] (61:49-61:50)
+  if_statement [if not all([youtube_api_key, astra_token, astra_endpoint]):
+    raise Exception("Missing required environment variables")] (64:0-65:61)
+    if [if] (64:0-64:2)
+    not_operator [not all([youtube_api_key, astra_token, astra_endpoint])] (64:3-64:58)
+      not [not] (64:3-64:6)
+      call [all([youtube_api_key, astra_token, astra_endpoint])] (64:7-64:58)
+        identifier [all] (64:7-64:10)
+        argument_list [([youtube_api_key, astra_token, astra_endpoint])] (64:10-64:58)
+          ( [(] (64:10-64:11)
+          list [[youtube_api_key, astra_token, astra_endpoint]] (64:11-64:57)
+            [ [[] (64:11-64:12)
+            identifier [youtube_api_key] (64:12-64:27)
+            , [,] (64:27-64:28)
+            identifier [astra_token] (64:29-64:40)
+            , [,] (64:40-64:41)
+            identifier [astra_endpoint] (64:42-64:56)
+            ] []] (64:56-64:57)
+          ) [)] (64:57-64:58)
+    : [:] (64:58-64:59)
+    block [raise Exception("Missing required environment variables")] (65:4-65:61)
+      raise_statement [raise Exception("Missing required environment variables")] (65:4-65:61)
+        raise [raise] (65:4-65:9)
+        call [Exception("Missing required environment variables")] (65:10-65:61)
+          identifier [Exception] (65:10-65:19)
+          argument_list [("Missing required environment variables")] (65:19-65:61)
+            ( [(] (65:19-65:20)
+            string ["Missing required environment variables"] (65:20-65:60)
+              string_start ["] (65:20-65:21)
+              string_content [Missing required environment variables] (65:21-65:59)
+              string_end ["] (65:59-65:60)
+            ) [)] (65:60-65:61)
+  comment [# Initialize services] (67:0-67:21)
+  expression_statement [youtube_integrator = None] (68:0-68:25)
+    assignment [youtube_integrator = None] (68:0-68:25)
+      identifier [youtube_integrator] (68:0-68:18)
+      = [=] (68:19-68:20)
+      none [None] (68:21-68:25)
+  expression_statement [instagram_integrator = None] (69:0-69:27)
+    assignment [instagram_integrator = None] (69:0-69:27)
+      identifier [instagram_integrator] (69:0-69:20)
+      = [=] (69:21-69:22)
+      none [None] (69:23-69:27)
+  try_statement [try:
+    youtube_integrator = YouTubeAstraIntegrator(
+        youtube_api_key=youtube_api_key,
+        astra_token=astra_token,
+        astra_endpoint=astra_endpoint,
+        collection_name="you"
+    )
+except Exception as e:
+    print(f"Error initializing YouTube integrator: {e}")] (71:0-79:56)
+    try [try] (71:0-71:3)
+    : [:] (71:3-71:4)
+    block [youtube_integrator = YouTubeAstraIntegrator(
+        youtube_api_key=youtube_api_key,
+        astra_token=astra_token,
+        astra_endpoint=astra_endpoint,
+        collection_name="you"
+    )] (72:4-77:5)
+      expression_statement [youtube_integrator = YouTubeAstraIntegrator(
+        youtube_api_key=youtube_api_key,
+        astra_token=astra_token,
+        astra_endpoint=astra_endpoint,
+        collection_name="you"
+    )] (72:4-77:5)
+        assignment [youtube_integrator = YouTubeAstraIntegrator(
+        youtube_api_key=youtube_api_key,
+        astra_token=astra_token,
+        astra_endpoint=astra_endpoint,
+        collection_name="you"
+    )] (72:4-77:5)
+          identifier [youtube_integrator] (72:4-72:22)
+          = [=] (72:23-72:24)
+          call [YouTubeAstraIntegrator(
+        youtube_api_key=youtube_api_key,
+        astra_token=astra_token,
+        astra_endpoint=astra_endpoint,
+        collection_name="you"
+    )] (72:25-77:5)
+            identifier [YouTubeAstraIntegrator] (72:25-72:47)
+            argument_list [(
+        youtube_api_key=youtube_api_key,
+        astra_token=astra_token,
+        astra_endpoint=astra_endpoint,
+        collection_name="you"
+    )] (72:47-77:5)
+              ( [(] (72:47-72:48)
+              keyword_argument [youtube_api_key=youtube_api_key] (73:8-73:39)
+                identifier [youtube_api_key] (73:8-73:23)
+                = [=] (73:23-73:24)
+                identifier [youtube_api_key] (73:24-73:39)
+              , [,] (73:39-73:40)
+              keyword_argument [astra_token=astra_token] (74:8-74:31)
+                identifier [astra_token] (74:8-74:19)
+                = [=] (74:19-74:20)
+                identifier [astra_token] (74:20-74:31)
+              , [,] (74:31-74:32)
+              keyword_argument [astra_endpoint=astra_endpoint] (75:8-75:37)
+                identifier [astra_endpoint] (75:8-75:22)
+                = [=] (75:22-75:23)
+                identifier [astra_endpoint] (75:23-75:37)
+              , [,] (75:37-75:38)
+              keyword_argument [collection_name="you"] (76:8-76:29)
+                identifier [collection_name] (76:8-76:23)
+                = [=] (76:23-76:24)
+                string ["you"] (76:24-76:29)
+                  string_start ["] (76:24-76:25)
+                  string_content [you] (76:25-76:28)
+                  string_end ["] (76:28-76:29)
+              ) [)] (77:4-77:5)
+    except_clause [except Exception as e:
+    print(f"Error initializing YouTube integrator: {e}")] (78:0-79:56)
+      except [except] (78:0-78:6)
+      as_pattern [Exception as e] (78:7-78:21)
+        identifier [Exception] (78:7-78:16)
+        as [as] (78:17-78:19)
+        as_pattern_target [e] (78:20-78:21)
+          identifier [e] (78:20-78:21)
+      : [:] (78:21-78:22)
+      block [print(f"Error initializing YouTube integrator: {e}")] (79:4-79:56)
+        expression_statement [print(f"Error initializing YouTube integrator: {e}")] (79:4-79:56)
+          call [print(f"Error initializing YouTube integrator: {e}")] (79:4-79:56)
+            identifier [print] (79:4-79:9)
+            argument_list [(f"Error initializing YouTube integrator: {e}")] (79:9-79:56)
+              ( [(] (79:9-79:10)
+              string [f"Error initializing YouTube integrator: {e}"] (79:10-79:55)
+                string_start [f"] (79:10-79:12)
+                string_content [Error initializing YouTube integrator: ] (79:12-79:51)
+                interpolation [{e}] (79:51-79:54)
+                  { [{] (79:51-79:52)
+                  identifier [e] (79:52-79:53)
+                  } [}] (79:53-79:54)
+                string_end ["] (79:54-79:55)
+              ) [)] (79:55-79:56)
+  try_statement [try:
+    instagram_integrator = InstagramAstraIntegrator(
+        instagram_username=instagram_username,
+        instagram_password=instagram_password,
+        astra_token=astra_token,
+        astra_endpoint=astra_endpoint,
+        collection_name="you"
+    )
+except Exception as e:
+    print(f"Error initializing Instagram integrator: {e}")] (81:0-90:58)
+    try [try] (81:0-81:3)
+    : [:] (81:3-81:4)
+    block [instagram_integrator = InstagramAstraIntegrator(
+        instagram_username=instagram_username,
+        instagram_password=instagram_password,
+        astra_token=astra_token,
+        astra_endpoint=astra_endpoint,
+        collection_name="you"
+    )] (82:4-88:5)
+      expression_statement [instagram_integrator = InstagramAstraIntegrator(
+        instagram_username=instagram_username,
+        instagram_password=instagram_password,
+        astra_token=astra_token,
+        astra_endpoint=astra_endpoint,
+        collection_name="you"
+    )] (82:4-88:5)
+        assignment [instagram_integrator = InstagramAstraIntegrator(
+        instagram_username=instagram_username,
+        instagram_password=instagram_password,
+        astra_token=astra_token,
+        astra_endpoint=astra_endpoint,
+        collection_name="you"
+    )] (82:4-88:5)
+          identifier [instagram_integrator] (82:4-82:24)
+          = [=] (82:25-82:26)
+          call [InstagramAstraIntegrator(
+        instagram_username=instagram_username,
+        instagram_password=instagram_password,
+        astra_token=astra_token,
+        astra_endpoint=astra_endpoint,
+        collection_name="you"
+    )] (82:27-88:5)
+            identifier [InstagramAstraIntegrator] (82:27-82:51)
+            argument_list [(
+        instagram_username=instagram_username,
+        instagram_password=instagram_password,
+        astra_token=astra_token,
+        astra_endpoint=astra_endpoint,
+        collection_name="you"
+    )] (82:51-88:5)
+              ( [(] (82:51-82:52)
+              keyword_argument [instagram_username=instagram_username] (83:8-83:45)
+                identifier [instagram_username] (83:8-83:26)
+                = [=] (83:26-83:27)
+                identifier [instagram_username] (83:27-83:45)
+              , [,] (83:45-83:46)
+              keyword_argument [instagram_password=instagram_password] (84:8-84:45)
+                identifier [instagram_password] (84:8-84:26)
+                = [=] (84:26-84:27)
+                identifier [instagram_password] (84:27-84:45)
+              , [,] (84:45-84:46)
+              keyword_argument [astra_token=astra_token] (85:8-85:31)
+                identifier [astra_token] (85:8-85:19)
+                = [=] (85:19-85:20)
+                identifier [astra_token] (85:20-85:31)
+              , [,] (85:31-85:32)
+              keyword_argument [astra_endpoint=astra_endpoint] (86:8-86:37)
+                identifier [astra_endpoint] (86:8-86:22)
+                = [=] (86:22-86:23)
+                identifier [astra_endpoint] (86:23-86:37)
+              , [,] (86:37-86:38)
+              keyword_argument [collection_name="you"] (87:8-87:29)
+                identifier [collection_name] (87:8-87:23)
+                = [=] (87:23-87:24)
+                string ["you"] (87:24-87:29)
+                  string_start ["] (87:24-87:25)
+                  string_content [you] (87:25-87:28)
+                  string_end ["] (87:28-87:29)
+              ) [)] (88:4-88:5)
+    except_clause [except Exception as e:
+    print(f"Error initializing Instagram integrator: {e}")] (89:0-90:58)
+      except [except] (89:0-89:6)
+      as_pattern [Exception as e] (89:7-89:21)
+        identifier [Exception] (89:7-89:16)
+        as [as] (89:17-89:19)
+        as_pattern_target [e] (89:20-89:21)
+          identifier [e] (89:20-89:21)
+      : [:] (89:21-89:22)
+      block [print(f"Error initializing Instagram integrator: {e}")] (90:4-90:58)
+        expression_statement [print(f"Error initializing Instagram integrator: {e}")] (90:4-90:58)
+          call [print(f"Error initializing Instagram integrator: {e}")] (90:4-90:58)
+            identifier [print] (90:4-90:9)
+            argument_list [(f"Error initializing Instagram integrator: {e}")] (90:9-90:58)
+              ( [(] (90:9-90:10)
+              string [f"Error initializing Instagram integrator: {e}"] (90:10-90:57)
+                string_start [f"] (90:10-90:12)
+                string_content [Error initializing Instagram integrator: ] (90:12-90:53)
+                interpolation [{e}] (90:53-90:56)
+                  { [{] (90:53-90:54)
+                  identifier [e] (90:54-90:55)
+                  } [}] (90:55-90:56)
+                string_end ["] (90:56-90:57)
+              ) [)] (90:57-90:58)
+  decorated_definition [@app.post("/youtube/search", response_model=SearchResponse)
+async def search_youtube_videos(request: SearchRequest):
+    """
+    Search YouTube videos and store in AstraDB.
+    """
+    if not youtube_integrator:
+        raise HTTPException(status_code=500, detail="YouTube integrator not initialized")
+
+    try:
+        videos_stored = 0
+        videos_failed = 0
+
+        print(f"Searching for YouTube videos with keyword: {request.keyword}")
+
+        search_response = youtube_integrator.youtube.search().list(
+            q=request.keyword,
+            type='video',
+            part='id,snippet',
+            maxResults=request.max_results
+        ).execute()
+
+        video_ids = [item['id']['videoId'] for item in search_response.get('items', [])]
+
+        videos_response = youtube_integrator.youtube.videos().list(
+            part="snippet,statistics,contentDetails",
+            id=','.join(video_ids)
+        ).execute()
+
+        for video_data in videos_response.get('items', []):
+            try:
+                comments = youtube_integrator.get_video_comments(video_data['id'])
+
+                video_info = {
+                    'video_id': video_data['id'],
+                    'title': video_data['snippet']['title'],
+                    'description': video_data['snippet']['description'],
+                    'published_at': video_data['snippet']['publishedAt'],
+                    'channel_title': video_data['snippet']['channelTitle'],
+                    'view_count': int(video_data['statistics'].get('viewCount', 0)),
+                    'like_count': int(video_data['statistics'].get('likeCount', 0)),
+                    'comment_count': int(video_data['statistics'].get('commentCount', 0)),
+                    'comments': comments
+                }
+
+                document = youtube_integrator.prepare_document(video_info)
+                if document:
+                    try:
+                        youtube_integrator.collection.insert_one(document)
+                        videos_stored += 1
+                        print(f"Successfully stored video: {video_info['title']}")
+                    except Exception as store_error:
+                        videos_failed += 1
+                        print(f"Failed to store video in AstraDB: {store_error}")
+
+                youtube_integrator._save_data(video_info, f'video_{video_data["id"]}')
+
+            except Exception as e:
+                videos_failed += 1
+                print(f"Error processing video: {e}")
+
+        return SearchResponse(
+            videos_stored=videos_stored,
+            videos_failed=videos_failed,
+            message=f"YouTube search completed. Stored {videos_stored} videos, failed {videos_failed}"
+        )
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))] (93:0-160:59)
+    decorator [@app.post("/youtube/search", response_model=SearchResponse)] (93:0-93:59)
+      @ [@] (93:0-93:1)
+      call [app.post("/youtube/search", response_model=SearchResponse)] (93:1-93:59)
+        attribute [app.post] (93:1-93:9)
+          identifier [app] (93:1-93:4)
+          . [.] (93:4-93:5)
+          identifier [post] (93:5-93:9)
+        argument_list [("/youtube/search", response_model=SearchResponse)] (93:9-93:59)
+          ( [(] (93:9-93:10)
+          string ["/youtube/search"] (93:10-93:27)
+            string_start ["] (93:10-93:11)
+            string_content [/youtube/search] (93:11-93:26)
+            string_end ["] (93:26-93:27)
+          , [,] (93:27-93:28)
+          keyword_argument [response_model=SearchResponse] (93:29-93:58)
+            identifier [response_model] (93:29-93:43)
+            = [=] (93:43-93:44)
+            identifier [SearchResponse] (93:44-93:58)
+          ) [)] (93:58-93:59)
+    function_definition [async def search_youtube_videos(request: SearchRequest):
+    """
+    Search YouTube videos and store in AstraDB.
+    """
+    if not youtube_integrator:
+        raise HTTPException(status_code=500, detail="YouTube integrator not initialized")
+
+    try:
+        videos_stored = 0
+        videos_failed = 0
+
+        print(f"Searching for YouTube videos with keyword: {request.keyword}")
+
+        search_response = youtube_integrator.youtube.search().list(
+            q=request.keyword,
+            type='video',
+            part='id,snippet',
+            maxResults=request.max_results
+        ).execute()
+
+        video_ids = [item['id']['videoId'] for item in search_response.get('items', [])]
+
+        videos_response = youtube_integrator.youtube.videos().list(
+            part="snippet,statistics,contentDetails",
+            id=','.join(video_ids)
+        ).execute()
+
+        for video_data in videos_response.get('items', []):
+            try:
+                comments = youtube_integrator.get_video_comments(video_data['id'])
+
+                video_info = {
+                    'video_id': video_data['id'],
+                    'title': video_data['snippet']['title'],
+                    'description': video_data['snippet']['description'],
+                    'published_at': video_data['snippet']['publishedAt'],
+                    'channel_title': video_data['snippet']['channelTitle'],
+                    'view_count': int(video_data['statistics'].get('viewCount', 0)),
+                    'like_count': int(video_data['statistics'].get('likeCount', 0)),
+                    'comment_count': int(video_data['statistics'].get('commentCount', 0)),
+                    'comments': comments
+                }
+
+                document = youtube_integrator.prepare_document(video_info)
+                if document:
+                    try:
+                        youtube_integrator.collection.insert_one(document)
+                        videos_stored += 1
+                        print(f"Successfully stored video: {video_info['title']}")
+                    except Exception as store_error:
+                        videos_failed += 1
+                        print(f"Failed to store video in AstraDB: {store_error}")
+
+                youtube_integrator._save_data(video_info, f'video_{video_data["id"]}')
+
+            except Exception as e:
+                videos_failed += 1
+                print(f"Error processing video: {e}")
+
+        return SearchResponse(
+            videos_stored=videos_stored,
+            videos_failed=videos_failed,
+            message=f"YouTube search completed. Stored {videos_stored} videos, failed {videos_failed}"
+        )
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))] (94:0-160:59)
+      async [async] (94:0-94:5)
+      def [def] (94:6-94:9)
+      identifier [search_youtube_videos] (94:10-94:31)
+      parameters [(request: SearchRequest)] (94:31-94:55)
+        ( [(] (94:31-94:32)
+        typed_parameter [request: SearchRequest] (94:32-94:54)
+          identifier [request] (94:32-94:39)
+          : [:] (94:39-94:40)
+          type [SearchRequest] (94:41-94:54)
+            identifier [SearchRequest] (94:41-94:54)
+        ) [)] (94:54-94:55)
+      : [:] (94:55-94:56)
+      block ["""
+    Search YouTube videos and store in AstraDB.
+    """
+    if not youtube_integrator:
+        raise HTTPException(status_code=500, detail="YouTube integrator not initialized")
+
+    try:
+        videos_stored = 0
+        videos_failed = 0
+
+        print(f"Searching for YouTube videos with keyword: {request.keyword}")
+
+        search_response = youtube_integrator.youtube.search().list(
+            q=request.keyword,
+            type='video',
+            part='id,snippet',
+            maxResults=request.max_results
+        ).execute()
+
+        video_ids = [item['id']['videoId'] for item in search_response.get('items', [])]
+
+        videos_response = youtube_integrator.youtube.videos().list(
+            part="snippet,statistics,contentDetails",
+            id=','.join(video_ids)
+        ).execute()
+
+        for video_data in videos_response.get('items', []):
+            try:
+                comments = youtube_integrator.get_video_comments(video_data['id'])
+
+                video_info = {
+                    'video_id': video_data['id'],
+                    'title': video_data['snippet']['title'],
+                    'description': video_data['snippet']['description'],
+                    'published_at': video_data['snippet']['publishedAt'],
+                    'channel_title': video_data['snippet']['channelTitle'],
+                    'view_count': int(video_data['statistics'].get('viewCount', 0)),
+                    'like_count': int(video_data['statistics'].get('likeCount', 0)),
+                    'comment_count': int(video_data['statistics'].get('commentCount', 0)),
+                    'comments': comments
+                }
+
+                document = youtube_integrator.prepare_document(video_info)
+                if document:
+                    try:
+                        youtube_integrator.collection.insert_one(document)
+                        videos_stored += 1
+                        print(f"Successfully stored video: {video_info['title']}")
+                    except Exception as store_error:
+                        videos_failed += 1
+                        print(f"Failed to store video in AstraDB: {store_error}")
+
+                youtube_integrator._save_data(video_info, f'video_{video_data["id"]}')
+
+            except Exception as e:
+                videos_failed += 1
+                print(f"Error processing video: {e}")
+
+        return SearchResponse(
+            videos_stored=videos_stored,
+            videos_failed=videos_failed,
+            message=f"YouTube search completed. Stored {videos_stored} videos, failed {videos_failed}"
+        )
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))] (95:4-160:59)
+        expression_statement ["""
+    Search YouTube videos and store in AstraDB.
+    """] (95:4-97:7)
+          string ["""
+    Search YouTube videos and store in AstraDB.
+    """] (95:4-97:7)
+            string_start ["""] (95:4-95:7)
+            string_content [
+    Search YouTube videos and store in AstraDB.
+    ] (95:7-97:4)
+            string_end ["""] (97:4-97:7)
+        if_statement [if not youtube_integrator:
+        raise HTTPException(status_code=500, detail="YouTube integrator not initialized")] (98:4-99:89)
+          if [if] (98:4-98:6)
+          not_operator [not youtube_integrator] (98:7-98:29)
+            not [not] (98:7-98:10)
+            identifier [youtube_integrator] (98:11-98:29)
+          : [:] (98:29-98:30)
+          block [raise HTTPException(status_code=500, detail="YouTube integrator not initialized")] (99:8-99:89)
+            raise_statement [raise HTTPException(status_code=500, detail="YouTube integrator not initialized")] (99:8-99:89)
+              raise [raise] (99:8-99:13)
+              call [HTTPException(status_code=500, detail="YouTube integrator not initialized")] (99:14-99:89)
+                identifier [HTTPException] (99:14-99:27)
+                argument_list [(status_code=500, detail="YouTube integrator not initialized")] (99:27-99:89)
+                  ( [(] (99:27-99:28)
+                  keyword_argument [status_code=500] (99:28-99:43)
+                    identifier [status_code] (99:28-99:39)
+                    = [=] (99:39-99:40)
+                    integer [500] (99:40-99:43)
+                  , [,] (99:43-99:44)
+                  keyword_argument [detail="YouTube integrator not initialized"] (99:45-99:88)
+                    identifier [detail] (99:45-99:51)
+                    = [=] (99:51-99:52)
+                    string ["YouTube integrator not initialized"] (99:52-99:88)
+                      string_start ["] (99:52-99:53)
+                      string_content [YouTube integrator not initialized] (99:53-99:87)
+                      string_end ["] (99:87-99:88)
+                  ) [)] (99:88-99:89)
+        try_statement [try:
+        videos_stored = 0
+        videos_failed = 0
+
+        print(f"Searching for YouTube videos with keyword: {request.keyword}")
+
+        search_response = youtube_integrator.youtube.search().list(
+            q=request.keyword,
+            type='video',
+            part='id,snippet',
+            maxResults=request.max_results
+        ).execute()
+
+        video_ids = [item['id']['videoId'] for item in search_response.get('items', [])]
+
+        videos_response = youtube_integrator.youtube.videos().list(
+            part="snippet,statistics,contentDetails",
+            id=','.join(video_ids)
+        ).execute()
+
+        for video_data in videos_response.get('items', []):
+            try:
+                comments = youtube_integrator.get_video_comments(video_data['id'])
+
+                video_info = {
+                    'video_id': video_data['id'],
+                    'title': video_data['snippet']['title'],
+                    'description': video_data['snippet']['description'],
+                    'published_at': video_data['snippet']['publishedAt'],
+                    'channel_title': video_data['snippet']['channelTitle'],
+                    'view_count': int(video_data['statistics'].get('viewCount', 0)),
+                    'like_count': int(video_data['statistics'].get('likeCount', 0)),
+                    'comment_count': int(video_data['statistics'].get('commentCount', 0)),
+                    'comments': comments
+                }
+
+                document = youtube_integrator.prepare_document(video_info)
+                if document:
+                    try:
+                        youtube_integrator.collection.insert_one(document)
+                        videos_stored += 1
+                        print(f"Successfully stored video: {video_info['title']}")
+                    except Exception as store_error:
+                        videos_failed += 1
+                        print(f"Failed to store video in AstraDB: {store_error}")
+
+                youtube_integrator._save_data(video_info, f'video_{video_data["id"]}')
+
+            except Exception as e:
+                videos_failed += 1
+                print(f"Error processing video: {e}")
+
+        return SearchResponse(
+            videos_stored=videos_stored,
+            videos_failed=videos_failed,
+            message=f"YouTube search completed. Stored {videos_stored} videos, failed {videos_failed}"
+        )
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))] (101:4-160:59)
+          try [try] (101:4-101:7)
+          : [:] (101:7-101:8)
+          block [videos_stored = 0
+        videos_failed = 0
+
+        print(f"Searching for YouTube videos with keyword: {request.keyword}")
+
+        search_response = youtube_integrator.youtube.search().list(
+            q=request.keyword,
+            type='video',
+            part='id,snippet',
+            maxResults=request.max_results
+        ).execute()
+
+        video_ids = [item['id']['videoId'] for item in search_response.get('items', [])]
+
+        videos_response = youtube_integrator.youtube.videos().list(
+            part="snippet,statistics,contentDetails",
+            id=','.join(video_ids)
+        ).execute()
+
+        for video_data in videos_response.get('items', []):
+            try:
+                comments = youtube_integrator.get_video_comments(video_data['id'])
+
+                video_info = {
+                    'video_id': video_data['id'],
+                    'title': video_data['snippet']['title'],
+                    'description': video_data['snippet']['description'],
+                    'published_at': video_data['snippet']['publishedAt'],
+                    'channel_title': video_data['snippet']['channelTitle'],
+                    'view_count': int(video_data['statistics'].get('viewCount', 0)),
+                    'like_count': int(video_data['statistics'].get('likeCount', 0)),
+                    'comment_count': int(video_data['statistics'].get('commentCount', 0)),
+                    'comments': comments
+                }
+
+                document = youtube_integrator.prepare_document(video_info)
+                if document:
+                    try:
+                        youtube_integrator.collection.insert_one(document)
+                        videos_stored += 1
+                        print(f"Successfully stored video: {video_info['title']}")
+                    except Exception as store_error:
+                        videos_failed += 1
+                        print(f"Failed to store video in AstraDB: {store_error}")
+
+                youtube_integrator._save_data(video_info, f'video_{video_data["id"]}')
+
+            except Exception as e:
+                videos_failed += 1
+                print(f"Error processing video: {e}")
+
+        return SearchResponse(
+            videos_stored=videos_stored,
+            videos_failed=videos_failed,
+            message=f"YouTube search completed. Stored {videos_stored} videos, failed {videos_failed}"
+        )] (102:8-157:9)
+            expression_statement [videos_stored = 0] (102:8-102:25)
+              assignment [videos_stored = 0] (102:8-102:25)
+                identifier [videos_stored] (102:8-102:21)
+                = [=] (102:22-102:23)
+                integer [0] (102:24-102:25)
+            expression_statement [videos_failed = 0] (103:8-103:25)
+              assignment [videos_failed = 0] (103:8-103:25)
+                identifier [videos_failed] (103:8-103:21)
+                = [=] (103:22-103:23)
+                integer [0] (103:24-103:25)
+            expression_statement [print(f"Searching for YouTube videos with keyword: {request.keyword}")] (105:8-105:78)
+              call [print(f"Searching for YouTube videos with keyword: {request.keyword}")] (105:8-105:78)
+                identifier [print] (105:8-105:13)
+                argument_list [(f"Searching for YouTube videos with keyword: {request.keyword}")] (105:13-105:78)
+                  ( [(] (105:13-105:14)
+                  string [f"Searching for YouTube videos with keyword: {request.keyword}"] (105:14-105:77)
+                    string_start [f"] (105:14-105:16)
+                    string_content [Searching for YouTube videos with keyword: ] (105:16-105:59)
+                    interpolation [{request.keyword}] (105:59-105:76)
+                      { [{] (105:59-105:60)
+                      attribute [request.keyword] (105:60-105:75)
+                        identifier [request] (105:60-105:67)
+                        . [.] (105:67-105:68)
+                        identifier [keyword] (105:68-105:75)
+                      } [}] (105:75-105:76)
+                    string_end ["] (105:76-105:77)
+                  ) [)] (105:77-105:78)
+            expression_statement [search_response = youtube_integrator.youtube.search().list(
+            q=request.keyword,
+            type='video',
+            part='id,snippet',
+            maxResults=request.max_results
+        ).execute()] (107:8-112:19)
+              assignment [search_response = youtube_integrator.youtube.search().list(
+            q=request.keyword,
+            type='video',
+            part='id,snippet',
+            maxResults=request.max_results
+        ).execute()] (107:8-112:19)
+                identifier [search_response] (107:8-107:23)
+                = [=] (107:24-107:25)
+                call [youtube_integrator.youtube.search().list(
+            q=request.keyword,
+            type='video',
+            part='id,snippet',
+            maxResults=request.max_results
+        ).execute()] (107:26-112:19)
+                  attribute [youtube_integrator.youtube.search().list(
+            q=request.keyword,
+            type='video',
+            part='id,snippet',
+            maxResults=request.max_results
+        ).execute] (107:26-112:17)
+                    call [youtube_integrator.youtube.search().list(
+            q=request.keyword,
+            type='video',
+            part='id,snippet',
+            maxResults=request.max_results
+        )] (107:26-112:9)
+                      attribute [youtube_integrator.youtube.search().list] (107:26-107:66)
+                        call [youtube_integrator.youtube.search()] (107:26-107:61)
+                          attribute [youtube_integrator.youtube.search] (107:26-107:59)
+                            attribute [youtube_integrator.youtube] (107:26-107:52)
+                              identifier [youtube_integrator] (107:26-107:44)
+                              . [.] (107:44-107:45)
+                              identifier [youtube] (107:45-107:52)
+                            . [.] (107:52-107:53)
+                            identifier [search] (107:53-107:59)
+                          argument_list [()] (107:59-107:61)
+                            ( [(] (107:59-107:60)
+                            ) [)] (107:60-107:61)
+                        . [.] (107:61-107:62)
+                        identifier [list] (107:62-107:66)
+                      argument_list [(
+            q=request.keyword,
+            type='video',
+            part='id,snippet',
+            maxResults=request.max_results
+        )] (107:66-112:9)
+                        ( [(] (107:66-107:67)
+                        keyword_argument [q=request.keyword] (108:12-108:29)
+                          identifier [q] (108:12-108:13)
+                          = [=] (108:13-108:14)
+                          attribute [request.keyword] (108:14-108:29)
+                            identifier [request] (108:14-108:21)
+                            . [.] (108:21-108:22)
+                            identifier [keyword] (108:22-108:29)
+                        , [,] (108:29-108:30)
+                        keyword_argument [type='video'] (109:12-109:24)
+                          identifier [type] (109:12-109:16)
+                          = [=] (109:16-109:17)
+                          string ['video'] (109:17-109:24)
+                            string_start ['] (109:17-109:18)
+                            string_content [video] (109:18-109:23)
+                            string_end ['] (109:23-109:24)
+                        , [,] (109:24-109:25)
+                        keyword_argument [part='id,snippet'] (110:12-110:29)
+                          identifier [part] (110:12-110:16)
+                          = [=] (110:16-110:17)
+                          string ['id,snippet'] (110:17-110:29)
+                            string_start ['] (110:17-110:18)
+                            string_content [id,snippet] (110:18-110:28)
+                            string_end ['] (110:28-110:29)
+                        , [,] (110:29-110:30)
+                        keyword_argument [maxResults=request.max_results] (111:12-111:42)
+                          identifier [maxResults] (111:12-111:22)
+                          = [=] (111:22-111:23)
+                          attribute [request.max_results] (111:23-111:42)
+                            identifier [request] (111:23-111:30)
+                            . [.] (111:30-111:31)
+                            identifier [max_results] (111:31-111:42)
+                        ) [)] (112:8-112:9)
+                    . [.] (112:9-112:10)
+                    identifier [execute] (112:10-112:17)
+                  argument_list [()] (112:17-112:19)
+                    ( [(] (112:17-112:18)
+                    ) [)] (112:18-112:19)
+            expression_statement [video_ids = [item['id']['videoId'] for item in search_response.get('items', [])]] (114:8-114:88)
+              assignment [video_ids = [item['id']['videoId'] for item in search_response.get('items', [])]] (114:8-114:88)
+                identifier [video_ids] (114:8-114:17)
+                = [=] (114:18-114:19)
+                list_comprehension [[item['id']['videoId'] for item in search_response.get('items', [])]] (114:20-114:88)
+                  [ [[] (114:20-114:21)
+                  subscript [item['id']['videoId']] (114:21-114:42)
+                    subscript [item['id']] (114:21-114:31)
+                      identifier [item] (114:21-114:25)
+                      [ [[] (114:25-114:26)
+                      string ['id'] (114:26-114:30)
+                        string_start ['] (114:26-114:27)
+                        string_content [id] (114:27-114:29)
+                        string_end ['] (114:29-114:30)
+                      ] []] (114:30-114:31)
+                    [ [[] (114:31-114:32)
+                    string ['videoId'] (114:32-114:41)
+                      string_start ['] (114:32-114:33)
+                      string_content [videoId] (114:33-114:40)
+                      string_end ['] (114:40-114:41)
+                    ] []] (114:41-114:42)
+                  for_in_clause [for item in search_response.get('items', [])] (114:43-114:87)
+                    for [for] (114:43-114:46)
+                    identifier [item] (114:47-114:51)
+                    in [in] (114:52-114:54)
+                    call [search_response.get('items', [])] (114:55-114:87)
+                      attribute [search_response.get] (114:55-114:74)
+                        identifier [search_response] (114:55-114:70)
+                        . [.] (114:70-114:71)
+                        identifier [get] (114:71-114:74)
+                      argument_list [('items', [])] (114:74-114:87)
+                        ( [(] (114:74-114:75)
+                        string ['items'] (114:75-114:82)
+                          string_start ['] (114:75-114:76)
+                          string_content [items] (114:76-114:81)
+                          string_end ['] (114:81-114:82)
+                        , [,] (114:82-114:83)
+                        list [[]] (114:84-114:86)
+                          [ [[] (114:84-114:85)
+                          ] []] (114:85-114:86)
+                        ) [)] (114:86-114:87)
+                  ] []] (114:87-114:88)
+            expression_statement [videos_response = youtube_integrator.youtube.videos().list(
+            part="snippet,statistics,contentDetails",
+            id=','.join(video_ids)
+        ).execute()] (116:8-119:19)
+              assignment [videos_response = youtube_integrator.youtube.videos().list(
+            part="snippet,statistics,contentDetails",
+            id=','.join(video_ids)
+        ).execute()] (116:8-119:19)
+                identifier [videos_response] (116:8-116:23)
+                = [=] (116:24-116:25)
+                call [youtube_integrator.youtube.videos().list(
+            part="snippet,statistics,contentDetails",
+            id=','.join(video_ids)
+        ).execute()] (116:26-119:19)
+                  attribute [youtube_integrator.youtube.videos().list(
+            part="snippet,statistics,contentDetails",
+            id=','.join(video_ids)
+        ).execute] (116:26-119:17)
+                    call [youtube_integrator.youtube.videos().list(
+            part="snippet,statistics,contentDetails",
+            id=','.join(video_ids)
+        )] (116:26-119:9)
+                      attribute [youtube_integrator.youtube.videos().list] (116:26-116:66)
+                        call [youtube_integrator.youtube.videos()] (116:26-116:61)
+                          attribute [youtube_integrator.youtube.videos] (116:26-116:59)
+                            attribute [youtube_integrator.youtube] (116:26-116:52)
+                              identifier [youtube_integrator] (116:26-116:44)
+                              . [.] (116:44-116:45)
+                              identifier [youtube] (116:45-116:52)
+                            . [.] (116:52-116:53)
+                            identifier [videos] (116:53-116:59)
+                          argument_list [()] (116:59-116:61)
+                            ( [(] (116:59-116:60)
+                            ) [)] (116:60-116:61)
+                        . [.] (116:61-116:62)
+                        identifier [list] (116:62-116:66)
+                      argument_list [(
+            part="snippet,statistics,contentDetails",
+            id=','.join(video_ids)
+        )] (116:66-119:9)
+                        ( [(] (116:66-116:67)
+                        keyword_argument [part="snippet,statistics,contentDetails"] (117:12-117:52)
+                          identifier [part] (117:12-117:16)
+                          = [=] (117:16-117:17)
+                          string ["snippet,statistics,contentDetails"] (117:17-117:52)
+                            string_start ["] (117:17-117:18)
+                            string_content [snippet,statistics,contentDetails] (117:18-117:51)
+                            string_end ["] (117:51-117:52)
+                        , [,] (117:52-117:53)
+                        keyword_argument [id=','.join(video_ids)] (118:12-118:34)
+                          identifier [id] (118:12-118:14)
+                          = [=] (118:14-118:15)
+                          call [','.join(video_ids)] (118:15-118:34)
+                            attribute [','.join] (118:15-118:23)
+                              string [','] (118:15-118:18)
+                                string_start ['] (118:15-118:16)
+                                string_content [,] (118:16-118:17)
+                                string_end ['] (118:17-118:18)
+                              . [.] (118:18-118:19)
+                              identifier [join] (118:19-118:23)
+                            argument_list [(video_ids)] (118:23-118:34)
+                              ( [(] (118:23-118:24)
+                              identifier [video_ids] (118:24-118:33)
+                              ) [)] (118:33-118:34)
+                        ) [)] (119:8-119:9)
+                    . [.] (119:9-119:10)
+                    identifier [execute] (119:10-119:17)
+                  argument_list [()] (119:17-119:19)
+                    ( [(] (119:17-119:18)
+                    ) [)] (119:18-119:19)
+            for_statement [for video_data in videos_response.get('items', []):
+            try:
+                comments = youtube_integrator.get_video_comments(video_data['id'])
+
+                video_info = {
+                    'video_id': video_data['id'],
+                    'title': video_data['snippet']['title'],
+                    'description': video_data['snippet']['description'],
+                    'published_at': video_data['snippet']['publishedAt'],
+                    'channel_title': video_data['snippet']['channelTitle'],
+                    'view_count': int(video_data['statistics'].get('viewCount', 0)),
+                    'like_count': int(video_data['statistics'].get('likeCount', 0)),
+                    'comment_count': int(video_data['statistics'].get('commentCount', 0)),
+                    'comments': comments
+                }
+
+                document = youtube_integrator.prepare_document(video_info)
+                if document:
+                    try:
+                        youtube_integrator.collection.insert_one(document)
+                        videos_stored += 1
+                        print(f"Successfully stored video: {video_info['title']}")
+                    except Exception as store_error:
+                        videos_failed += 1
+                        print(f"Failed to store video in AstraDB: {store_error}")
+
+                youtube_integrator._save_data(video_info, f'video_{video_data["id"]}')
+
+            except Exception as e:
+                videos_failed += 1
+                print(f"Error processing video: {e}")] (121:8-151:53)
+              for [for] (121:8-121:11)
+              identifier [video_data] (121:12-121:22)
+              in [in] (121:23-121:25)
+              call [videos_response.get('items', [])] (121:26-121:58)
+                attribute [videos_response.get] (121:26-121:45)
+                  identifier [videos_response] (121:26-121:41)
+                  . [.] (121:41-121:42)
+                  identifier [get] (121:42-121:45)
+                argument_list [('items', [])] (121:45-121:58)
+                  ( [(] (121:45-121:46)
+                  string ['items'] (121:46-121:53)
+                    string_start ['] (121:46-121:47)
+                    string_content [items] (121:47-121:52)
+                    string_end ['] (121:52-121:53)
+                  , [,] (121:53-121:54)
+                  list [[]] (121:55-121:57)
+                    [ [[] (121:55-121:56)
+                    ] []] (121:56-121:57)
+                  ) [)] (121:57-121:58)
+              : [:] (121:58-121:59)
+              block [try:
+                comments = youtube_integrator.get_video_comments(video_data['id'])
+
+                video_info = {
+                    'video_id': video_data['id'],
+                    'title': video_data['snippet']['title'],
+                    'description': video_data['snippet']['description'],
+                    'published_at': video_data['snippet']['publishedAt'],
+                    'channel_title': video_data['snippet']['channelTitle'],
+                    'view_count': int(video_data['statistics'].get('viewCount', 0)),
+                    'like_count': int(video_data['statistics'].get('likeCount', 0)),
+                    'comment_count': int(video_data['statistics'].get('commentCount', 0)),
+                    'comments': comments
+                }
+
+                document = youtube_integrator.prepare_document(video_info)
+                if document:
+                    try:
+                        youtube_integrator.collection.insert_one(document)
+                        videos_stored += 1
+                        print(f"Successfully stored video: {video_info['title']}")
+                    except Exception as store_error:
+                        videos_failed += 1
+                        print(f"Failed to store video in AstraDB: {store_error}")
+
+                youtube_integrator._save_data(video_info, f'video_{video_data["id"]}')
+
+            except Exception as e:
+                videos_failed += 1
+                print(f"Error processing video: {e}")] (122:12-151:53)
+                try_statement [try:
+                comments = youtube_integrator.get_video_comments(video_data['id'])
+
+                video_info = {
+                    'video_id': video_data['id'],
+                    'title': video_data['snippet']['title'],
+                    'description': video_data['snippet']['description'],
+                    'published_at': video_data['snippet']['publishedAt'],
+                    'channel_title': video_data['snippet']['channelTitle'],
+                    'view_count': int(video_data['statistics'].get('viewCount', 0)),
+                    'like_count': int(video_data['statistics'].get('likeCount', 0)),
+                    'comment_count': int(video_data['statistics'].get('commentCount', 0)),
+                    'comments': comments
+                }
+
+                document = youtube_integrator.prepare_document(video_info)
+                if document:
+                    try:
+                        youtube_integrator.collection.insert_one(document)
+                        videos_stored += 1
+                        print(f"Successfully stored video: {video_info['title']}")
+                    except Exception as store_error:
+                        videos_failed += 1
+                        print(f"Failed to store video in AstraDB: {store_error}")
+
+                youtube_integrator._save_data(video_info, f'video_{video_data["id"]}')
+
+            except Exception as e:
+                videos_failed += 1
+                print(f"Error processing video: {e}")] (122:12-151:53)
+                  try [try] (122:12-122:15)
+                  : [:] (122:15-122:16)
+                  block [comments = youtube_integrator.get_video_comments(video_data['id'])
+
+                video_info = {
+                    'video_id': video_data['id'],
+                    'title': video_data['snippet']['title'],
+                    'description': video_data['snippet']['description'],
+                    'published_at': video_data['snippet']['publishedAt'],
+                    'channel_title': video_data['snippet']['channelTitle'],
+                    'view_count': int(video_data['statistics'].get('viewCount', 0)),
+                    'like_count': int(video_data['statistics'].get('likeCount', 0)),
+                    'comment_count': int(video_data['statistics'].get('commentCount', 0)),
+                    'comments': comments
+                }
+
+                document = youtube_integrator.prepare_document(video_info)
+                if document:
+                    try:
+                        youtube_integrator.collection.insert_one(document)
+                        videos_stored += 1
+                        print(f"Successfully stored video: {video_info['title']}")
+                    except Exception as store_error:
+                        videos_failed += 1
+                        print(f"Failed to store video in AstraDB: {store_error}")
+
+                youtube_integrator._save_data(video_info, f'video_{video_data["id"]}')] (123:16-147:86)
+                    expression_statement [comments = youtube_integrator.get_video_comments(video_data['id'])] (123:16-123:82)
+                      assignment [comments = youtube_integrator.get_video_comments(video_data['id'])] (123:16-123:82)
+                        identifier [comments] (123:16-123:24)
+                        = [=] (123:25-123:26)
+                        call [youtube_integrator.get_video_comments(video_data['id'])] (123:27-123:82)
+                          attribute [youtube_integrator.get_video_comments] (123:27-123:64)
+                            identifier [youtube_integrator] (123:27-123:45)
+                            . [.] (123:45-123:46)
+                            identifier [get_video_comments] (123:46-123:64)
+                          argument_list [(video_data['id'])] (123:64-123:82)
+                            ( [(] (123:64-123:65)
+                            subscript [video_data['id']] (123:65-123:81)
+                              identifier [video_data] (123:65-123:75)
+                              [ [[] (123:75-123:76)
+                              string ['id'] (123:76-123:80)
+                                string_start ['] (123:76-123:77)
+                                string_content [id] (123:77-123:79)
+                                string_end ['] (123:79-123:80)
+                              ] []] (123:80-123:81)
+                            ) [)] (123:81-123:82)
+                    expression_statement [video_info = {
+                    'video_id': video_data['id'],
+                    'title': video_data['snippet']['title'],
+                    'description': video_data['snippet']['description'],
+                    'published_at': video_data['snippet']['publishedAt'],
+                    'channel_title': video_data['snippet']['channelTitle'],
+                    'view_count': int(video_data['statistics'].get('viewCount', 0)),
+                    'like_count': int(video_data['statistics'].get('likeCount', 0)),
+                    'comment_count': int(video_data['statistics'].get('commentCount', 0)),
+                    'comments': comments
+                }] (125:16-135:17)
+                      assignment [video_info = {
+                    'video_id': video_data['id'],
+                    'title': video_data['snippet']['title'],
+                    'description': video_data['snippet']['description'],
+                    'published_at': video_data['snippet']['publishedAt'],
+                    'channel_title': video_data['snippet']['channelTitle'],
+                    'view_count': int(video_data['statistics'].get('viewCount', 0)),
+                    'like_count': int(video_data['statistics'].get('likeCount', 0)),
+                    'comment_count': int(video_data['statistics'].get('commentCount', 0)),
+                    'comments': comments
+                }] (125:16-135:17)
+                        identifier [video_info] (125:16-125:26)
+                        = [=] (125:27-125:28)
+                        dictionary [{
+                    'video_id': video_data['id'],
+                    'title': video_data['snippet']['title'],
+                    'description': video_data['snippet']['description'],
+                    'published_at': video_data['snippet']['publishedAt'],
+                    'channel_title': video_data['snippet']['channelTitle'],
+                    'view_count': int(video_data['statistics'].get('viewCount', 0)),
+                    'like_count': int(video_data['statistics'].get('likeCount', 0)),
+                    'comment_count': int(video_data['statistics'].get('commentCount', 0)),
+                    'comments': comments
+                }] (125:29-135:17)
+                          { [{] (125:29-125:30)
+                          pair ['video_id': video_data['id']] (126:20-126:48)
+                            string ['video_id'] (126:20-126:30)
+                              string_start ['] (126:20-126:21)
+                              string_content [video_id] (126:21-126:29)
+                              string_end ['] (126:29-126:30)
+                            : [:] (126:30-126:31)
+                            subscript [video_data['id']] (126:32-126:48)
+                              identifier [video_data] (126:32-126:42)
+                              [ [[] (126:42-126:43)
+                              string ['id'] (126:43-126:47)
+                                string_start ['] (126:43-126:44)
+                                string_content [id] (126:44-126:46)
+                                string_end ['] (126:46-126:47)
+                              ] []] (126:47-126:48)
+                          , [,] (126:48-126:49)
+                          pair ['title': video_data['snippet']['title']] (127:20-127:59)
+                            string ['title'] (127:20-127:27)
+                              string_start ['] (127:20-127:21)
+                              string_content [title] (127:21-127:26)
+                              string_end ['] (127:26-127:27)
+                            : [:] (127:27-127:28)
+                            subscript [video_data['snippet']['title']] (127:29-127:59)
+                              subscript [video_data['snippet']] (127:29-127:50)
+                                identifier [video_data] (127:29-127:39)
+                                [ [[] (127:39-127:40)
+                                string ['snippet'] (127:40-127:49)
+                                  string_start ['] (127:40-127:41)
+                                  string_content [snippet] (127:41-127:48)
+                                  string_end ['] (127:48-127:49)
+                                ] []] (127:49-127:50)
+                              [ [[] (127:50-127:51)
+                              string ['title'] (127:51-127:58)
+                                string_start ['] (127:51-127:52)
+                                string_content [title] (127:52-127:57)
+                                string_end ['] (127:57-127:58)
+                              ] []] (127:58-127:59)
+                          , [,] (127:59-127:60)
+                          pair ['description': video_data['snippet']['description']] (128:20-128:71)
+                            string ['description'] (128:20-128:33)
+                              string_start ['] (128:20-128:21)
+                              string_content [description] (128:21-128:32)
+                              string_end ['] (128:32-128:33)
+                            : [:] (128:33-128:34)
+                            subscript [video_data['snippet']['description']] (128:35-128:71)
+                              subscript [video_data['snippet']] (128:35-128:56)
+                                identifier [video_data] (128:35-128:45)
+                                [ [[] (128:45-128:46)
+                                string ['snippet'] (128:46-128:55)
+                                  string_start ['] (128:46-128:47)
+                                  string_content [snippet] (128:47-128:54)
+                                  string_end ['] (128:54-128:55)
+                                ] []] (128:55-128:56)
+                              [ [[] (128:56-128:57)
+                              string ['description'] (128:57-128:70)
+                                string_start ['] (128:57-128:58)
+                                string_content [description] (128:58-128:69)
+                                string_end ['] (128:69-128:70)
+                              ] []] (128:70-128:71)
+                          , [,] (128:71-128:72)
+                          pair ['published_at': video_data['snippet']['publishedAt']] (129:20-129:72)
+                            string ['published_at'] (129:20-129:34)
+                              string_start ['] (129:20-129:21)
+                              string_content [published_at] (129:21-129:33)
+                              string_end ['] (129:33-129:34)
+                            : [:] (129:34-129:35)
+                            subscript [video_data['snippet']['publishedAt']] (129:36-129:72)
+                              subscript [video_data['snippet']] (129:36-129:57)
+                                identifier [video_data] (129:36-129:46)
+                                [ [[] (129:46-129:47)
+                                string ['snippet'] (129:47-129:56)
+                                  string_start ['] (129:47-129:48)
+                                  string_content [snippet] (129:48-129:55)
+                                  string_end ['] (129:55-129:56)
+                                ] []] (129:56-129:57)
+                              [ [[] (129:57-129:58)
+                              string ['publishedAt'] (129:58-129:71)
+                                string_start ['] (129:58-129:59)
+                                string_content [publishedAt] (129:59-129:70)
+                                string_end ['] (129:70-129:71)
+                              ] []] (129:71-129:72)
+                          , [,] (129:72-129:73)
+                          pair ['channel_title': video_data['snippet']['channelTitle']] (130:20-130:74)
+                            string ['channel_title'] (130:20-130:35)
+                              string_start ['] (130:20-130:21)
+                              string_content [channel_title] (130:21-130:34)
+                              string_end ['] (130:34-130:35)
+                            : [:] (130:35-130:36)
+                            subscript [video_data['snippet']['channelTitle']] (130:37-130:74)
+                              subscript [video_data['snippet']] (130:37-130:58)
+                                identifier [video_data] (130:37-130:47)
+                                [ [[] (130:47-130:48)
+                                string ['snippet'] (130:48-130:57)
+                                  string_start ['] (130:48-130:49)
+                                  string_content [snippet] (130:49-130:56)
+                                  string_end ['] (130:56-130:57)
+                                ] []] (130:57-130:58)
+                              [ [[] (130:58-130:59)
+                              string ['channelTitle'] (130:59-130:73)
+                                string_start ['] (130:59-130:60)
+                                string_content [channelTitle] (130:60-130:72)
+                                string_end ['] (130:72-130:73)
+                              ] []] (130:73-130:74)
+                          , [,] (130:74-130:75)
+                          pair ['view_count': int(video_data['statistics'].get('viewCount', 0))] (131:20-131:83)
+                            string ['view_count'] (131:20-131:32)
+                              string_start ['] (131:20-131:21)
+                              string_content [view_count] (131:21-131:31)
+                              string_end ['] (131:31-131:32)
+                            : [:] (131:32-131:33)
+                            call [int(video_data['statistics'].get('viewCount', 0))] (131:34-131:83)
+                              identifier [int] (131:34-131:37)
+                              argument_list [(video_data['statistics'].get('viewCount', 0))] (131:37-131:83)
+                                ( [(] (131:37-131:38)
+                                call [video_data['statistics'].get('viewCount', 0)] (131:38-131:82)
+                                  attribute [video_data['statistics'].get] (131:38-131:66)
+                                    subscript [video_data['statistics']] (131:38-131:62)
+                                      identifier [video_data] (131:38-131:48)
+                                      [ [[] (131:48-131:49)
+                                      string ['statistics'] (131:49-131:61)
+                                        string_start ['] (131:49-131:50)
+                                        string_content [statistics] (131:50-131:60)
+                                        string_end ['] (131:60-131:61)
+                                      ] []] (131:61-131:62)
+                                    . [.] (131:62-131:63)
+                                    identifier [get] (131:63-131:66)
+                                  argument_list [('viewCount', 0)] (131:66-131:82)
+                                    ( [(] (131:66-131:67)
+                                    string ['viewCount'] (131:67-131:78)
+                                      string_start ['] (131:67-131:68)
+                                      string_content [viewCount] (131:68-131:77)
+                                      string_end ['] (131:77-131:78)
+                                    , [,] (131:78-131:79)
+                                    integer [0] (131:80-131:81)
+                                    ) [)] (131:81-131:82)
+                                ) [)] (131:82-131:83)
+                          , [,] (131:83-131:84)
+                          pair ['like_count': int(video_data['statistics'].get('likeCount', 0))] (132:20-132:83)
+                            string ['like_count'] (132:20-132:32)
+                              string_start ['] (132:20-132:21)
+                              string_content [like_count] (132:21-132:31)
+                              string_end ['] (132:31-132:32)
+                            : [:] (132:32-132:33)
+                            call [int(video_data['statistics'].get('likeCount', 0))] (132:34-132:83)
+                              identifier [int] (132:34-132:37)
+                              argument_list [(video_data['statistics'].get('likeCount', 0))] (132:37-132:83)
+                                ( [(] (132:37-132:38)
+                                call [video_data['statistics'].get('likeCount', 0)] (132:38-132:82)
+                                  attribute [video_data['statistics'].get] (132:38-132:66)
+                                    subscript [video_data['statistics']] (132:38-132:62)
+                                      identifier [video_data] (132:38-132:48)
+                                      [ [[] (132:48-132:49)
+                                      string ['statistics'] (132:49-132:61)
+                                        string_start ['] (132:49-132:50)
+                                        string_content [statistics] (132:50-132:60)
+                                        string_end ['] (132:60-132:61)
+                                      ] []] (132:61-132:62)
+                                    . [.] (132:62-132:63)
+                                    identifier [get] (132:63-132:66)
+                                  argument_list [('likeCount', 0)] (132:66-132:82)
+                                    ( [(] (132:66-132:67)
+                                    string ['likeCount'] (132:67-132:78)
+                                      string_start ['] (132:67-132:68)
+                                      string_content [likeCount] (132:68-132:77)
+                                      string_end ['] (132:77-132:78)
+                                    , [,] (132:78-132:79)
+                                    integer [0] (132:80-132:81)
+                                    ) [)] (132:81-132:82)
+                                ) [)] (132:82-132:83)
+                          , [,] (132:83-132:84)
+                          pair ['comment_count': int(video_data['statistics'].get('commentCount', 0))] (133:20-133:89)
+                            string ['comment_count'] (133:20-133:35)
+                              string_start ['] (133:20-133:21)
+                              string_content [comment_count] (133:21-133:34)
+                              string_end ['] (133:34-133:35)
+                            : [:] (133:35-133:36)
+                            call [int(video_data['statistics'].get('commentCount', 0))] (133:37-133:89)
+                              identifier [int] (133:37-133:40)
+                              argument_list [(video_data['statistics'].get('commentCount', 0))] (133:40-133:89)
+                                ( [(] (133:40-133:41)
+                                call [video_data['statistics'].get('commentCount', 0)] (133:41-133:88)
+                                  attribute [video_data['statistics'].get] (133:41-133:69)
+                                    subscript [video_data['statistics']] (133:41-133:65)
+                                      identifier [video_data] (133:41-133:51)
+                                      [ [[] (133:51-133:52)
+                                      string ['statistics'] (133:52-133:64)
+                                        string_start ['] (133:52-133:53)
+                                        string_content [statistics] (133:53-133:63)
+                                        string_end ['] (133:63-133:64)
+                                      ] []] (133:64-133:65)
+                                    . [.] (133:65-133:66)
+                                    identifier [get] (133:66-133:69)
+                                  argument_list [('commentCount', 0)] (133:69-133:88)
+                                    ( [(] (133:69-133:70)
+                                    string ['commentCount'] (133:70-133:84)
+                                      string_start ['] (133:70-133:71)
+                                      string_content [commentCount] (133:71-133:83)
+                                      string_end ['] (133:83-133:84)
+                                    , [,] (133:84-133:85)
+                                    integer [0] (133:86-133:87)
+                                    ) [)] (133:87-133:88)
+                                ) [)] (133:88-133:89)
+                          , [,] (133:89-133:90)
+                          pair ['comments': comments] (134:20-134:40)
+                            string ['comments'] (134:20-134:30)
+                              string_start ['] (134:20-134:21)
+                              string_content [comments] (134:21-134:29)
+                              string_end ['] (134:29-134:30)
+                            : [:] (134:30-134:31)
+                            identifier [comments] (134:32-134:40)
+                          } [}] (135:16-135:17)
+                    expression_statement [document = youtube_integrator.prepare_document(video_info)] (137:16-137:74)
+                      assignment [document = youtube_integrator.prepare_document(video_info)] (137:16-137:74)
+                        identifier [document] (137:16-137:24)
+                        = [=] (137:25-137:26)
+                        call [youtube_integrator.prepare_document(video_info)] (137:27-137:74)
+                          attribute [youtube_integrator.prepare_document] (137:27-137:62)
+                            identifier [youtube_integrator] (137:27-137:45)
+                            . [.] (137:45-137:46)
+                            identifier [prepare_document] (137:46-137:62)
+                          argument_list [(video_info)] (137:62-137:74)
+                            ( [(] (137:62-137:63)
+                            identifier [video_info] (137:63-137:73)
+                            ) [)] (137:73-137:74)
+                    if_statement [if document:
+                    try:
+                        youtube_integrator.collection.insert_one(document)
+                        videos_stored += 1
+                        print(f"Successfully stored video: {video_info['title']}")
+                    except Exception as store_error:
+                        videos_failed += 1
+                        print(f"Failed to store video in AstraDB: {store_error}")] (138:16-145:81)
+                      if [if] (138:16-138:18)
+                      identifier [document] (138:19-138:27)
+                      : [:] (138:27-138:28)
+                      block [try:
+                        youtube_integrator.collection.insert_one(document)
+                        videos_stored += 1
+                        print(f"Successfully stored video: {video_info['title']}")
+                    except Exception as store_error:
+                        videos_failed += 1
+                        print(f"Failed to store video in AstraDB: {store_error}")] (139:20-145:81)
+                        try_statement [try:
+                        youtube_integrator.collection.insert_one(document)
+                        videos_stored += 1
+                        print(f"Successfully stored video: {video_info['title']}")
+                    except Exception as store_error:
+                        videos_failed += 1
+                        print(f"Failed to store video in AstraDB: {store_error}")] (139:20-145:81)
+                          try [try] (139:20-139:23)
+                          : [:] (139:23-139:24)
+                          block [youtube_integrator.collection.insert_one(document)
+                        videos_stored += 1
+                        print(f"Successfully stored video: {video_info['title']}")] (140:24-142:82)
+                            expression_statement [youtube_integrator.collection.insert_one(document)] (140:24-140:74)
+                              call [youtube_integrator.collection.insert_one(document)] (140:24-140:74)
+                                attribute [youtube_integrator.collection.insert_one] (140:24-140:64)
+                                  attribute [youtube_integrator.collection] (140:24-140:53)
+                                    identifier [youtube_integrator] (140:24-140:42)
+                                    . [.] (140:42-140:43)
+                                    identifier [collection] (140:43-140:53)
+                                  . [.] (140:53-140:54)
+                                  identifier [insert_one] (140:54-140:64)
+                                argument_list [(document)] (140:64-140:74)
+                                  ( [(] (140:64-140:65)
+                                  identifier [document] (140:65-140:73)
+                                  ) [)] (140:73-140:74)
+                            expression_statement [videos_stored += 1] (141:24-141:42)
+                              augmented_assignment [videos_stored += 1] (141:24-141:42)
+                                identifier [videos_stored] (141:24-141:37)
+                                += [+=] (141:38-141:40)
+                                integer [1] (141:41-141:42)
+                            expression_statement [print(f"Successfully stored video: {video_info['title']}")] (142:24-142:82)
+                              call [print(f"Successfully stored video: {video_info['title']}")] (142:24-142:82)
+                                identifier [print] (142:24-142:29)
+                                argument_list [(f"Successfully stored video: {video_info['title']}")] (142:29-142:82)
+                                  ( [(] (142:29-142:30)
+                                  string [f"Successfully stored video: {video_info['title']}"] (142:30-142:81)
+                                    string_start [f"] (142:30-142:32)
+                                    string_content [Successfully stored video: ] (142:32-142:59)
+                                    interpolation [{video_info['title']}] (142:59-142:80)
+                                      { [{] (142:59-142:60)
+                                      subscript [video_info['title']] (142:60-142:79)
+                                        identifier [video_info] (142:60-142:70)
+                                        [ [[] (142:70-142:71)
+                                        string ['title'] (142:71-142:78)
+                                          string_start ['] (142:71-142:72)
+                                          string_content [title] (142:72-142:77)
+                                          string_end ['] (142:77-142:78)
+                                        ] []] (142:78-142:79)
+                                      } [}] (142:79-142:80)
+                                    string_end ["] (142:80-142:81)
+                                  ) [)] (142:81-142:82)
+                          except_clause [except Exception as store_error:
+                        videos_failed += 1
+                        print(f"Failed to store video in AstraDB: {store_error}")] (143:20-145:81)
+                            except [except] (143:20-143:26)
+                            as_pattern [Exception as store_error] (143:27-143:51)
+                              identifier [Exception] (143:27-143:36)
+                              as [as] (143:37-143:39)
+                              as_pattern_target [store_error] (143:40-143:51)
+                                identifier [store_error] (143:40-143:51)
+                            : [:] (143:51-143:52)
+                            block [videos_failed += 1
+                        print(f"Failed to store video in AstraDB: {store_error}")] (144:24-145:81)
+                              expression_statement [videos_failed += 1] (144:24-144:42)
+                                augmented_assignment [videos_failed += 1] (144:24-144:42)
+                                  identifier [videos_failed] (144:24-144:37)
+                                  += [+=] (144:38-144:40)
+                                  integer [1] (144:41-144:42)
+                              expression_statement [print(f"Failed to store video in AstraDB: {store_error}")] (145:24-145:81)
+                                call [print(f"Failed to store video in AstraDB: {store_error}")] (145:24-145:81)
+                                  identifier [print] (145:24-145:29)
+                                  argument_list [(f"Failed to store video in AstraDB: {store_error}")] (145:29-145:81)
+                                    ( [(] (145:29-145:30)
+                                    string [f"Failed to store video in AstraDB: {store_error}"] (145:30-145:80)
+                                      string_start [f"] (145:30-145:32)
+                                      string_content [Failed to store video in AstraDB: ] (145:32-145:66)
+                                      interpolation [{store_error}] (145:66-145:79)
+                                        { [{] (145:66-145:67)
+                                        identifier [store_error] (145:67-145:78)
+                                        } [}] (145:78-145:79)
+                                      string_end ["] (145:79-145:80)
+                                    ) [)] (145:80-145:81)
+                    expression_statement [youtube_integrator._save_data(video_info, f'video_{video_data["id"]}')] (147:16-147:86)
+                      call [youtube_integrator._save_data(video_info, f'video_{video_data["id"]}')] (147:16-147:86)
+                        attribute [youtube_integrator._save_data] (147:16-147:45)
+                          identifier [youtube_integrator] (147:16-147:34)
+                          . [.] (147:34-147:35)
+                          identifier [_save_data] (147:35-147:45)
+                        argument_list [(video_info, f'video_{video_data["id"]}')] (147:45-147:86)
+                          ( [(] (147:45-147:46)
+                          identifier [video_info] (147:46-147:56)
+                          , [,] (147:56-147:57)
+                          string [f'video_{video_data["id"]}'] (147:58-147:85)
+                            string_start [f'] (147:58-147:60)
+                            string_content [video_] (147:60-147:66)
+                            interpolation [{video_data["id"]}] (147:66-147:84)
+                              { [{] (147:66-147:67)
+                              subscript [video_data["id"]] (147:67-147:83)
+                                identifier [video_data] (147:67-147:77)
+                                [ [[] (147:77-147:78)
+                                string ["id"] (147:78-147:82)
+                                  string_start ["] (147:78-147:79)
+                                  string_content [id] (147:79-147:81)
+                                  string_end ["] (147:81-147:82)
+                                ] []] (147:82-147:83)
+                              } [}] (147:83-147:84)
+                            string_end ['] (147:84-147:85)
+                          ) [)] (147:85-147:86)
+                  except_clause [except Exception as e:
+                videos_failed += 1
+                print(f"Error processing video: {e}")] (149:12-151:53)
+                    except [except] (149:12-149:18)
+                    as_pattern [Exception as e] (149:19-149:33)
+                      identifier [Exception] (149:19-149:28)
+                      as [as] (149:29-149:31)
+                      as_pattern_target [e] (149:32-149:33)
+                        identifier [e] (149:32-149:33)
+                    : [:] (149:33-149:34)
+                    block [videos_failed += 1
+                print(f"Error processing video: {e}")] (150:16-151:53)
+                      expression_statement [videos_failed += 1] (150:16-150:34)
+                        augmented_assignment [videos_failed += 1] (150:16-150:34)
+                          identifier [videos_failed] (150:16-150:29)
+                          += [+=] (150:30-150:32)
+                          integer [1] (150:33-150:34)
+                      expression_statement [print(f"Error processing video: {e}")] (151:16-151:53)
+                        call [print(f"Error processing video: {e}")] (151:16-151:53)
+                          identifier [print] (151:16-151:21)
+                          argument_list [(f"Error processing video: {e}")] (151:21-151:53)
+                            ( [(] (151:21-151:22)
+                            string [f"Error processing video: {e}"] (151:22-151:52)
+                              string_start [f"] (151:22-151:24)
+                              string_content [Error processing video: ] (151:24-151:48)
+                              interpolation [{e}] (151:48-151:51)
+                                { [{] (151:48-151:49)
+                                identifier [e] (151:49-151:50)
+                                } [}] (151:50-151:51)
+                              string_end ["] (151:51-151:52)
+                            ) [)] (151:52-151:53)
+            return_statement [return SearchResponse(
+            videos_stored=videos_stored,
+            videos_failed=videos_failed,
+            message=f"YouTube search completed. Stored {videos_stored} videos, failed {videos_failed}"
+        )] (153:8-157:9)
+              return [return] (153:8-153:14)
+              call [SearchResponse(
+            videos_stored=videos_stored,
+            videos_failed=videos_failed,
+            message=f"YouTube search completed. Stored {videos_stored} videos, failed {videos_failed}"
+        )] (153:15-157:9)
+                identifier [SearchResponse] (153:15-153:29)
+                argument_list [(
+            videos_stored=videos_stored,
+            videos_failed=videos_failed,
+            message=f"YouTube search completed. Stored {videos_stored} videos, failed {videos_failed}"
+        )] (153:29-157:9)
+                  ( [(] (153:29-153:30)
+                  keyword_argument [videos_stored=videos_stored] (154:12-154:39)
+                    identifier [videos_stored] (154:12-154:25)
+                    = [=] (154:25-154:26)
+                    identifier [videos_stored] (154:26-154:39)
+                  , [,] (154:39-154:40)
+                  keyword_argument [videos_failed=videos_failed] (155:12-155:39)
+                    identifier [videos_failed] (155:12-155:25)
+                    = [=] (155:25-155:26)
+                    identifier [videos_failed] (155:26-155:39)
+                  , [,] (155:39-155:40)
+                  keyword_argument [message=f"YouTube search completed. Stored {videos_stored} videos, failed {videos_failed}"] (156:12-156:102)
+                    identifier [message] (156:12-156:19)
+                    = [=] (156:19-156:20)
+                    string [f"YouTube search completed. Stored {videos_stored} videos, failed {videos_failed}"] (156:20-156:102)
+                      string_start [f"] (156:20-156:22)
+                      string_content [YouTube search completed. Stored ] (156:22-156:55)
+                      interpolation [{videos_stored}] (156:55-156:70)
+                        { [{] (156:55-156:56)
+                        identifier [videos_stored] (156:56-156:69)
+                        } [}] (156:69-156:70)
+                      string_content [ videos, failed ] (156:70-156:86)
+                      interpolation [{videos_failed}] (156:86-156:101)
+                        { [{] (156:86-156:87)
+                        identifier [videos_failed] (156:87-156:100)
+                        } [}] (156:100-156:101)
+                      string_end ["] (156:101-156:102)
+                  ) [)] (157:8-157:9)
+          except_clause [except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))] (159:4-160:59)
+            except [except] (159:4-159:10)
+            as_pattern [Exception as e] (159:11-159:25)
+              identifier [Exception] (159:11-159:20)
+              as [as] (159:21-159:23)
+              as_pattern_target [e] (159:24-159:25)
+                identifier [e] (159:24-159:25)
+            : [:] (159:25-159:26)
+            block [raise HTTPException(status_code=500, detail=str(e))] (160:8-160:59)
+              raise_statement [raise HTTPException(status_code=500, detail=str(e))] (160:8-160:59)
+                raise [raise] (160:8-160:13)
+                call [HTTPException(status_code=500, detail=str(e))] (160:14-160:59)
+                  identifier [HTTPException] (160:14-160:27)
+                  argument_list [(status_code=500, detail=str(e))] (160:27-160:59)
+                    ( [(] (160:27-160:28)
+                    keyword_argument [status_code=500] (160:28-160:43)
+                      identifier [status_code] (160:28-160:39)
+                      = [=] (160:39-160:40)
+                      integer [500] (160:40-160:43)
+                    , [,] (160:43-160:44)
+                    keyword_argument [detail=str(e)] (160:45-160:58)
+                      identifier [detail] (160:45-160:51)
+                      = [=] (160:51-160:52)
+                      call [str(e)] (160:52-160:58)
+                        identifier [str] (160:52-160:55)
+                        argument_list [(e)] (160:55-160:58)
+                          ( [(] (160:55-160:56)
+                          identifier [e] (160:56-160:57)
+                          ) [)] (160:57-160:58)
+                    ) [)] (160:58-160:59)
+  decorated_definition [@app.post("/instagram/search", response_model=InstagramResponse)
+async def search_instagram_posts(request: InstagramSearchRequest):
+    """
+    Search Instagram posts by hashtag and store in AstraDB.
+    """
+    if not instagram_integrator:
+        raise HTTPException(status_code=500, detail="Instagram integrator not initialized")
+
+    try:
+        results = instagram_integrator.search_and_store_hashtag_posts(
+            request.hashtag,
+            request.amount
+        )
+
+        return InstagramResponse(
+            posts_found=results['posts_found'],
+            posts_stored=results['posts_stored'],
+            posts_failed=results['posts_failed'],
+            file_path=results['file_path'],
+            message=f"Found {results['posts_found']} posts, stored {results['posts_stored']} in AstraDB, failed {results['posts_failed']}"
+        )
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))] (163:0-186:59)
+    decorator [@app.post("/instagram/search", response_model=InstagramResponse)] (163:0-163:64)
+      @ [@] (163:0-163:1)
+      call [app.post("/instagram/search", response_model=InstagramResponse)] (163:1-163:64)
+        attribute [app.post] (163:1-163:9)
+          identifier [app] (163:1-163:4)
+          . [.] (163:4-163:5)
+          identifier [post] (163:5-163:9)
+        argument_list [("/instagram/search", response_model=InstagramResponse)] (163:9-163:64)
+          ( [(] (163:9-163:10)
+          string ["/instagram/search"] (163:10-163:29)
+            string_start ["] (163:10-163:11)
+            string_content [/instagram/search] (163:11-163:28)
+            string_end ["] (163:28-163:29)
+          , [,] (163:29-163:30)
+          keyword_argument [response_model=InstagramResponse] (163:31-163:63)
+            identifier [response_model] (163:31-163:45)
+            = [=] (163:45-163:46)
+            identifier [InstagramResponse] (163:46-163:63)
+          ) [)] (163:63-163:64)
+    function_definition [async def search_instagram_posts(request: InstagramSearchRequest):
+    """
+    Search Instagram posts by hashtag and store in AstraDB.
+    """
+    if not instagram_integrator:
+        raise HTTPException(status_code=500, detail="Instagram integrator not initialized")
+
+    try:
+        results = instagram_integrator.search_and_store_hashtag_posts(
+            request.hashtag,
+            request.amount
+        )
+
+        return InstagramResponse(
+            posts_found=results['posts_found'],
+            posts_stored=results['posts_stored'],
+            posts_failed=results['posts_failed'],
+            file_path=results['file_path'],
+            message=f"Found {results['posts_found']} posts, stored {results['posts_stored']} in AstraDB, failed {results['posts_failed']}"
+        )
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))] (164:0-186:59)
+      async [async] (164:0-164:5)
+      def [def] (164:6-164:9)
+      identifier [search_instagram_posts] (164:10-164:32)
+      parameters [(request: InstagramSearchRequest)] (164:32-164:65)
+        ( [(] (164:32-164:33)
+        typed_parameter [request: InstagramSearchRequest] (164:33-164:64)
+          identifier [request] (164:33-164:40)
+          : [:] (164:40-164:41)
+          type [InstagramSearchRequest] (164:42-164:64)
+            identifier [InstagramSearchRequest] (164:42-164:64)
+        ) [)] (164:64-164:65)
+      : [:] (164:65-164:66)
+      block ["""
+    Search Instagram posts by hashtag and store in AstraDB.
+    """
+    if not instagram_integrator:
+        raise HTTPException(status_code=500, detail="Instagram integrator not initialized")
+
+    try:
+        results = instagram_integrator.search_and_store_hashtag_posts(
+            request.hashtag,
+            request.amount
+        )
+
+        return InstagramResponse(
+            posts_found=results['posts_found'],
+            posts_stored=results['posts_stored'],
+            posts_failed=results['posts_failed'],
+            file_path=results['file_path'],
+            message=f"Found {results['posts_found']} posts, stored {results['posts_stored']} in AstraDB, failed {results['posts_failed']}"
+        )
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))] (165:4-186:59)
+        expression_statement ["""
+    Search Instagram posts by hashtag and store in AstraDB.
+    """] (165:4-167:7)
+          string ["""
+    Search Instagram posts by hashtag and store in AstraDB.
+    """] (165:4-167:7)
+            string_start ["""] (165:4-165:7)
+            string_content [
+    Search Instagram posts by hashtag and store in AstraDB.
+    ] (165:7-167:4)
+            string_end ["""] (167:4-167:7)
+        if_statement [if not instagram_integrator:
+        raise HTTPException(status_code=500, detail="Instagram integrator not initialized")] (168:4-169:91)
+          if [if] (168:4-168:6)
+          not_operator [not instagram_integrator] (168:7-168:31)
+            not [not] (168:7-168:10)
+            identifier [instagram_integrator] (168:11-168:31)
+          : [:] (168:31-168:32)
+          block [raise HTTPException(status_code=500, detail="Instagram integrator not initialized")] (169:8-169:91)
+            raise_statement [raise HTTPException(status_code=500, detail="Instagram integrator not initialized")] (169:8-169:91)
+              raise [raise] (169:8-169:13)
+              call [HTTPException(status_code=500, detail="Instagram integrator not initialized")] (169:14-169:91)
+                identifier [HTTPException] (169:14-169:27)
+                argument_list [(status_code=500, detail="Instagram integrator not initialized")] (169:27-169:91)
+                  ( [(] (169:27-169:28)
+                  keyword_argument [status_code=500] (169:28-169:43)
+                    identifier [status_code] (169:28-169:39)
+                    = [=] (169:39-169:40)
+                    integer [500] (169:40-169:43)
+                  , [,] (169:43-169:44)
+                  keyword_argument [detail="Instagram integrator not initialized"] (169:45-169:90)
+                    identifier [detail] (169:45-169:51)
+                    = [=] (169:51-169:52)
+                    string ["Instagram integrator not initialized"] (169:52-169:90)
+                      string_start ["] (169:52-169:53)
+                      string_content [Instagram integrator not initialized] (169:53-169:89)
+                      string_end ["] (169:89-169:90)
+                  ) [)] (169:90-169:91)
+        try_statement [try:
+        results = instagram_integrator.search_and_store_hashtag_posts(
+            request.hashtag,
+            request.amount
+        )
+
+        return InstagramResponse(
+            posts_found=results['posts_found'],
+            posts_stored=results['posts_stored'],
+            posts_failed=results['posts_failed'],
+            file_path=results['file_path'],
+            message=f"Found {results['posts_found']} posts, stored {results['posts_stored']} in AstraDB, failed {results['posts_failed']}"
+        )
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))] (171:4-186:59)
+          try [try] (171:4-171:7)
+          : [:] (171:7-171:8)
+          block [results = instagram_integrator.search_and_store_hashtag_posts(
+            request.hashtag,
+            request.amount
+        )
+
+        return InstagramResponse(
+            posts_found=results['posts_found'],
+            posts_stored=results['posts_stored'],
+            posts_failed=results['posts_failed'],
+            file_path=results['file_path'],
+            message=f"Found {results['posts_found']} posts, stored {results['posts_stored']} in AstraDB, failed {results['posts_failed']}"
+        )] (172:8-183:9)
+            expression_statement [results = instagram_integrator.search_and_store_hashtag_posts(
+            request.hashtag,
+            request.amount
+        )] (172:8-175:9)
+              assignment [results = instagram_integrator.search_and_store_hashtag_posts(
+            request.hashtag,
+            request.amount
+        )] (172:8-175:9)
+                identifier [results] (172:8-172:15)
+                = [=] (172:16-172:17)
+                call [instagram_integrator.search_and_store_hashtag_posts(
+            request.hashtag,
+            request.amount
+        )] (172:18-175:9)
+                  attribute [instagram_integrator.search_and_store_hashtag_posts] (172:18-172:69)
+                    identifier [instagram_integrator] (172:18-172:38)
+                    . [.] (172:38-172:39)
+                    identifier [search_and_store_hashtag_posts] (172:39-172:69)
+                  argument_list [(
+            request.hashtag,
+            request.amount
+        )] (172:69-175:9)
+                    ( [(] (172:69-172:70)
+                    attribute [request.hashtag] (173:12-173:27)
+                      identifier [request] (173:12-173:19)
+                      . [.] (173:19-173:20)
+                      identifier [hashtag] (173:20-173:27)
+                    , [,] (173:27-173:28)
+                    attribute [request.amount] (174:12-174:26)
+                      identifier [request] (174:12-174:19)
+                      . [.] (174:19-174:20)
+                      identifier [amount] (174:20-174:26)
+                    ) [)] (175:8-175:9)
+            return_statement [return InstagramResponse(
+            posts_found=results['posts_found'],
+            posts_stored=results['posts_stored'],
+            posts_failed=results['posts_failed'],
+            file_path=results['file_path'],
+            message=f"Found {results['posts_found']} posts, stored {results['posts_stored']} in AstraDB, failed {results['posts_failed']}"
+        )] (177:8-183:9)
+              return [return] (177:8-177:14)
+              call [InstagramResponse(
+            posts_found=results['posts_found'],
+            posts_stored=results['posts_stored'],
+            posts_failed=results['posts_failed'],
+            file_path=results['file_path'],
+            message=f"Found {results['posts_found']} posts, stored {results['posts_stored']} in AstraDB, failed {results['posts_failed']}"
+        )] (177:15-183:9)
+                identifier [InstagramResponse] (177:15-177:32)
+                argument_list [(
+            posts_found=results['posts_found'],
+            posts_stored=results['posts_stored'],
+            posts_failed=results['posts_failed'],
+            file_path=results['file_path'],
+            message=f"Found {results['posts_found']} posts, stored {results['posts_stored']} in AstraDB, failed {results['posts_failed']}"
+        )] (177:32-183:9)
+                  ( [(] (177:32-177:33)
+                  keyword_argument [posts_found=results['posts_found']] (178:12-178:46)
+                    identifier [posts_found] (178:12-178:23)
+                    = [=] (178:23-178:24)
+                    subscript [results['posts_found']] (178:24-178:46)
+                      identifier [results] (178:24-178:31)
+                      [ [[] (178:31-178:32)
+                      string ['posts_found'] (178:32-178:45)
+                        string_start ['] (178:32-178:33)
+                        string_content [posts_found] (178:33-178:44)
+                        string_end ['] (178:44-178:45)
+                      ] []] (178:45-178:46)
+                  , [,] (178:46-178:47)
+                  keyword_argument [posts_stored=results['posts_stored']] (179:12-179:48)
+                    identifier [posts_stored] (179:12-179:24)
+                    = [=] (179:24-179:25)
+                    subscript [results['posts_stored']] (179:25-179:48)
+                      identifier [results] (179:25-179:32)
+                      [ [[] (179:32-179:33)
+                      string ['posts_stored'] (179:33-179:47)
+                        string_start ['] (179:33-179:34)
+                        string_content [posts_stored] (179:34-179:46)
+                        string_end ['] (179:46-179:47)
+                      ] []] (179:47-179:48)
+                  , [,] (179:48-179:49)
+                  keyword_argument [posts_failed=results['posts_failed']] (180:12-180:48)
+                    identifier [posts_failed] (180:12-180:24)
+                    = [=] (180:24-180:25)
+                    subscript [results['posts_failed']] (180:25-180:48)
+                      identifier [results] (180:25-180:32)
+                      [ [[] (180:32-180:33)
+                      string ['posts_failed'] (180:33-180:47)
+                        string_start ['] (180:33-180:34)
+                        string_content [posts_failed] (180:34-180:46)
+                        string_end ['] (180:46-180:47)
+                      ] []] (180:47-180:48)
+                  , [,] (180:48-180:49)
+                  keyword_argument [file_path=results['file_path']] (181:12-181:42)
+                    identifier [file_path] (181:12-181:21)
+                    = [=] (181:21-181:22)
+                    subscript [results['file_path']] (181:22-181:42)
+                      identifier [results] (181:22-181:29)
+                      [ [[] (181:29-181:30)
+                      string ['file_path'] (181:30-181:41)
+                        string_start ['] (181:30-181:31)
+                        string_content [file_path] (181:31-181:40)
+                        string_end ['] (181:40-181:41)
+                      ] []] (181:41-181:42)
+                  , [,] (181:42-181:43)
+                  keyword_argument [message=f"Found {results['posts_found']} posts, stored {results['posts_stored']} in AstraDB, failed {results['posts_failed']}"] (182:12-182:138)
+                    identifier [message] (182:12-182:19)
+                    = [=] (182:19-182:20)
+                    string [f"Found {results['posts_found']} posts, stored {results['posts_stored']} in AstraDB, failed {results['posts_failed']}"] (182:20-182:138)
+                      string_start [f"] (182:20-182:22)
+                      string_content [Found ] (182:22-182:28)
+                      interpolation [{results['posts_found']}] (182:28-182:52)
+                        { [{] (182:28-182:29)
+                        subscript [results['posts_found']] (182:29-182:51)
+                          identifier [results] (182:29-182:36)
+                          [ [[] (182:36-182:37)
+                          string ['posts_found'] (182:37-182:50)
+                            string_start ['] (182:37-182:38)
+                            string_content [posts_found] (182:38-182:49)
+                            string_end ['] (182:49-182:50)
+                          ] []] (182:50-182:51)
+                        } [}] (182:51-182:52)
+                      string_content [ posts, stored ] (182:52-182:67)
+                      interpolation [{results['posts_stored']}] (182:67-182:92)
+                        { [{] (182:67-182:68)
+                        subscript [results['posts_stored']] (182:68-182:91)
+                          identifier [results] (182:68-182:75)
+                          [ [[] (182:75-182:76)
+                          string ['posts_stored'] (182:76-182:90)
+                            string_start ['] (182:76-182:77)
+                            string_content [posts_stored] (182:77-182:89)
+                            string_end ['] (182:89-182:90)
+                          ] []] (182:90-182:91)
+                        } [}] (182:91-182:92)
+                      string_content [ in AstraDB, failed ] (182:92-182:112)
+                      interpolation [{results['posts_failed']}] (182:112-182:137)
+                        { [{] (182:112-182:113)
+                        subscript [results['posts_failed']] (182:113-182:136)
+                          identifier [results] (182:113-182:120)
+                          [ [[] (182:120-182:121)
+                          string ['posts_failed'] (182:121-182:135)
+                            string_start ['] (182:121-182:122)
+                            string_content [posts_failed] (182:122-182:134)
+                            string_end ['] (182:134-182:135)
+                          ] []] (182:135-182:136)
+                        } [}] (182:136-182:137)
+                      string_end ["] (182:137-182:138)
+                  ) [)] (183:8-183:9)
+          except_clause [except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))] (185:4-186:59)
+            except [except] (185:4-185:10)
+            as_pattern [Exception as e] (185:11-185:25)
+              identifier [Exception] (185:11-185:20)
+              as [as] (185:21-185:23)
+              as_pattern_target [e] (185:24-185:25)
+                identifier [e] (185:24-185:25)
+            : [:] (185:25-185:26)
+            block [raise HTTPException(status_code=500, detail=str(e))] (186:8-186:59)
+              raise_statement [raise HTTPException(status_code=500, detail=str(e))] (186:8-186:59)
+                raise [raise] (186:8-186:13)
+                call [HTTPException(status_code=500, detail=str(e))] (186:14-186:59)
+                  identifier [HTTPException] (186:14-186:27)
+                  argument_list [(status_code=500, detail=str(e))] (186:27-186:59)
+                    ( [(] (186:27-186:28)
+                    keyword_argument [status_code=500] (186:28-186:43)
+                      identifier [status_code] (186:28-186:39)
+                      = [=] (186:39-186:40)
+                      integer [500] (186:40-186:43)
+                    , [,] (186:43-186:44)
+                    keyword_argument [detail=str(e)] (186:45-186:58)
+                      identifier [detail] (186:45-186:51)
+                      = [=] (186:51-186:52)
+                      call [str(e)] (186:52-186:58)
+                        identifier [str] (186:52-186:55)
+                        argument_list [(e)] (186:55-186:58)
+                          ( [(] (186:55-186:56)
+                          identifier [e] (186:56-186:57)
+                          ) [)] (186:57-186:58)
+                    ) [)] (186:58-186:59)
+  comment [# Add to service initialization] (189:0-189:31)
+  expression_statement [reddit_integrator = None] (190:0-190:24)
+    assignment [reddit_integrator = None] (190:0-190:24)
+      identifier [reddit_integrator] (190:0-190:17)
+      = [=] (190:18-190:19)
+      none [None] (190:20-190:24)
+  try_statement [try:
+    reddit_integrator = RedditAstraIntegrator(
+        reddit_client_id=reddit_client_id,
+        reddit_client_secret=reddit_client_secret,
+        reddit_user_agent=reddit_user_agent,
+        astra_token=astra_token,
+        astra_endpoint=astra_endpoint,
+        collection_name="you"
+    )
+except Exception as e:
+    print(f"Error initializing Reddit integrator: {e}")] (191:0-201:55)
+    try [try] (191:0-191:3)
+    : [:] (191:3-191:4)
+    block [reddit_integrator = RedditAstraIntegrator(
+        reddit_client_id=reddit_client_id,
+        reddit_client_secret=reddit_client_secret,
+        reddit_user_agent=reddit_user_agent,
+        astra_token=astra_token,
+        astra_endpoint=astra_endpoint,
+        collection_name="you"
+    )] (192:4-199:5)
+      expression_statement [reddit_integrator = RedditAstraIntegrator(
+        reddit_client_id=reddit_client_id,
+        reddit_client_secret=reddit_client_secret,
+        reddit_user_agent=reddit_user_agent,
+        astra_token=astra_token,
+        astra_endpoint=astra_endpoint,
+        collection_name="you"
+    )] (192:4-199:5)
+        assignment [reddit_integrator = RedditAstraIntegrator(
+        reddit_client_id=reddit_client_id,
+        reddit_client_secret=reddit_client_secret,
+        reddit_user_agent=reddit_user_agent,
+        astra_token=astra_token,
+        astra_endpoint=astra_endpoint,
+        collection_name="you"
+    )] (192:4-199:5)
+          identifier [reddit_integrator] (192:4-192:21)
+          = [=] (192:22-192:23)
+          call [RedditAstraIntegrator(
+        reddit_client_id=reddit_client_id,
+        reddit_client_secret=reddit_client_secret,
+        reddit_user_agent=reddit_user_agent,
+        astra_token=astra_token,
+        astra_endpoint=astra_endpoint,
+        collection_name="you"
+    )] (192:24-199:5)
+            identifier [RedditAstraIntegrator] (192:24-192:45)
+            argument_list [(
+        reddit_client_id=reddit_client_id,
+        reddit_client_secret=reddit_client_secret,
+        reddit_user_agent=reddit_user_agent,
+        astra_token=astra_token,
+        astra_endpoint=astra_endpoint,
+        collection_name="you"
+    )] (192:45-199:5)
+              ( [(] (192:45-192:46)
+              keyword_argument [reddit_client_id=reddit_client_id] (193:8-193:41)
+                identifier [reddit_client_id] (193:8-193:24)
+                = [=] (193:24-193:25)
+                identifier [reddit_client_id] (193:25-193:41)
+              , [,] (193:41-193:42)
+              keyword_argument [reddit_client_secret=reddit_client_secret] (194:8-194:49)
+                identifier [reddit_client_secret] (194:8-194:28)
+                = [=] (194:28-194:29)
+                identifier [reddit_client_secret] (194:29-194:49)
+              , [,] (194:49-194:50)
+              keyword_argument [reddit_user_agent=reddit_user_agent] (195:8-195:43)
+                identifier [reddit_user_agent] (195:8-195:25)
+                = [=] (195:25-195:26)
+                identifier [reddit_user_agent] (195:26-195:43)
+              , [,] (195:43-195:44)
+              keyword_argument [astra_token=astra_token] (196:8-196:31)
+                identifier [astra_token] (196:8-196:19)
+                = [=] (196:19-196:20)
+                identifier [astra_token] (196:20-196:31)
+              , [,] (196:31-196:32)
+              keyword_argument [astra_endpoint=astra_endpoint] (197:8-197:37)
+                identifier [astra_endpoint] (197:8-197:22)
+                = [=] (197:22-197:23)
+                identifier [astra_endpoint] (197:23-197:37)
+              , [,] (197:37-197:38)
+              keyword_argument [collection_name="you"] (198:8-198:29)
+                identifier [collection_name] (198:8-198:23)
+                = [=] (198:23-198:24)
+                string ["you"] (198:24-198:29)
+                  string_start ["] (198:24-198:25)
+                  string_content [you] (198:25-198:28)
+                  string_end ["] (198:28-198:29)
+              ) [)] (199:4-199:5)
+    except_clause [except Exception as e:
+    print(f"Error initializing Reddit integrator: {e}")] (200:0-201:55)
+      except [except] (200:0-200:6)
+      as_pattern [Exception as e] (200:7-200:21)
+        identifier [Exception] (200:7-200:16)
+        as [as] (200:17-200:19)
+        as_pattern_target [e] (200:20-200:21)
+          identifier [e] (200:20-200:21)
+      : [:] (200:21-200:22)
+      block [print(f"Error initializing Reddit integrator: {e}")] (201:4-201:55)
+        expression_statement [print(f"Error initializing Reddit integrator: {e}")] (201:4-201:55)
+          call [print(f"Error initializing Reddit integrator: {e}")] (201:4-201:55)
+            identifier [print] (201:4-201:9)
+            argument_list [(f"Error initializing Reddit integrator: {e}")] (201:9-201:55)
+              ( [(] (201:9-201:10)
+              string [f"Error initializing Reddit integrator: {e}"] (201:10-201:54)
+                string_start [f"] (201:10-201:12)
+                string_content [Error initializing Reddit integrator: ] (201:12-201:50)
+                interpolation [{e}] (201:50-201:53)
+                  { [{] (201:50-201:51)
+                  identifier [e] (201:51-201:52)
+                  } [}] (201:52-201:53)
+                string_end ["] (201:53-201:54)
+              ) [)] (201:54-201:55)
+  comment [# Add new endpoint] (204:0-204:18)
+  decorated_definition [@app.post("/reddit/search", response_model=RedditResponse)
+async def search_reddit_posts(request: RedditSearchRequest):
+    """
+    Search Reddit posts by topic and store in AstraDB.
+    """
+    if not reddit_integrator:
+        raise HTTPException(status_code=500, detail="Reddit integrator not initialized")
+
+    try:
+        results = reddit_integrator.search_and_store_posts(
+            request.topic,
+            request.limit
+        )
+
+        return RedditResponse(
+            posts_found=results['posts_found'],
+            posts_stored=results['posts_stored'],
+            posts_failed=results['posts_failed'],
+            file_path=results['file_path'],
+            message=f"Found {results['posts_found']} posts, stored {results['posts_stored']} in AstraDB, failed {results['posts_failed']}"
+        )
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))] (205:0-228:59)
+    decorator [@app.post("/reddit/search", response_model=RedditResponse)] (205:0-205:58)
+      @ [@] (205:0-205:1)
+      call [app.post("/reddit/search", response_model=RedditResponse)] (205:1-205:58)
+        attribute [app.post] (205:1-205:9)
+          identifier [app] (205:1-205:4)
+          . [.] (205:4-205:5)
+          identifier [post] (205:5-205:9)
+        argument_list [("/reddit/search", response_model=RedditResponse)] (205:9-205:58)
+          ( [(] (205:9-205:10)
+          string ["/reddit/search"] (205:10-205:26)
+            string_start ["] (205:10-205:11)
+            string_content [/reddit/search] (205:11-205:25)
+            string_end ["] (205:25-205:26)
+          , [,] (205:26-205:27)
+          keyword_argument [response_model=RedditResponse] (205:28-205:57)
+            identifier [response_model] (205:28-205:42)
+            = [=] (205:42-205:43)
+            identifier [RedditResponse] (205:43-205:57)
+          ) [)] (205:57-205:58)
+    function_definition [async def search_reddit_posts(request: RedditSearchRequest):
+    """
+    Search Reddit posts by topic and store in AstraDB.
+    """
+    if not reddit_integrator:
+        raise HTTPException(status_code=500, detail="Reddit integrator not initialized")
+
+    try:
+        results = reddit_integrator.search_and_store_posts(
+            request.topic,
+            request.limit
+        )
+
+        return RedditResponse(
+            posts_found=results['posts_found'],
+            posts_stored=results['posts_stored'],
+            posts_failed=results['posts_failed'],
+            file_path=results['file_path'],
+            message=f"Found {results['posts_found']} posts, stored {results['posts_stored']} in AstraDB, failed {results['posts_failed']}"
+        )
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))] (206:0-228:59)
+      async [async] (206:0-206:5)
+      def [def] (206:6-206:9)
+      identifier [search_reddit_posts] (206:10-206:29)
+      parameters [(request: RedditSearchRequest)] (206:29-206:59)
+        ( [(] (206:29-206:30)
+        typed_parameter [request: RedditSearchRequest] (206:30-206:58)
+          identifier [request] (206:30-206:37)
+          : [:] (206:37-206:38)
+          type [RedditSearchRequest] (206:39-206:58)
+            identifier [RedditSearchRequest] (206:39-206:58)
+        ) [)] (206:58-206:59)
+      : [:] (206:59-206:60)
+      block ["""
+    Search Reddit posts by topic and store in AstraDB.
+    """
+    if not reddit_integrator:
+        raise HTTPException(status_code=500, detail="Reddit integrator not initialized")
+
+    try:
+        results = reddit_integrator.search_and_store_posts(
+            request.topic,
+            request.limit
+        )
+
+        return RedditResponse(
+            posts_found=results['posts_found'],
+            posts_stored=results['posts_stored'],
+            posts_failed=results['posts_failed'],
+            file_path=results['file_path'],
+            message=f"Found {results['posts_found']} posts, stored {results['posts_stored']} in AstraDB, failed {results['posts_failed']}"
+        )
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))] (207:4-228:59)
+        expression_statement ["""
+    Search Reddit posts by topic and store in AstraDB.
+    """] (207:4-209:7)
+          string ["""
+    Search Reddit posts by topic and store in AstraDB.
+    """] (207:4-209:7)
+            string_start ["""] (207:4-207:7)
+            string_content [
+    Search Reddit posts by topic and store in AstraDB.
+    ] (207:7-209:4)
+            string_end ["""] (209:4-209:7)
+        if_statement [if not reddit_integrator:
+        raise HTTPException(status_code=500, detail="Reddit integrator not initialized")] (210:4-211:88)
+          if [if] (210:4-210:6)
+          not_operator [not reddit_integrator] (210:7-210:28)
+            not [not] (210:7-210:10)
+            identifier [reddit_integrator] (210:11-210:28)
+          : [:] (210:28-210:29)
+          block [raise HTTPException(status_code=500, detail="Reddit integrator not initialized")] (211:8-211:88)
+            raise_statement [raise HTTPException(status_code=500, detail="Reddit integrator not initialized")] (211:8-211:88)
+              raise [raise] (211:8-211:13)
+              call [HTTPException(status_code=500, detail="Reddit integrator not initialized")] (211:14-211:88)
+                identifier [HTTPException] (211:14-211:27)
+                argument_list [(status_code=500, detail="Reddit integrator not initialized")] (211:27-211:88)
+                  ( [(] (211:27-211:28)
+                  keyword_argument [status_code=500] (211:28-211:43)
+                    identifier [status_code] (211:28-211:39)
+                    = [=] (211:39-211:40)
+                    integer [500] (211:40-211:43)
+                  , [,] (211:43-211:44)
+                  keyword_argument [detail="Reddit integrator not initialized"] (211:45-211:87)
+                    identifier [detail] (211:45-211:51)
+                    = [=] (211:51-211:52)
+                    string ["Reddit integrator not initialized"] (211:52-211:87)
+                      string_start ["] (211:52-211:53)
+                      string_content [Reddit integrator not initialized] (211:53-211:86)
+                      string_end ["] (211:86-211:87)
+                  ) [)] (211:87-211:88)
+        try_statement [try:
+        results = reddit_integrator.search_and_store_posts(
+            request.topic,
+            request.limit
+        )
+
+        return RedditResponse(
+            posts_found=results['posts_found'],
+            posts_stored=results['posts_stored'],
+            posts_failed=results['posts_failed'],
+            file_path=results['file_path'],
+            message=f"Found {results['posts_found']} posts, stored {results['posts_stored']} in AstraDB, failed {results['posts_failed']}"
+        )
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))] (213:4-228:59)
+          try [try] (213:4-213:7)
+          : [:] (213:7-213:8)
+          block [results = reddit_integrator.search_and_store_posts(
+            request.topic,
+            request.limit
+        )
+
+        return RedditResponse(
+            posts_found=results['posts_found'],
+            posts_stored=results['posts_stored'],
+            posts_failed=results['posts_failed'],
+            file_path=results['file_path'],
+            message=f"Found {results['posts_found']} posts, stored {results['posts_stored']} in AstraDB, failed {results['posts_failed']}"
+        )] (214:8-225:9)
+            expression_statement [results = reddit_integrator.search_and_store_posts(
+            request.topic,
+            request.limit
+        )] (214:8-217:9)
+              assignment [results = reddit_integrator.search_and_store_posts(
+            request.topic,
+            request.limit
+        )] (214:8-217:9)
+                identifier [results] (214:8-214:15)
+                = [=] (214:16-214:17)
+                call [reddit_integrator.search_and_store_posts(
+            request.topic,
+            request.limit
+        )] (214:18-217:9)
+                  attribute [reddit_integrator.search_and_store_posts] (214:18-214:58)
+                    identifier [reddit_integrator] (214:18-214:35)
+                    . [.] (214:35-214:36)
+                    identifier [search_and_store_posts] (214:36-214:58)
+                  argument_list [(
+            request.topic,
+            request.limit
+        )] (214:58-217:9)
+                    ( [(] (214:58-214:59)
+                    attribute [request.topic] (215:12-215:25)
+                      identifier [request] (215:12-215:19)
+                      . [.] (215:19-215:20)
+                      identifier [topic] (215:20-215:25)
+                    , [,] (215:25-215:26)
+                    attribute [request.limit] (216:12-216:25)
+                      identifier [request] (216:12-216:19)
+                      . [.] (216:19-216:20)
+                      identifier [limit] (216:20-216:25)
+                    ) [)] (217:8-217:9)
+            return_statement [return RedditResponse(
+            posts_found=results['posts_found'],
+            posts_stored=results['posts_stored'],
+            posts_failed=results['posts_failed'],
+            file_path=results['file_path'],
+            message=f"Found {results['posts_found']} posts, stored {results['posts_stored']} in AstraDB, failed {results['posts_failed']}"
+        )] (219:8-225:9)
+              return [return] (219:8-219:14)
+              call [RedditResponse(
+            posts_found=results['posts_found'],
+            posts_stored=results['posts_stored'],
+            posts_failed=results['posts_failed'],
+            file_path=results['file_path'],
+            message=f"Found {results['posts_found']} posts, stored {results['posts_stored']} in AstraDB, failed {results['posts_failed']}"
+        )] (219:15-225:9)
+                identifier [RedditResponse] (219:15-219:29)
+                argument_list [(
+            posts_found=results['posts_found'],
+            posts_stored=results['posts_stored'],
+            posts_failed=results['posts_failed'],
+            file_path=results['file_path'],
+            message=f"Found {results['posts_found']} posts, stored {results['posts_stored']} in AstraDB, failed {results['posts_failed']}"
+        )] (219:29-225:9)
+                  ( [(] (219:29-219:30)
+                  keyword_argument [posts_found=results['posts_found']] (220:12-220:46)
+                    identifier [posts_found] (220:12-220:23)
+                    = [=] (220:23-220:24)
+                    subscript [results['posts_found']] (220:24-220:46)
+                      identifier [results] (220:24-220:31)
+                      [ [[] (220:31-220:32)
+                      string ['posts_found'] (220:32-220:45)
+                        string_start ['] (220:32-220:33)
+                        string_content [posts_found] (220:33-220:44)
+                        string_end ['] (220:44-220:45)
+                      ] []] (220:45-220:46)
+                  , [,] (220:46-220:47)
+                  keyword_argument [posts_stored=results['posts_stored']] (221:12-221:48)
+                    identifier [posts_stored] (221:12-221:24)
+                    = [=] (221:24-221:25)
+                    subscript [results['posts_stored']] (221:25-221:48)
+                      identifier [results] (221:25-221:32)
+                      [ [[] (221:32-221:33)
+                      string ['posts_stored'] (221:33-221:47)
+                        string_start ['] (221:33-221:34)
+                        string_content [posts_stored] (221:34-221:46)
+                        string_end ['] (221:46-221:47)
+                      ] []] (221:47-221:48)
+                  , [,] (221:48-221:49)
+                  keyword_argument [posts_failed=results['posts_failed']] (222:12-222:48)
+                    identifier [posts_failed] (222:12-222:24)
+                    = [=] (222:24-222:25)
+                    subscript [results['posts_failed']] (222:25-222:48)
+                      identifier [results] (222:25-222:32)
+                      [ [[] (222:32-222:33)
+                      string ['posts_failed'] (222:33-222:47)
+                        string_start ['] (222:33-222:34)
+                        string_content [posts_failed] (222:34-222:46)
+                        string_end ['] (222:46-222:47)
+                      ] []] (222:47-222:48)
+                  , [,] (222:48-222:49)
+                  keyword_argument [file_path=results['file_path']] (223:12-223:42)
+                    identifier [file_path] (223:12-223:21)
+                    = [=] (223:21-223:22)
+                    subscript [results['file_path']] (223:22-223:42)
+                      identifier [results] (223:22-223:29)
+                      [ [[] (223:29-223:30)
+                      string ['file_path'] (223:30-223:41)
+                        string_start ['] (223:30-223:31)
+                        string_content [file_path] (223:31-223:40)
+                        string_end ['] (223:40-223:41)
+                      ] []] (223:41-223:42)
+                  , [,] (223:42-223:43)
+                  keyword_argument [message=f"Found {results['posts_found']} posts, stored {results['posts_stored']} in AstraDB, failed {results['posts_failed']}"] (224:12-224:138)
+                    identifier [message] (224:12-224:19)
+                    = [=] (224:19-224:20)
+                    string [f"Found {results['posts_found']} posts, stored {results['posts_stored']} in AstraDB, failed {results['posts_failed']}"] (224:20-224:138)
+                      string_start [f"] (224:20-224:22)
+                      string_content [Found ] (224:22-224:28)
+                      interpolation [{results['posts_found']}] (224:28-224:52)
+                        { [{] (224:28-224:29)
+                        subscript [results['posts_found']] (224:29-224:51)
+                          identifier [results] (224:29-224:36)
+                          [ [[] (224:36-224:37)
+                          string ['posts_found'] (224:37-224:50)
+                            string_start ['] (224:37-224:38)
+                            string_content [posts_found] (224:38-224:49)
+                            string_end ['] (224:49-224:50)
+                          ] []] (224:50-224:51)
+                        } [}] (224:51-224:52)
+                      string_content [ posts, stored ] (224:52-224:67)
+                      interpolation [{results['posts_stored']}] (224:67-224:92)
+                        { [{] (224:67-224:68)
+                        subscript [results['posts_stored']] (224:68-224:91)
+                          identifier [results] (224:68-224:75)
+                          [ [[] (224:75-224:76)
+                          string ['posts_stored'] (224:76-224:90)
+                            string_start ['] (224:76-224:77)
+                            string_content [posts_stored] (224:77-224:89)
+                            string_end ['] (224:89-224:90)
+                          ] []] (224:90-224:91)
+                        } [}] (224:91-224:92)
+                      string_content [ in AstraDB, failed ] (224:92-224:112)
+                      interpolation [{results['posts_failed']}] (224:112-224:137)
+                        { [{] (224:112-224:113)
+                        subscript [results['posts_failed']] (224:113-224:136)
+                          identifier [results] (224:113-224:120)
+                          [ [[] (224:120-224:121)
+                          string ['posts_failed'] (224:121-224:135)
+                            string_start ['] (224:121-224:122)
+                            string_content [posts_failed] (224:122-224:134)
+                            string_end ['] (224:134-224:135)
+                          ] []] (224:135-224:136)
+                        } [}] (224:136-224:137)
+                      string_end ["] (224:137-224:138)
+                  ) [)] (225:8-225:9)
+          except_clause [except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))] (227:4-228:59)
+            except [except] (227:4-227:10)
+            as_pattern [Exception as e] (227:11-227:25)
+              identifier [Exception] (227:11-227:20)
+              as [as] (227:21-227:23)
+              as_pattern_target [e] (227:24-227:25)
+                identifier [e] (227:24-227:25)
+            : [:] (227:25-227:26)
+            block [raise HTTPException(status_code=500, detail=str(e))] (228:8-228:59)
+              raise_statement [raise HTTPException(status_code=500, detail=str(e))] (228:8-228:59)
+                raise [raise] (228:8-228:13)
+                call [HTTPException(status_code=500, detail=str(e))] (228:14-228:59)
+                  identifier [HTTPException] (228:14-228:27)
+                  argument_list [(status_code=500, detail=str(e))] (228:27-228:59)
+                    ( [(] (228:27-228:28)
+                    keyword_argument [status_code=500] (228:28-228:43)
+                      identifier [status_code] (228:28-228:39)
+                      = [=] (228:39-228:40)
+                      integer [500] (228:40-228:43)
+                    , [,] (228:43-228:44)
+                    keyword_argument [detail=str(e)] (228:45-228:58)
+                      identifier [detail] (228:45-228:51)
+                      = [=] (228:51-228:52)
+                      call [str(e)] (228:52-228:58)
+                        identifier [str] (228:52-228:55)
+                        argument_list [(e)] (228:55-228:58)
+                          ( [(] (228:55-228:56)
+                          identifier [e] (228:56-228:57)
+                          ) [)] (228:57-228:58)
+                    ) [)] (228:58-228:59)
+  comment [# Update health check to include Reddit] (231:0-231:39)
+  decorated_definition [@app.get("/health")
+async def health_check():
+    return {
+        "youtube_status": "healthy" if youtube_integrator else "unhealthy",
+        "instagram_status": "healthy" if instagram_integrator else "unhealthy",
+        "reddit_status": "healthy" if reddit_integrator else "unhealthy",
+        "youtube_api": "configured" if youtube_api_key else "missing",
+        "astra_db": "configured" if astra_token and astra_endpoint else "missing",
+        "instagram_auth": "configured" if instagram_username and instagram_password else "missing",
+        "reddit_auth": "configured" if all([reddit_client_id, reddit_client_secret, reddit_user_agent]) else "missing"
+    }] (232:0-242:5)
+    decorator [@app.get("/health")] (232:0-232:19)
+      @ [@] (232:0-232:1)
+      call [app.get("/health")] (232:1-232:19)
+        attribute [app.get] (232:1-232:8)
+          identifier [app] (232:1-232:4)
+          . [.] (232:4-232:5)
+          identifier [get] (232:5-232:8)
+        argument_list [("/health")] (232:8-232:19)
+          ( [(] (232:8-232:9)
+          string ["/health"] (232:9-232:18)
+            string_start ["] (232:9-232:10)
+            string_content [/health] (232:10-232:17)
+            string_end ["] (232:17-232:18)
+          ) [)] (232:18-232:19)
+    function_definition [async def health_check():
+    return {
+        "youtube_status": "healthy" if youtube_integrator else "unhealthy",
+        "instagram_status": "healthy" if instagram_integrator else "unhealthy",
+        "reddit_status": "healthy" if reddit_integrator else "unhealthy",
+        "youtube_api": "configured" if youtube_api_key else "missing",
+        "astra_db": "configured" if astra_token and astra_endpoint else "missing",
+        "instagram_auth": "configured" if instagram_username and instagram_password else "missing",
+        "reddit_auth": "configured" if all([reddit_client_id, reddit_client_secret, reddit_user_agent]) else "missing"
+    }] (233:0-242:5)
+      async [async] (233:0-233:5)
+      def [def] (233:6-233:9)
+      identifier [health_check] (233:10-233:22)
+      parameters [()] (233:22-233:24)
+        ( [(] (233:22-233:23)
+        ) [)] (233:23-233:24)
+      : [:] (233:24-233:25)
+      block [return {
+        "youtube_status": "healthy" if youtube_integrator else "unhealthy",
+        "instagram_status": "healthy" if instagram_integrator else "unhealthy",
+        "reddit_status": "healthy" if reddit_integrator else "unhealthy",
+        "youtube_api": "configured" if youtube_api_key else "missing",
+        "astra_db": "configured" if astra_token and astra_endpoint else "missing",
+        "instagram_auth": "configured" if instagram_username and instagram_password else "missing",
+        "reddit_auth": "configured" if all([reddit_client_id, reddit_client_secret, reddit_user_agent]) else "missing"
+    }] (234:4-242:5)
+        return_statement [return {
+        "youtube_status": "healthy" if youtube_integrator else "unhealthy",
+        "instagram_status": "healthy" if instagram_integrator else "unhealthy",
+        "reddit_status": "healthy" if reddit_integrator else "unhealthy",
+        "youtube_api": "configured" if youtube_api_key else "missing",
+        "astra_db": "configured" if astra_token and astra_endpoint else "missing",
+        "instagram_auth": "configured" if instagram_username and instagram_password else "missing",
+        "reddit_auth": "configured" if all([reddit_client_id, reddit_client_secret, reddit_user_agent]) else "missing"
+    }] (234:4-242:5)
+          return [return] (234:4-234:10)
+          dictionary [{
+        "youtube_status": "healthy" if youtube_integrator else "unhealthy",
+        "instagram_status": "healthy" if instagram_integrator else "unhealthy",
+        "reddit_status": "healthy" if reddit_integrator else "unhealthy",
+        "youtube_api": "configured" if youtube_api_key else "missing",
+        "astra_db": "configured" if astra_token and astra_endpoint else "missing",
+        "instagram_auth": "configured" if instagram_username and instagram_password else "missing",
+        "reddit_auth": "configured" if all([reddit_client_id, reddit_client_secret, reddit_user_agent]) else "missing"
+    }] (234:11-242:5)
+            { [{] (234:11-234:12)
+            pair ["youtube_status": "healthy" if youtube_integrator else "unhealthy"] (235:8-235:74)
+              string ["youtube_status"] (235:8-235:24)
+                string_start ["] (235:8-235:9)
+                string_content [youtube_status] (235:9-235:23)
+                string_end ["] (235:23-235:24)
+              : [:] (235:24-235:25)
+              conditional_expression ["healthy" if youtube_integrator else "unhealthy"] (235:26-235:74)
+                string ["healthy"] (235:26-235:35)
+                  string_start ["] (235:26-235:27)
+                  string_content [healthy] (235:27-235:34)
+                  string_end ["] (235:34-235:35)
+                if [if] (235:36-235:38)
+                identifier [youtube_integrator] (235:39-235:57)
+                else [else] (235:58-235:62)
+                string ["unhealthy"] (235:63-235:74)
+                  string_start ["] (235:63-235:64)
+                  string_content [unhealthy] (235:64-235:73)
+                  string_end ["] (235:73-235:74)
+            , [,] (235:74-235:75)
+            pair ["instagram_status": "healthy" if instagram_integrator else "unhealthy"] (236:8-236:78)
+              string ["instagram_status"] (236:8-236:26)
+                string_start ["] (236:8-236:9)
+                string_content [instagram_status] (236:9-236:25)
+                string_end ["] (236:25-236:26)
+              : [:] (236:26-236:27)
+              conditional_expression ["healthy" if instagram_integrator else "unhealthy"] (236:28-236:78)
+                string ["healthy"] (236:28-236:37)
+                  string_start ["] (236:28-236:29)
+                  string_content [healthy] (236:29-236:36)
+                  string_end ["] (236:36-236:37)
+                if [if] (236:38-236:40)
+                identifier [instagram_integrator] (236:41-236:61)
+                else [else] (236:62-236:66)
+                string ["unhealthy"] (236:67-236:78)
+                  string_start ["] (236:67-236:68)
+                  string_content [unhealthy] (236:68-236:77)
+                  string_end ["] (236:77-236:78)
+            , [,] (236:78-236:79)
+            pair ["reddit_status": "healthy" if reddit_integrator else "unhealthy"] (237:8-237:72)
+              string ["reddit_status"] (237:8-237:23)
+                string_start ["] (237:8-237:9)
+                string_content [reddit_status] (237:9-237:22)
+                string_end ["] (237:22-237:23)
+              : [:] (237:23-237:24)
+              conditional_expression ["healthy" if reddit_integrator else "unhealthy"] (237:25-237:72)
+                string ["healthy"] (237:25-237:34)
+                  string_start ["] (237:25-237:26)
+                  string_content [healthy] (237:26-237:33)
+                  string_end ["] (237:33-237:34)
+                if [if] (237:35-237:37)
+                identifier [reddit_integrator] (237:38-237:55)
+                else [else] (237:56-237:60)
+                string ["unhealthy"] (237:61-237:72)
+                  string_start ["] (237:61-237:62)
+                  string_content [unhealthy] (237:62-237:71)
+                  string_end ["] (237:71-237:72)
+            , [,] (237:72-237:73)
+            pair ["youtube_api": "configured" if youtube_api_key else "missing"] (238:8-238:69)
+              string ["youtube_api"] (238:8-238:21)
+                string_start ["] (238:8-238:9)
+                string_content [youtube_api] (238:9-238:20)
+                string_end ["] (238:20-238:21)
+              : [:] (238:21-238:22)
+              conditional_expression ["configured" if youtube_api_key else "missing"] (238:23-238:69)
+                string ["configured"] (238:23-238:35)
+                  string_start ["] (238:23-238:24)
+                  string_content [configured] (238:24-238:34)
+                  string_end ["] (238:34-238:35)
+                if [if] (238:36-238:38)
+                identifier [youtube_api_key] (238:39-238:54)
+                else [else] (238:55-238:59)
+                string ["missing"] (238:60-238:69)
+                  string_start ["] (238:60-238:61)
+                  string_content [missing] (238:61-238:68)
+                  string_end ["] (238:68-238:69)
+            , [,] (238:69-238:70)
+            pair ["astra_db": "configured" if astra_token and astra_endpoint else "missing"] (239:8-239:81)
+              string ["astra_db"] (239:8-239:18)
+                string_start ["] (239:8-239:9)
+                string_content [astra_db] (239:9-239:17)
+                string_end ["] (239:17-239:18)
+              : [:] (239:18-239:19)
+              conditional_expression ["configured" if astra_token and astra_endpoint else "missing"] (239:20-239:81)
+                string ["configured"] (239:20-239:32)
+                  string_start ["] (239:20-239:21)
+                  string_content [configured] (239:21-239:31)
+                  string_end ["] (239:31-239:32)
+                if [if] (239:33-239:35)
+                boolean_operator [astra_token and astra_endpoint] (239:36-239:66)
+                  identifier [astra_token] (239:36-239:47)
+                  and [and] (239:48-239:51)
+                  identifier [astra_endpoint] (239:52-239:66)
+                else [else] (239:67-239:71)
+                string ["missing"] (239:72-239:81)
+                  string_start ["] (239:72-239:73)
+                  string_content [missing] (239:73-239:80)
+                  string_end ["] (239:80-239:81)
+            , [,] (239:81-239:82)
+            pair ["instagram_auth": "configured" if instagram_username and instagram_password else "missing"] (240:8-240:98)
+              string ["instagram_auth"] (240:8-240:24)
+                string_start ["] (240:8-240:9)
+                string_content [instagram_auth] (240:9-240:23)
+                string_end ["] (240:23-240:24)
+              : [:] (240:24-240:25)
+              conditional_expression ["configured" if instagram_username and instagram_password else "missing"] (240:26-240:98)
+                string ["configured"] (240:26-240:38)
+                  string_start ["] (240:26-240:27)
+                  string_content [configured] (240:27-240:37)
+                  string_end ["] (240:37-240:38)
+                if [if] (240:39-240:41)
+                boolean_operator [instagram_username and instagram_password] (240:42-240:83)
+                  identifier [instagram_username] (240:42-240:60)
+                  and [and] (240:61-240:64)
+                  identifier [instagram_password] (240:65-240:83)
+                else [else] (240:84-240:88)
+                string ["missing"] (240:89-240:98)
+                  string_start ["] (240:89-240:90)
+                  string_content [missing] (240:90-240:97)
+                  string_end ["] (240:97-240:98)
+            , [,] (240:98-240:99)
+            pair ["reddit_auth": "configured" if all([reddit_client_id, reddit_client_secret, reddit_user_agent]) else "missing"] (241:8-241:118)
+              string ["reddit_auth"] (241:8-241:21)
+                string_start ["] (241:8-241:9)
+                string_content [reddit_auth] (241:9-241:20)
+                string_end ["] (241:20-241:21)
+              : [:] (241:21-241:22)
+              conditional_expression ["configured" if all([reddit_client_id, reddit_client_secret, reddit_user_agent]) else "missing"] (241:23-241:118)
+                string ["configured"] (241:23-241:35)
+                  string_start ["] (241:23-241:24)
+                  string_content [configured] (241:24-241:34)
+                  string_end ["] (241:34-241:35)
+                if [if] (241:36-241:38)
+                call [all([reddit_client_id, reddit_client_secret, reddit_user_agent])] (241:39-241:103)
+                  identifier [all] (241:39-241:42)
+                  argument_list [([reddit_client_id, reddit_client_secret, reddit_user_agent])] (241:42-241:103)
+                    ( [(] (241:42-241:43)
+                    list [[reddit_client_id, reddit_client_secret, reddit_user_agent]] (241:43-241:102)
+                      [ [[] (241:43-241:44)
+                      identifier [reddit_client_id] (241:44-241:60)
+                      , [,] (241:60-241:61)
+                      identifier [reddit_client_secret] (241:62-241:82)
+                      , [,] (241:82-241:83)
+                      identifier [reddit_user_agent] (241:84-241:101)
+                      ] []] (241:101-241:102)
+                    ) [)] (241:102-241:103)
+                else [else] (241:104-241:108)
+                string ["missing"] (241:109-241:118)
+                  string_start ["] (241:109-241:110)
+                  string_content [missing] (241:110-241:117)
+                  string_end ["] (241:117-241:118)
+            } [}] (242:4-242:5)
+  if_statement [if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(app, host="0.0.0.0", port=8000)] (244:0-247:47)
+    if [if] (244:0-244:2)
+    comparison_operator [__name__ == "__main__"] (244:3-244:25)
+      identifier [__name__] (244:3-244:11)
+      == [==] (244:12-244:14)
+      string ["__main__"] (244:15-244:25)
+        string_start ["] (244:15-244:16)
+        string_content [__main__] (244:16-244:24)
+        string_end ["] (244:24-244:25)
+    : [:] (244:25-244:26)
+    block [import uvicorn
+
+    uvicorn.run(app, host="0.0.0.0", port=8000)] (245:4-247:47)
+      import_statement [import uvicorn] (245:4-245:18)
+        import [import] (245:4-245:10)
+        dotted_name [uvicorn] (245:11-245:18)
+          identifier [uvicorn] (245:11-245:18)
+      expression_statement [uvicorn.run(app, host="0.0.0.0", port=8000)] (247:4-247:47)
+        call [uvicorn.run(app, host="0.0.0.0", port=8000)] (247:4-247:47)
+          attribute [uvicorn.run] (247:4-247:15)
+            identifier [uvicorn] (247:4-247:11)
+            . [.] (247:11-247:12)
+            identifier [run] (247:12-247:15)
+          argument_list [(app, host="0.0.0.0", port=8000)] (247:15-247:47)
+            ( [(] (247:15-247:16)
+            identifier [app] (247:16-247:19)
+            , [,] (247:19-247:20)
+            keyword_argument [host="0.0.0.0"] (247:21-247:35)
+              identifier [host] (247:21-247:25)
+              = [=] (247:25-247:26)
+              string ["0.0.0.0"] (247:26-247:35)
+                string_start ["] (247:26-247:27)
+                string_content [0.0.0.0] (247:27-247:34)
+                string_end ["] (247:34-247:35)
+            , [,] (247:35-247:36)
+            keyword_argument [port=8000] (247:37-247:46)
+              identifier [port] (247:37-247:41)
+              = [=] (247:41-247:42)
+              integer [8000] (247:42-247:46)
+            ) [)] (247:46-247:47)

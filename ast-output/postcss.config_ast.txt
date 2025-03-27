@@ -1,0 +1,53 @@
+AST for temp_dir\ARTGuru-AI-main\postcss.config.js
+==================================================
+program [export default {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+};
+] (0:0-6:0)
+  export_statement [export default {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+};] (0:0-5:2)
+    export [export] (0:0-0:6)
+    default [default] (0:7-0:14)
+    object [{
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+}] (0:15-5:1)
+      { [{] (0:15-0:16)
+      pair [plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  }] (1:2-4:3)
+        property_identifier [plugins] (1:2-1:9)
+        : [:] (1:9-1:10)
+        object [{
+    tailwindcss: {},
+    autoprefixer: {},
+  }] (1:11-4:3)
+          { [{] (1:11-1:12)
+          pair [tailwindcss: {}] (2:4-2:19)
+            property_identifier [tailwindcss] (2:4-2:15)
+            : [:] (2:15-2:16)
+            object [{}] (2:17-2:19)
+              { [{] (2:17-2:18)
+              } [}] (2:18-2:19)
+          , [,] (2:19-2:20)
+          pair [autoprefixer: {}] (3:4-3:20)
+            property_identifier [autoprefixer] (3:4-3:16)
+            : [:] (3:16-3:17)
+            object [{}] (3:18-3:20)
+              { [{] (3:18-3:19)
+              } [}] (3:19-3:20)
+          , [,] (3:20-3:21)
+          } [}] (4:2-4:3)
+      , [,] (4:3-4:4)
+      } [}] (5:0-5:1)
+    ; [;] (5:1-5:2)

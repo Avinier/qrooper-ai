@@ -1,0 +1,916 @@
+AST for temp_dir\ARTGuru-AI-main\app\routes\_index.tsx
+==================================================
+ERROR [import React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import SearchInput from '~/components/UI/SearchInput';
+import AnimatedBackground from '~/components/UI/AnimatedBackground';
+import DashboardOverview from '~/components/Dashboard/DashboardOverview';
+import AnalyticsDashboard from '~/components/Dashboard/AnalyticsDashboard';
+import ProfileLogo from '~/components/UI/ProfileLogo';
+
+const Index = () => {
+  const [isSearching, setIsSearching] = React.useState(false);
+  const [searchCompleted, setSearchCompleted] = React.useState(false);
+  const [items, setItems] = React.useState([]);
+
+  const handleSearchComplete = (results) => {
+    setItems(results.items);
+    setSearchCompleted(true);
+    setIsSearching(false);
+  };
+
+  return (
+    <AnimatedBackground className="min-h-screen items-center justify-center">
+      <AnimatePresence mode="wait">
+        <ProfileLogo/>
+        {!searchCompleted && (
+          <motion.div
+            className="mx-auto pt-40"
+            initial={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -50 }}
+            transition={{ duration: 0.5 }}
+            key="header"
+          >
+            <motion.h1
+              className="font-subheading text-5xl pb-3 text-gray-800 text-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              ARTGuru.AI
+            </motion.h1>
+            <motion.h3
+              className="font-subheading text-xl font-light text-gray-600 text-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              Seamlessly research, generate, and analyse your marketing idea
+            </motion.h3>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <AnimatePresence mode="wait">
+        <motion.div
+          className={`${searchCompleted ? 'pt-10' : 'mt-12'}`}
+          transition={{ duration: 0.5 }}
+          key="search-input"
+        >
+          <SearchInput
+            onSearchStart={() => setIsSearching(true)}
+            onSearchComplete={handleSearchComplete}
+            searchCompleted={searchCompleted}
+          />
+        </motion.div>
+      </AnimatePresence>
+      <AnimatePresence>
+        {searchCompleted && (
+          <motion.div
+            className="mt-8"
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            key="welcome-message"
+          >
+            <DashboardOverview items={items} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </AnimatedBackground>
+  );
+};
+
+export default Index;] (0:0-80:21)
+  import_statement [import React from 'react';] (0:0-0:26)
+    import [import] (0:0-0:6)
+    import_clause [React] (0:7-0:12)
+      identifier [React] (0:7-0:12)
+    from [from] (0:13-0:17)
+    string ['react'] (0:18-0:25)
+      ' ['] (0:18-0:19)
+      string_fragment [react] (0:19-0:24)
+      ' ['] (0:24-0:25)
+    ; [;] (0:25-0:26)
+  import_statement [import { motion, AnimatePresence } from 'framer-motion';] (1:0-1:56)
+    import [import] (1:0-1:6)
+    import_clause [{ motion, AnimatePresence }] (1:7-1:34)
+      named_imports [{ motion, AnimatePresence }] (1:7-1:34)
+        { [{] (1:7-1:8)
+        import_specifier [motion] (1:9-1:15)
+          identifier [motion] (1:9-1:15)
+        , [,] (1:15-1:16)
+        import_specifier [AnimatePresence] (1:17-1:32)
+          identifier [AnimatePresence] (1:17-1:32)
+        } [}] (1:33-1:34)
+    from [from] (1:35-1:39)
+    string ['framer-motion'] (1:40-1:55)
+      ' ['] (1:40-1:41)
+      string_fragment [framer-motion] (1:41-1:54)
+      ' ['] (1:54-1:55)
+    ; [;] (1:55-1:56)
+  import_statement [import SearchInput from '~/components/UI/SearchInput';] (2:0-2:54)
+    import [import] (2:0-2:6)
+    import_clause [SearchInput] (2:7-2:18)
+      identifier [SearchInput] (2:7-2:18)
+    from [from] (2:19-2:23)
+    string ['~/components/UI/SearchInput'] (2:24-2:53)
+      ' ['] (2:24-2:25)
+      string_fragment [~/components/UI/SearchInput] (2:25-2:52)
+      ' ['] (2:52-2:53)
+    ; [;] (2:53-2:54)
+  import_statement [import AnimatedBackground from '~/components/UI/AnimatedBackground';] (3:0-3:68)
+    import [import] (3:0-3:6)
+    import_clause [AnimatedBackground] (3:7-3:25)
+      identifier [AnimatedBackground] (3:7-3:25)
+    from [from] (3:26-3:30)
+    string ['~/components/UI/AnimatedBackground'] (3:31-3:67)
+      ' ['] (3:31-3:32)
+      string_fragment [~/components/UI/AnimatedBackground] (3:32-3:66)
+      ' ['] (3:66-3:67)
+    ; [;] (3:67-3:68)
+  import_statement [import DashboardOverview from '~/components/Dashboard/DashboardOverview';] (4:0-4:73)
+    import [import] (4:0-4:6)
+    import_clause [DashboardOverview] (4:7-4:24)
+      identifier [DashboardOverview] (4:7-4:24)
+    from [from] (4:25-4:29)
+    string ['~/components/Dashboard/DashboardOverview'] (4:30-4:72)
+      ' ['] (4:30-4:31)
+      string_fragment [~/components/Dashboard/DashboardOverview] (4:31-4:71)
+      ' ['] (4:71-4:72)
+    ; [;] (4:72-4:73)
+  import_statement [import AnalyticsDashboard from '~/components/Dashboard/AnalyticsDashboard';] (5:0-5:75)
+    import [import] (5:0-5:6)
+    import_clause [AnalyticsDashboard] (5:7-5:25)
+      identifier [AnalyticsDashboard] (5:7-5:25)
+    from [from] (5:26-5:30)
+    string ['~/components/Dashboard/AnalyticsDashboard'] (5:31-5:74)
+      ' ['] (5:31-5:32)
+      string_fragment [~/components/Dashboard/AnalyticsDashboard] (5:32-5:73)
+      ' ['] (5:73-5:74)
+    ; [;] (5:74-5:75)
+  import_statement [import ProfileLogo from '~/components/UI/ProfileLogo';] (6:0-6:54)
+    import [import] (6:0-6:6)
+    import_clause [ProfileLogo] (6:7-6:18)
+      identifier [ProfileLogo] (6:7-6:18)
+    from [from] (6:19-6:23)
+    string ['~/components/UI/ProfileLogo'] (6:24-6:53)
+      ' ['] (6:24-6:25)
+      string_fragment [~/components/UI/ProfileLogo] (6:25-6:52)
+      ' ['] (6:52-6:53)
+    ; [;] (6:53-6:54)
+  const [const] (8:0-8:5)
+  identifier [Index] (8:6-8:11)
+  = [=] (8:12-8:13)
+  formal_parameters [()] (8:14-8:16)
+    ( [(] (8:14-8:15)
+    ) [)] (8:15-8:16)
+  => [=>] (8:17-8:19)
+  { [{] (8:20-8:21)
+  lexical_declaration [const [isSearching, setIsSearching] = React.useState(false);] (9:2-9:62)
+    const [const] (9:2-9:7)
+    variable_declarator [[isSearching, setIsSearching] = React.useState(false)] (9:8-9:61)
+      array_pattern [[isSearching, setIsSearching]] (9:8-9:37)
+        [ [[] (9:8-9:9)
+        identifier [isSearching] (9:9-9:20)
+        , [,] (9:20-9:21)
+        identifier [setIsSearching] (9:22-9:36)
+        ] []] (9:36-9:37)
+      = [=] (9:38-9:39)
+      call_expression [React.useState(false)] (9:40-9:61)
+        member_expression [React.useState] (9:40-9:54)
+          identifier [React] (9:40-9:45)
+          . [.] (9:45-9:46)
+          property_identifier [useState] (9:46-9:54)
+        arguments [(false)] (9:54-9:61)
+          ( [(] (9:54-9:55)
+          false [false] (9:55-9:60)
+          ) [)] (9:60-9:61)
+    ; [;] (9:61-9:62)
+  lexical_declaration [const [searchCompleted, setSearchCompleted] = React.useState(false);] (10:2-10:70)
+    const [const] (10:2-10:7)
+    variable_declarator [[searchCompleted, setSearchCompleted] = React.useState(false)] (10:8-10:69)
+      array_pattern [[searchCompleted, setSearchCompleted]] (10:8-10:45)
+        [ [[] (10:8-10:9)
+        identifier [searchCompleted] (10:9-10:24)
+        , [,] (10:24-10:25)
+        identifier [setSearchCompleted] (10:26-10:44)
+        ] []] (10:44-10:45)
+      = [=] (10:46-10:47)
+      call_expression [React.useState(false)] (10:48-10:69)
+        member_expression [React.useState] (10:48-10:62)
+          identifier [React] (10:48-10:53)
+          . [.] (10:53-10:54)
+          property_identifier [useState] (10:54-10:62)
+        arguments [(false)] (10:62-10:69)
+          ( [(] (10:62-10:63)
+          false [false] (10:63-10:68)
+          ) [)] (10:68-10:69)
+    ; [;] (10:69-10:70)
+  lexical_declaration [const [items, setItems] = React.useState([]);] (11:2-11:47)
+    const [const] (11:2-11:7)
+    variable_declarator [[items, setItems] = React.useState([])] (11:8-11:46)
+      array_pattern [[items, setItems]] (11:8-11:25)
+        [ [[] (11:8-11:9)
+        identifier [items] (11:9-11:14)
+        , [,] (11:14-11:15)
+        identifier [setItems] (11:16-11:24)
+        ] []] (11:24-11:25)
+      = [=] (11:26-11:27)
+      call_expression [React.useState([])] (11:28-11:46)
+        member_expression [React.useState] (11:28-11:42)
+          identifier [React] (11:28-11:33)
+          . [.] (11:33-11:34)
+          property_identifier [useState] (11:34-11:42)
+        arguments [([])] (11:42-11:46)
+          ( [(] (11:42-11:43)
+          array [[]] (11:43-11:45)
+            [ [[] (11:43-11:44)
+            ] []] (11:44-11:45)
+          ) [)] (11:45-11:46)
+    ; [;] (11:46-11:47)
+  lexical_declaration [const handleSearchComplete = (results) => {
+    setItems(results.items);
+    setSearchCompleted(true);
+    setIsSearching(false);
+  };] (13:2-17:4)
+    const [const] (13:2-13:7)
+    variable_declarator [handleSearchComplete = (results) => {
+    setItems(results.items);
+    setSearchCompleted(true);
+    setIsSearching(false);
+  }] (13:8-17:3)
+      identifier [handleSearchComplete] (13:8-13:28)
+      = [=] (13:29-13:30)
+      arrow_function [(results) => {
+    setItems(results.items);
+    setSearchCompleted(true);
+    setIsSearching(false);
+  }] (13:31-17:3)
+        formal_parameters [(results)] (13:31-13:40)
+          ( [(] (13:31-13:32)
+          required_parameter [results] (13:32-13:39)
+            identifier [results] (13:32-13:39)
+          ) [)] (13:39-13:40)
+        => [=>] (13:41-13:43)
+        statement_block [{
+    setItems(results.items);
+    setSearchCompleted(true);
+    setIsSearching(false);
+  }] (13:44-17:3)
+          { [{] (13:44-13:45)
+          expression_statement [setItems(results.items);] (14:4-14:28)
+            call_expression [setItems(results.items)] (14:4-14:27)
+              identifier [setItems] (14:4-14:12)
+              arguments [(results.items)] (14:12-14:27)
+                ( [(] (14:12-14:13)
+                member_expression [results.items] (14:13-14:26)
+                  identifier [results] (14:13-14:20)
+                  . [.] (14:20-14:21)
+                  property_identifier [items] (14:21-14:26)
+                ) [)] (14:26-14:27)
+            ; [;] (14:27-14:28)
+          expression_statement [setSearchCompleted(true);] (15:4-15:29)
+            call_expression [setSearchCompleted(true)] (15:4-15:28)
+              identifier [setSearchCompleted] (15:4-15:22)
+              arguments [(true)] (15:22-15:28)
+                ( [(] (15:22-15:23)
+                true [true] (15:23-15:27)
+                ) [)] (15:27-15:28)
+            ; [;] (15:28-15:29)
+          expression_statement [setIsSearching(false);] (16:4-16:26)
+            call_expression [setIsSearching(false)] (16:4-16:25)
+              identifier [setIsSearching] (16:4-16:18)
+              arguments [(false)] (16:18-16:25)
+                ( [(] (16:18-16:19)
+                false [false] (16:19-16:24)
+                ) [)] (16:24-16:25)
+            ; [;] (16:25-16:26)
+          } [}] (17:2-17:3)
+    ; [;] (17:3-17:4)
+  return [return] (19:2-19:8)
+  ( [(] (19:9-19:10)
+  type_arguments [<AnimatedBackground] (20:4-20:23)
+    < [<] (20:4-20:5)
+    type_identifier [AnimatedBackground] (20:5-20:23)
+    > [] (20:23-20:23)
+  identifier [className] (20:24-20:33)
+  = [=] (20:33-20:34)
+  string ["min-h-screen items-center justify-center"] (20:34-20:76)
+    " ["] (20:34-20:35)
+    string_fragment [min-h-screen items-center justify-center] (20:35-20:75)
+    " ["] (20:75-20:76)
+  > [>] (20:76-20:77)
+  type_arguments [<AnimatePresence] (21:6-21:22)
+    < [<] (21:6-21:7)
+    type_identifier [AnimatePresence] (21:7-21:22)
+    > [] (21:22-21:22)
+  identifier [mode] (21:23-21:27)
+  = [=] (21:27-21:28)
+  binary_expression ["wait">
+        <ProfileLogo/>
+        {!searchCompleted] (21:28-23:25)
+    string ["wait"] (21:28-21:34)
+      " ["] (21:28-21:29)
+      string_fragment [wait] (21:29-21:33)
+      " ["] (21:33-21:34)
+    > [>] (21:34-21:35)
+    type_assertion [<ProfileLogo/>
+        {!searchCompleted] (22:8-23:25)
+      type_arguments [<ProfileLogo/>] (22:8-22:22)
+        < [<] (22:8-22:9)
+        type_identifier [ProfileLogo] (22:9-22:20)
+        ERROR [/] (22:20-22:21)
+          / [/] (22:20-22:21)
+        > [>] (22:21-22:22)
+      ERROR [{] (23:8-23:9)
+        { [{] (23:8-23:9)
+      unary_expression [!searchCompleted] (23:9-23:25)
+        ! [!] (23:9-23:10)
+        identifier [searchCompleted] (23:10-23:25)
+  && [&&] (23:26-23:28)
+  ( [(] (23:29-23:30)
+  ERROR [<motion.div
+            className="mx-auto pt-40"
+            initial={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -50 }}
+            transition={{ duration: 0.5 }}
+            key="header"
+          >
+            <motion.h1] (24:10-31:22)
+    type_parameters [<motion.div
+            className="mx-auto pt-40"
+            initial={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -50 }}
+            transition={{ duration: 0.5 }}
+            key="header"
+          >] (24:10-30:11)
+      < [<] (24:10-24:11)
+      ERROR [motion.div] (24:11-24:21)
+        nested_identifier [motion.div] (24:11-24:21)
+          identifier [motion] (24:11-24:17)
+          . [.] (24:17-24:18)
+          property_identifier [div] (24:18-24:21)
+      type_parameter [className="mx-auto pt-40"] (25:12-25:37)
+        type_identifier [className] (25:12-25:21)
+        default_type [="mx-auto pt-40"] (25:21-25:37)
+          = [=] (25:21-25:22)
+          literal_type ["mx-auto pt-40"] (25:22-25:37)
+            string ["mx-auto pt-40"] (25:22-25:37)
+              " ["] (25:22-25:23)
+              string_fragment [mx-auto pt-40] (25:23-25:36)
+              " ["] (25:36-25:37)
+      ERROR [initial={{ opacity: 1] (26:12-26:33)
+        identifier [initial] (26:12-26:19)
+        = [=] (26:19-26:20)
+        { [{] (26:20-26:21)
+        { [{] (26:21-26:22)
+        identifier [opacity] (26:23-26:30)
+        : [:] (26:30-26:31)
+        number [1] (26:32-26:33)
+      , [,] (26:33-26:34)
+      type_parameter [y: 0 }}
+            exit={{ opacity: 0, y: -50 }}
+            transition={{ duration: 0.5 }}
+            key="header"] (26:35-29:24)
+        type_identifier [y] (26:35-26:36)
+        constraint [: 0 }}
+            exit] (26:36-27:16)
+          : [:] (26:36-26:37)
+          ERROR [0 }}] (26:38-26:42)
+            literal_type [0] (26:38-26:39)
+              number [0] (26:38-26:39)
+            } [}] (26:40-26:41)
+            } [}] (26:41-26:42)
+          type_identifier [exit] (27:12-27:16)
+        default_type [={{ opacity: 0, y: -50 }}
+            transition={{ duration: 0.5 }}
+            key="header"] (27:16-29:24)
+          = [=] (27:16-27:17)
+          ERROR [{{ opacity: 0, y: -50 }}
+            transition={{ duration: 0.5 }}
+            key=] (27:17-29:16)
+            { [{] (27:17-27:18)
+            object_type [{ opacity: 0, y: -50 }] (27:18-27:40)
+              { [{] (27:18-27:19)
+              property_signature [opacity: 0] (27:20-27:30)
+                property_identifier [opacity] (27:20-27:27)
+                type_annotation [: 0] (27:27-27:30)
+                  : [:] (27:27-27:28)
+                  literal_type [0] (27:29-27:30)
+                    number [0] (27:29-27:30)
+              , [,] (27:30-27:31)
+              property_signature [y: -50] (27:32-27:38)
+                property_identifier [y] (27:32-27:33)
+                type_annotation [: -50] (27:33-27:38)
+                  : [:] (27:33-27:34)
+                  literal_type [-50] (27:35-27:38)
+                    unary_expression [-50] (27:35-27:38)
+                      - [-] (27:35-27:36)
+                      number [50] (27:36-27:38)
+              } [}] (27:39-27:40)
+            } [}] (27:40-27:41)
+            type_identifier [transition] (28:12-28:22)
+            = [=] (28:22-28:23)
+            { [{] (28:23-28:24)
+            object_type [{ duration: 0.5 }] (28:24-28:41)
+              { [{] (28:24-28:25)
+              property_signature [duration: 0.5] (28:26-28:39)
+                property_identifier [duration] (28:26-28:34)
+                type_annotation [: 0.5] (28:34-28:39)
+                  : [:] (28:34-28:35)
+                  literal_type [0.5] (28:36-28:39)
+                    number [0.5] (28:36-28:39)
+              } [}] (28:40-28:41)
+            } [}] (28:41-28:42)
+            type_identifier [key] (29:12-29:15)
+            = [=] (29:15-29:16)
+          literal_type ["header"] (29:16-29:24)
+            string ["header"] (29:16-29:24)
+              " ["] (29:16-29:17)
+              string_fragment [header] (29:17-29:23)
+              " ["] (29:23-29:24)
+      > [>] (30:10-30:11)
+    < [<] (31:12-31:13)
+    identifier [motion] (31:13-31:19)
+    . [.] (31:19-31:20)
+    identifier [h1] (31:20-31:22)
+  identifier [className] (32:14-32:23)
+  = [=] (32:23-32:24)
+  member_expression ["font-subheading text-5xl pb-3 text-gray-800 text-center"
+              initial] (32:24-33:21)
+    string ["font-subheading text-5xl pb-3 text-gray-800 text-center"] (32:24-32:81)
+      " ["] (32:24-32:25)
+      string_fragment [font-subheading text-5xl pb-3 text-gray-800 text-center] (32:25-32:80)
+      " ["] (32:80-32:81)
+    optional_chain [] (32:81-32:81)
+      ?. [] (32:81-32:81)
+    property_identifier [initial] (33:14-33:21)
+  = [=] (33:21-33:22)
+  { [{] (33:22-33:23)
+  { [{] (33:23-33:24)
+  pair_pattern [opacity: 0] (33:25-33:35)
+    property_identifier [opacity] (33:25-33:32)
+    : [:] (33:32-33:33)
+    non_null_expression [0] (33:34-33:35)
+      number [0] (33:34-33:35)
+      ! [] (33:35-33:35)
+  , [,] (33:35-33:36)
+  property_identifier [y] (33:37-33:38)
+  : [:] (33:38-33:39)
+  ERROR [20 }}] (33:40-33:45)
+    number [20] (33:40-33:42)
+    } [}] (33:43-33:44)
+    } [}] (33:44-33:45)
+  identifier [animate] (34:14-34:21)
+  = [=] (34:21-34:22)
+  { [{] (34:22-34:23)
+  { [{] (34:23-34:24)
+  pair_pattern [opacity: 1] (34:25-34:35)
+    property_identifier [opacity] (34:25-34:32)
+    : [:] (34:32-34:33)
+    non_null_expression [1] (34:34-34:35)
+      number [1] (34:34-34:35)
+      ! [] (34:35-34:35)
+  , [,] (34:35-34:36)
+  property_identifier [y] (34:37-34:38)
+  : [:] (34:38-34:39)
+  ERROR [0 }}] (34:40-34:44)
+    number [0] (34:40-34:41)
+    } [}] (34:42-34:43)
+    } [}] (34:43-34:44)
+  identifier [transition] (35:14-35:24)
+  = [=] (35:24-35:25)
+  { [{] (35:25-35:26)
+  { [{] (35:26-35:27)
+  property_identifier [delay] (35:28-35:33)
+  : [:] (35:33-35:34)
+  number [0.2] (35:35-35:38)
+  ERROR [}}] (35:39-35:41)
+    } [}] (35:39-35:40)
+    } [}] (35:40-35:41)
+  > [>] (36:12-36:13)
+  member_expression [ARTGuru.AI] (37:14-37:24)
+    identifier [ARTGuru] (37:14-37:21)
+    . [.] (37:21-37:22)
+    property_identifier [AI] (37:22-37:24)
+  < [<] (38:12-38:13)
+  regex [/motion.h1>] (38:13-38:24)
+    / [/] (38:13-38:14)
+    regex_pattern [motion.h1>] (38:14-38:24)
+    / [] (38:24-38:24)
+  < [<] (39:12-39:13)
+  ERROR [motion.h3] (39:13-39:22)
+    nested_identifier [motion.h3] (39:13-39:22)
+      identifier [motion] (39:13-39:19)
+      . [.] (39:19-39:20)
+      property_identifier [h3] (39:20-39:22)
+  identifier [className] (40:14-40:23)
+  = [=] (40:23-40:24)
+  member_expression ["font-subheading text-xl font-light text-gray-600 text-center"
+              initial] (40:24-41:21)
+    string ["font-subheading text-xl font-light text-gray-600 text-center"] (40:24-40:86)
+      " ["] (40:24-40:25)
+      string_fragment [font-subheading text-xl font-light text-gray-600 text-center] (40:25-40:85)
+      " ["] (40:85-40:86)
+    optional_chain [] (40:86-40:86)
+      ?. [] (40:86-40:86)
+    property_identifier [initial] (41:14-41:21)
+  = [=] (41:21-41:22)
+  { [{] (41:22-41:23)
+  { [{] (41:23-41:24)
+  pair_pattern [opacity: 0] (41:25-41:35)
+    property_identifier [opacity] (41:25-41:32)
+    : [:] (41:32-41:33)
+    non_null_expression [0] (41:34-41:35)
+      number [0] (41:34-41:35)
+      ! [] (41:35-41:35)
+  , [,] (41:35-41:36)
+  property_identifier [y] (41:37-41:38)
+  : [:] (41:38-41:39)
+  ERROR [20 }}] (41:40-41:45)
+    number [20] (41:40-41:42)
+    } [}] (41:43-41:44)
+    } [}] (41:44-41:45)
+  identifier [animate] (42:14-42:21)
+  = [=] (42:21-42:22)
+  { [{] (42:22-42:23)
+  { [{] (42:23-42:24)
+  pair_pattern [opacity: 1] (42:25-42:35)
+    property_identifier [opacity] (42:25-42:32)
+    : [:] (42:32-42:33)
+    non_null_expression [1] (42:34-42:35)
+      number [1] (42:34-42:35)
+      ! [] (42:35-42:35)
+  , [,] (42:35-42:36)
+  property_identifier [y] (42:37-42:38)
+  : [:] (42:38-42:39)
+  ERROR [0 }}] (42:40-42:44)
+    number [0] (42:40-42:41)
+    } [}] (42:42-42:43)
+    } [}] (42:43-42:44)
+  identifier [transition] (43:14-43:24)
+  = [=] (43:24-43:25)
+  { [{] (43:25-43:26)
+  { [{] (43:26-43:27)
+  property_identifier [delay] (43:28-43:33)
+  : [:] (43:33-43:34)
+  binary_expression [0.3 }}
+            >
+              Seamlessly research, generate, and analyse your marketing idea
+            </motion.h3>
+          </motion.div] (43:35-47:22)
+    number [0.3] (43:35-43:38)
+    ERROR [}}] (43:39-43:41)
+      } [}] (43:39-43:40)
+      } [}] (43:40-43:41)
+    > [>] (44:12-44:13)
+    ERROR [Seamlessly research, generate, and analyse your marketing] (45:14-45:71)
+      identifier [Seamlessly] (45:14-45:24)
+      identifier [research] (45:25-45:33)
+      , [,] (45:33-45:34)
+      identifier [generate] (45:35-45:43)
+      , [,] (45:43-45:44)
+      identifier [and] (45:45-45:48)
+      identifier [analyse] (45:49-45:56)
+      identifier [your] (45:57-45:61)
+      identifier [marketing] (45:62-45:71)
+    binary_expression [idea
+            </motion.h3>
+          </motion.div] (45:72-47:22)
+      identifier [idea] (45:72-45:76)
+      < [<] (46:12-46:13)
+      member_expression [/motion.h3>
+          </motion.div] (46:13-47:22)
+        regex [/motion.h3>
+          </motion] (46:13-47:18)
+          / [/] (46:13-46:14)
+          regex_pattern [motion.h3>] (46:14-46:24)
+          ERROR [<] (47:10-47:11)
+            < [<] (47:10-47:11)
+          / [/] (47:11-47:12)
+          regex_flags [motion] (47:12-47:18)
+        . [.] (47:18-47:19)
+        property_identifier [div] (47:19-47:22)
+  > [>] (47:22-47:23)
+  ERROR [)}] (48:8-48:10)
+    ) [)] (48:8-48:9)
+    } [}] (48:9-48:10)
+  type_arguments [</AnimatePresence>] (49:6-49:24)
+    < [<] (49:6-49:7)
+    ERROR [/] (49:7-49:8)
+      / [/] (49:7-49:8)
+    type_identifier [AnimatePresence] (49:8-49:23)
+    > [>] (49:23-49:24)
+  type_arguments [<AnimatePresence] (50:6-50:22)
+    < [<] (50:6-50:7)
+    type_identifier [AnimatePresence] (50:7-50:22)
+    > [] (50:22-50:22)
+  identifier [mode] (50:23-50:27)
+  = [=] (50:27-50:28)
+  string ["wait"] (50:28-50:34)
+    " ["] (50:28-50:29)
+    string_fragment [wait] (50:29-50:33)
+    " ["] (50:33-50:34)
+  > [>] (50:34-50:35)
+  type_parameters [<motion.div
+          className={`${searchCompleted ? 'pt-10' : 'mt-12'}`}
+          transition={{ duration: 0.5 }}
+          key="search-input"
+        >] (51:8-55:9)
+    < [<] (51:8-51:9)
+    ERROR [motion.div] (51:9-51:19)
+      nested_identifier [motion.div] (51:9-51:19)
+        identifier [motion] (51:9-51:15)
+        . [.] (51:15-51:16)
+        property_identifier [div] (51:16-51:19)
+    type_parameter [className={`${searchCompleted ? 'pt-10' : 'mt-12'}`}
+          transition={{ duration: 0.5 }}
+          key="search-input"] (52:10-54:28)
+      type_identifier [className] (52:10-52:19)
+      default_type [={`${searchCompleted ? 'pt-10' : 'mt-12'}`}
+          transition={{ duration: 0.5 }}
+          key="search-input"] (52:19-54:28)
+        = [=] (52:19-52:20)
+        ERROR [{`${searchCompleted ? 'pt-10' : 'mt-12'}`}
+          transition={{ duration: 0.5 }}
+          key=] (52:20-54:14)
+          { [{] (52:20-52:21)
+          template_literal_type [`${searchCompleted ? 'pt-10' : 'mt-12'}`] (52:21-52:61)
+            ` [`] (52:21-52:22)
+            template_type [${searchCompleted ? 'pt-10' : 'mt-12'}] (52:22-52:60)
+              ${ [${] (52:22-52:24)
+              ERROR [searchCompleted ? 'pt-10' :] (52:24-52:51)
+                type_identifier [searchCompleted] (52:24-52:39)
+                flow_maybe_type [? 'pt-10'] (52:40-52:49)
+                  ? [?] (52:40-52:41)
+                  literal_type ['pt-10'] (52:42-52:49)
+                    string ['pt-10'] (52:42-52:49)
+                      ' ['] (52:42-52:43)
+                      string_fragment [pt-10] (52:43-52:48)
+                      ' ['] (52:48-52:49)
+                : [:] (52:50-52:51)
+              literal_type ['mt-12'] (52:52-52:59)
+                string ['mt-12'] (52:52-52:59)
+                  ' ['] (52:52-52:53)
+                  string_fragment [mt-12] (52:53-52:58)
+                  ' ['] (52:58-52:59)
+              } [}] (52:59-52:60)
+            ` [`] (52:60-52:61)
+          } [}] (52:61-52:62)
+          type_identifier [transition] (53:10-53:20)
+          = [=] (53:20-53:21)
+          { [{] (53:21-53:22)
+          object_type [{ duration: 0.5 }] (53:22-53:39)
+            { [{] (53:22-53:23)
+            property_signature [duration: 0.5] (53:24-53:37)
+              property_identifier [duration] (53:24-53:32)
+              type_annotation [: 0.5] (53:32-53:37)
+                : [:] (53:32-53:33)
+                literal_type [0.5] (53:34-53:37)
+                  number [0.5] (53:34-53:37)
+            } [}] (53:38-53:39)
+          } [}] (53:39-53:40)
+          type_identifier [key] (54:10-54:13)
+          = [=] (54:13-54:14)
+        literal_type ["search-input"] (54:14-54:28)
+          string ["search-input"] (54:14-54:28)
+            " ["] (54:14-54:15)
+            string_fragment [search-input] (54:15-54:27)
+            " ["] (54:27-54:28)
+    > [>] (55:8-55:9)
+  ERROR [<SearchInput
+            onSearchStart={] (56:10-57:27)
+    < [<] (56:10-56:11)
+    identifier [SearchInput] (56:11-56:22)
+    identifier [onSearchStart] (57:12-57:25)
+    = [=] (57:25-57:26)
+    { [{] (57:26-57:27)
+  formal_parameters [()] (57:27-57:29)
+    ( [(] (57:27-57:28)
+    ) [)] (57:28-57:29)
+  => [=>] (57:30-57:32)
+  ERROR [setIsSearching(true)}] (57:33-57:54)
+    call_expression [setIsSearching(true)] (57:33-57:53)
+      identifier [setIsSearching] (57:33-57:47)
+      arguments [(true)] (57:47-57:53)
+        ( [(] (57:47-57:48)
+        true [true] (57:48-57:52)
+        ) [)] (57:52-57:53)
+    } [}] (57:53-57:54)
+  identifier [onSearchComplete] (58:12-58:28)
+  = [=] (58:28-58:29)
+  object_pattern [{handleSearchComplete}] (58:29-58:51)
+    { [{] (58:29-58:30)
+    shorthand_property_identifier_pattern [handleSearchComplete] (58:30-58:50)
+    } [}] (58:50-58:51)
+  ERROR [searchCompleted] (59:12-59:27)
+    identifier [searchCompleted] (59:12-59:27)
+  = [=] (59:27-59:28)
+  binary_expression [{searchCompleted}
+          />
+        </motion.div>
+      </AnimatePresence>
+      <AnimatePresence>
+        {searchCompleted] (59:28-64:24)
+    object [{searchCompleted}] (59:28-59:45)
+      { [{] (59:28-59:29)
+      shorthand_property_identifier [searchCompleted] (59:29-59:44)
+      } [}] (59:44-59:45)
+    / [/] (60:10-60:11)
+    ERROR [>] (60:11-60:12)
+      > [>] (60:11-60:12)
+    type_assertion [</motion.div>
+      </AnimatePresence>
+      <AnimatePresence>
+        {searchCompleted] (61:8-64:24)
+      type_arguments [</motion.div>] (61:8-61:21)
+        < [<] (61:8-61:9)
+        ERROR [/] (61:9-61:10)
+          / [/] (61:9-61:10)
+        nested_type_identifier [motion.div] (61:10-61:20)
+          identifier [motion] (61:10-61:16)
+          . [.] (61:16-61:17)
+          type_identifier [div] (61:17-61:20)
+        > [>] (61:20-61:21)
+      type_assertion [</AnimatePresence>
+      <AnimatePresence>
+        {searchCompleted] (62:6-64:24)
+        type_arguments [</AnimatePresence>] (62:6-62:24)
+          < [<] (62:6-62:7)
+          ERROR [/] (62:7-62:8)
+            / [/] (62:7-62:8)
+          type_identifier [AnimatePresence] (62:8-62:23)
+          > [>] (62:23-62:24)
+        type_assertion [<AnimatePresence>
+        {searchCompleted] (63:6-64:24)
+          type_arguments [<AnimatePresence>] (63:6-63:23)
+            < [<] (63:6-63:7)
+            type_identifier [AnimatePresence] (63:7-63:22)
+            > [>] (63:22-63:23)
+          object [{searchCompleted] (64:8-64:24)
+            { [{] (64:8-64:9)
+            shorthand_property_identifier [searchCompleted] (64:9-64:24)
+            } [] (64:24-64:24)
+  && [&&] (64:25-64:27)
+  ( [(] (64:28-64:29)
+  ERROR [<motion.div
+            className="mt-8"
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            key="welcome-message"
+          >
+            <DashboardOverview] (65:10-72:30)
+    type_parameters [<motion.div
+            className="mt-8"
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            key="welcome-message"
+          >] (65:10-71:11)
+      < [<] (65:10-65:11)
+      ERROR [motion.div] (65:11-65:21)
+        nested_identifier [motion.div] (65:11-65:21)
+          identifier [motion] (65:11-65:17)
+          . [.] (65:17-65:18)
+          property_identifier [div] (65:18-65:21)
+      type_parameter [className="mt-8"] (66:12-66:28)
+        type_identifier [className] (66:12-66:21)
+        default_type [="mt-8"] (66:21-66:28)
+          = [=] (66:21-66:22)
+          literal_type ["mt-8"] (66:22-66:28)
+            string ["mt-8"] (66:22-66:28)
+              " ["] (66:22-66:23)
+              string_fragment [mt-8] (66:23-66:27)
+              " ["] (66:27-66:28)
+      ERROR [initial={{ opacity: 0] (67:12-67:33)
+        identifier [initial] (67:12-67:19)
+        = [=] (67:19-67:20)
+        { [{] (67:20-67:21)
+        { [{] (67:21-67:22)
+        identifier [opacity] (67:23-67:30)
+        : [:] (67:30-67:31)
+        number [0] (67:32-67:33)
+      , [,] (67:33-67:34)
+      type_parameter [y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            key="welcome-message"] (67:35-70:33)
+        type_identifier [y] (67:35-67:36)
+        constraint [: 50 }}
+            animate] (67:36-68:19)
+          : [:] (67:36-67:37)
+          ERROR [50 }}] (67:38-67:43)
+            literal_type [50] (67:38-67:40)
+              number [50] (67:38-67:40)
+            } [}] (67:41-67:42)
+            } [}] (67:42-67:43)
+          type_identifier [animate] (68:12-68:19)
+        default_type [={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            key="welcome-message"] (68:19-70:33)
+          = [=] (68:19-68:20)
+          ERROR [{{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            key=] (68:20-70:16)
+            { [{] (68:20-68:21)
+            object_type [{ opacity: 1, y: 0 }] (68:21-68:41)
+              { [{] (68:21-68:22)
+              property_signature [opacity: 1] (68:23-68:33)
+                property_identifier [opacity] (68:23-68:30)
+                type_annotation [: 1] (68:30-68:33)
+                  : [:] (68:30-68:31)
+                  literal_type [1] (68:32-68:33)
+                    number [1] (68:32-68:33)
+              , [,] (68:33-68:34)
+              property_signature [y: 0] (68:35-68:39)
+                property_identifier [y] (68:35-68:36)
+                type_annotation [: 0] (68:36-68:39)
+                  : [:] (68:36-68:37)
+                  literal_type [0] (68:38-68:39)
+                    number [0] (68:38-68:39)
+              } [}] (68:40-68:41)
+            } [}] (68:41-68:42)
+            type_identifier [transition] (69:12-69:22)
+            = [=] (69:22-69:23)
+            { [{] (69:23-69:24)
+            object_type [{ duration: 0.5, delay: 0.3 }] (69:24-69:53)
+              { [{] (69:24-69:25)
+              property_signature [duration: 0.5] (69:26-69:39)
+                property_identifier [duration] (69:26-69:34)
+                type_annotation [: 0.5] (69:34-69:39)
+                  : [:] (69:34-69:35)
+                  literal_type [0.5] (69:36-69:39)
+                    number [0.5] (69:36-69:39)
+              , [,] (69:39-69:40)
+              property_signature [delay: 0.3] (69:41-69:51)
+                property_identifier [delay] (69:41-69:46)
+                type_annotation [: 0.3] (69:46-69:51)
+                  : [:] (69:46-69:47)
+                  literal_type [0.3] (69:48-69:51)
+                    number [0.3] (69:48-69:51)
+              } [}] (69:52-69:53)
+            } [}] (69:53-69:54)
+            type_identifier [key] (70:12-70:15)
+            = [=] (70:15-70:16)
+          literal_type ["welcome-message"] (70:16-70:33)
+            string ["welcome-message"] (70:16-70:33)
+              " ["] (70:16-70:17)
+              string_fragment [welcome-message] (70:17-70:32)
+              " ["] (70:32-70:33)
+      > [>] (71:10-71:11)
+    < [<] (72:12-72:13)
+    identifier [DashboardOverview] (72:13-72:30)
+  identifier [items] (72:31-72:36)
+  = [=] (72:36-72:37)
+  object [{items}] (72:37-72:44)
+    { [{] (72:37-72:38)
+    shorthand_property_identifier [items] (72:38-72:43)
+    } [}] (72:43-72:44)
+  / [/] (72:45-72:46)
+  ERROR [>] (72:46-72:47)
+    > [>] (72:46-72:47)
+  type_arguments [</motion.div>] (73:10-73:23)
+    < [<] (73:10-73:11)
+    ERROR [/] (73:11-73:12)
+      / [/] (73:11-73:12)
+    nested_type_identifier [motion.div] (73:12-73:22)
+      identifier [motion] (73:12-73:18)
+      . [.] (73:18-73:19)
+      type_identifier [div] (73:19-73:22)
+    > [>] (73:22-73:23)
+  ERROR [)}] (74:8-74:10)
+    ) [)] (74:8-74:9)
+    } [}] (74:9-74:10)
+  type_assertion [</AnimatePresence>
+    </AnimatedBackground>
+  );
+};
+
+export default Index] (75:6-80:20)
+    type_arguments [</AnimatePresence>] (75:6-75:24)
+      < [<] (75:6-75:7)
+      ERROR [/] (75:7-75:8)
+        / [/] (75:7-75:8)
+      type_identifier [AnimatePresence] (75:8-75:23)
+      > [>] (75:23-75:24)
+    ERROR [</AnimatedBackground>
+  );
+};
+
+export default] (76:4-80:14)
+      type_parameters [</AnimatedBackground>] (76:4-76:25)
+        < [<] (76:4-76:5)
+        ERROR [/] (76:5-76:6)
+          / [/] (76:5-76:6)
+        type_parameter [AnimatedBackground] (76:6-76:24)
+          type_identifier [AnimatedBackground] (76:6-76:24)
+        > [>] (76:24-76:25)
+      ) [)] (77:2-77:3)
+      ; [;] (77:3-77:4)
+      } [}] (78:0-78:1)
+      ; [;] (78:1-78:2)
+      export [export] (80:0-80:6)
+      identifier [default] (80:7-80:14)
+    identifier [Index] (80:15-80:20)
+  ; [;] (80:20-80:21)

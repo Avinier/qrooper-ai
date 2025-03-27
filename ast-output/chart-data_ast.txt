@@ -1,0 +1,1830 @@
+AST for temp_dir\ARTGuru-AI-main\app\api\chart-data.ts
+==================================================
+program [const radarData = [
+    { 
+      metric: 'Stream Views', 
+      A: 145, // YouTube Gaming
+      B: 130, // Twitch
+      CompA: 160, // Competitor YouTube
+      CompB: 150  // Competitor Twitch
+    },
+    { 
+      metric: 'Social Shares', 
+      A: 110,
+      B: 140,
+      CompA: 125,
+      CompB: 145
+    },
+    { 
+      metric: 'Community Posts', 
+      A: 95,
+      B: 125,
+      CompA: 105,
+      CompB: 130
+    },
+    { 
+      metric: 'Player Reviews', 
+      A: 120,
+      B: 105,
+      CompA: 130,
+      CompB: 110
+    },
+    { 
+      metric: 'Discord Activity', 
+      A: 130,
+      B: 115,
+      CompA: 140,
+      CompB: 125
+    }
+  ];
+  
+  // Time Patterns Data (Daily Gaming Activity)
+  const timePatternData = [
+    { 
+      time: '00:00', 
+      engagement: 2200,    // Active players
+      viral: 3500,         // Stream viewers
+      competitorEngagement: 2400,
+      competitorViral: 3800
+    },
+    { 
+      time: '04:00', 
+      engagement: 1800,
+      viral: 2800,
+      competitorEngagement: 2000,
+      competitorViral: 3000
+    },
+    { 
+      time: '08:00', 
+      engagement: 3500,
+      viral: 5500,
+      competitorEngagement: 3800,
+      competitorViral: 5800
+    },
+    { 
+      time: '12:00', 
+      engagement: 4200,
+      viral: 6800,
+      competitorEngagement: 4500,
+      competitorViral: 7200
+    },
+    { 
+      time: '16:00', 
+      engagement: 5000,
+      viral: 8500,
+      competitorEngagement: 5400,
+      competitorViral: 9000
+    },
+    { 
+      time: '20:00', 
+      engagement: 4800,
+      viral: 7800,
+      competitorEngagement: 5200,
+      competitorViral: 8200
+    }
+  ];
+  
+  // Platform Performance Data (Monthly Gaming Metrics)
+  const platformData = [
+    { 
+      date: '2024-01', 
+      youtube: 8500,      // YouTube Gaming views (K)
+      twitch: 6200,       // Twitch viewers (K)
+      steam: 4800,        // Steam activity (K)
+      competitorYoutube: 9000,
+      competitorTwitch: 6800
+    },
+    { 
+      date: '2024-02', 
+      youtube: 9200,
+      twitch: 7000,
+      steam: 5200,
+      competitorYoutube: 9800,
+      competitorTwitch: 7500
+    },
+    { 
+      date: '2024-03', 
+      youtube: 11000,
+      twitch: 8500,
+      steam: 6000,
+      competitorYoutube: 11500,
+      competitorTwitch: 9000
+    },
+    { 
+      date: '2024-04', 
+      youtube: 10500,
+      twitch: 8000,
+      steam: 5800,
+      competitorYoutube: 11000,
+      competitorTwitch: 8500
+    },
+    { 
+      date: '2024-05', 
+      youtube: 12000,
+      twitch: 9500,
+      steam: 7000,
+      competitorYoutube: 12500,
+      competitorTwitch: 10000
+    }
+  ];
+  
+  // CTA Funnel Data (Player Conversion Funnel)
+  const funnelData = [
+    { 
+      stage: 'Game Page Views', 
+      value: 1000000,
+      competitorValue: 900000
+    },
+    { 
+      stage: 'Demo Downloads', 
+      value: 500000,
+      competitorValue: 450000
+    },
+    { 
+      stage: 'Full Game Purchase', 
+      value: 200000,
+      competitorValue: 180000
+    },
+    { 
+      stage: 'Active Players', 
+      value: 150000,
+      competitorValue: 130000
+    },
+    { 
+      stage: 'Community Members', 
+      value: 80000,
+      competitorValue: 70000
+    }
+  ];
+  
+  // ROI Comparison Data (Gaming Marketing ROI)
+  const roiData = [
+    { 
+      month: 'Jan', 
+      cost: 800000,         // Marketing spend
+      revenue: 1500000,     // Game sales + IAP
+      profit: 700000,
+      competitorCost: 900000,
+      competitorRevenue: 1600000,
+      competitorProfit: 700000
+    },
+    { 
+      month: 'Feb', 
+      cost: 850000,
+      revenue: 1700000,
+      profit: 850000,
+      competitorCost: 950000,
+      competitorRevenue: 1800000,
+      competitorProfit: 850000
+    },
+    { 
+      month: 'Mar', 
+      cost: 900000,
+      revenue: 2000000,
+      profit: 1100000,
+      competitorCost: 1000000,
+      competitorRevenue: 2200000,
+      competitorProfit: 1200000
+    },
+    { 
+      month: 'Apr', 
+      cost: 1000000,
+      revenue: 2500000,
+      profit: 1500000,
+      competitorCost: 1100000,
+      competitorRevenue: 2700000,
+      competitorProfit: 1600000
+    },
+    { 
+      month: 'May', 
+      cost: 1200000,
+      revenue: 3000000,
+      profit: 1800000,
+      competitorCost: 1300000,
+      competitorRevenue: 3200000,
+      competitorProfit: 1900000
+    }
+  ];] (0:0-204:4)
+  lexical_declaration [const radarData = [
+    { 
+      metric: 'Stream Views', 
+      A: 145, // YouTube Gaming
+      B: 130, // Twitch
+      CompA: 160, // Competitor YouTube
+      CompB: 150  // Competitor Twitch
+    },
+    { 
+      metric: 'Social Shares', 
+      A: 110,
+      B: 140,
+      CompA: 125,
+      CompB: 145
+    },
+    { 
+      metric: 'Community Posts', 
+      A: 95,
+      B: 125,
+      CompA: 105,
+      CompB: 130
+    },
+    { 
+      metric: 'Player Reviews', 
+      A: 120,
+      B: 105,
+      CompA: 130,
+      CompB: 110
+    },
+    { 
+      metric: 'Discord Activity', 
+      A: 130,
+      B: 115,
+      CompA: 140,
+      CompB: 125
+    }
+  ];] (0:0-36:4)
+    const [const] (0:0-0:5)
+    variable_declarator [radarData = [
+    { 
+      metric: 'Stream Views', 
+      A: 145, // YouTube Gaming
+      B: 130, // Twitch
+      CompA: 160, // Competitor YouTube
+      CompB: 150  // Competitor Twitch
+    },
+    { 
+      metric: 'Social Shares', 
+      A: 110,
+      B: 140,
+      CompA: 125,
+      CompB: 145
+    },
+    { 
+      metric: 'Community Posts', 
+      A: 95,
+      B: 125,
+      CompA: 105,
+      CompB: 130
+    },
+    { 
+      metric: 'Player Reviews', 
+      A: 120,
+      B: 105,
+      CompA: 130,
+      CompB: 110
+    },
+    { 
+      metric: 'Discord Activity', 
+      A: 130,
+      B: 115,
+      CompA: 140,
+      CompB: 125
+    }
+  ]] (0:6-36:3)
+      identifier [radarData] (0:6-0:15)
+      = [=] (0:16-0:17)
+      array [[
+    { 
+      metric: 'Stream Views', 
+      A: 145, // YouTube Gaming
+      B: 130, // Twitch
+      CompA: 160, // Competitor YouTube
+      CompB: 150  // Competitor Twitch
+    },
+    { 
+      metric: 'Social Shares', 
+      A: 110,
+      B: 140,
+      CompA: 125,
+      CompB: 145
+    },
+    { 
+      metric: 'Community Posts', 
+      A: 95,
+      B: 125,
+      CompA: 105,
+      CompB: 130
+    },
+    { 
+      metric: 'Player Reviews', 
+      A: 120,
+      B: 105,
+      CompA: 130,
+      CompB: 110
+    },
+    { 
+      metric: 'Discord Activity', 
+      A: 130,
+      B: 115,
+      CompA: 140,
+      CompB: 125
+    }
+  ]] (0:18-36:3)
+        [ [[] (0:18-0:19)
+        object [{ 
+      metric: 'Stream Views', 
+      A: 145, // YouTube Gaming
+      B: 130, // Twitch
+      CompA: 160, // Competitor YouTube
+      CompB: 150  // Competitor Twitch
+    }] (1:4-7:5)
+          { [{] (1:4-1:5)
+          pair [metric: 'Stream Views'] (2:6-2:28)
+            property_identifier [metric] (2:6-2:12)
+            : [:] (2:12-2:13)
+            string ['Stream Views'] (2:14-2:28)
+              ' ['] (2:14-2:15)
+              string_fragment [Stream Views] (2:15-2:27)
+              ' ['] (2:27-2:28)
+          , [,] (2:28-2:29)
+          pair [A: 145] (3:6-3:12)
+            property_identifier [A] (3:6-3:7)
+            : [:] (3:7-3:8)
+            number [145] (3:9-3:12)
+          , [,] (3:12-3:13)
+          comment [// YouTube Gaming] (3:14-3:31)
+          pair [B: 130] (4:6-4:12)
+            property_identifier [B] (4:6-4:7)
+            : [:] (4:7-4:8)
+            number [130] (4:9-4:12)
+          , [,] (4:12-4:13)
+          comment [// Twitch] (4:14-4:23)
+          pair [CompA: 160] (5:6-5:16)
+            property_identifier [CompA] (5:6-5:11)
+            : [:] (5:11-5:12)
+            number [160] (5:13-5:16)
+          , [,] (5:16-5:17)
+          comment [// Competitor YouTube] (5:18-5:39)
+          pair [CompB: 150] (6:6-6:16)
+            property_identifier [CompB] (6:6-6:11)
+            : [:] (6:11-6:12)
+            number [150] (6:13-6:16)
+          comment [// Competitor Twitch] (6:18-6:38)
+          } [}] (7:4-7:5)
+        , [,] (7:5-7:6)
+        object [{ 
+      metric: 'Social Shares', 
+      A: 110,
+      B: 140,
+      CompA: 125,
+      CompB: 145
+    }] (8:4-14:5)
+          { [{] (8:4-8:5)
+          pair [metric: 'Social Shares'] (9:6-9:29)
+            property_identifier [metric] (9:6-9:12)
+            : [:] (9:12-9:13)
+            string ['Social Shares'] (9:14-9:29)
+              ' ['] (9:14-9:15)
+              string_fragment [Social Shares] (9:15-9:28)
+              ' ['] (9:28-9:29)
+          , [,] (9:29-9:30)
+          pair [A: 110] (10:6-10:12)
+            property_identifier [A] (10:6-10:7)
+            : [:] (10:7-10:8)
+            number [110] (10:9-10:12)
+          , [,] (10:12-10:13)
+          pair [B: 140] (11:6-11:12)
+            property_identifier [B] (11:6-11:7)
+            : [:] (11:7-11:8)
+            number [140] (11:9-11:12)
+          , [,] (11:12-11:13)
+          pair [CompA: 125] (12:6-12:16)
+            property_identifier [CompA] (12:6-12:11)
+            : [:] (12:11-12:12)
+            number [125] (12:13-12:16)
+          , [,] (12:16-12:17)
+          pair [CompB: 145] (13:6-13:16)
+            property_identifier [CompB] (13:6-13:11)
+            : [:] (13:11-13:12)
+            number [145] (13:13-13:16)
+          } [}] (14:4-14:5)
+        , [,] (14:5-14:6)
+        object [{ 
+      metric: 'Community Posts', 
+      A: 95,
+      B: 125,
+      CompA: 105,
+      CompB: 130
+    }] (15:4-21:5)
+          { [{] (15:4-15:5)
+          pair [metric: 'Community Posts'] (16:6-16:31)
+            property_identifier [metric] (16:6-16:12)
+            : [:] (16:12-16:13)
+            string ['Community Posts'] (16:14-16:31)
+              ' ['] (16:14-16:15)
+              string_fragment [Community Posts] (16:15-16:30)
+              ' ['] (16:30-16:31)
+          , [,] (16:31-16:32)
+          pair [A: 95] (17:6-17:11)
+            property_identifier [A] (17:6-17:7)
+            : [:] (17:7-17:8)
+            number [95] (17:9-17:11)
+          , [,] (17:11-17:12)
+          pair [B: 125] (18:6-18:12)
+            property_identifier [B] (18:6-18:7)
+            : [:] (18:7-18:8)
+            number [125] (18:9-18:12)
+          , [,] (18:12-18:13)
+          pair [CompA: 105] (19:6-19:16)
+            property_identifier [CompA] (19:6-19:11)
+            : [:] (19:11-19:12)
+            number [105] (19:13-19:16)
+          , [,] (19:16-19:17)
+          pair [CompB: 130] (20:6-20:16)
+            property_identifier [CompB] (20:6-20:11)
+            : [:] (20:11-20:12)
+            number [130] (20:13-20:16)
+          } [}] (21:4-21:5)
+        , [,] (21:5-21:6)
+        object [{ 
+      metric: 'Player Reviews', 
+      A: 120,
+      B: 105,
+      CompA: 130,
+      CompB: 110
+    }] (22:4-28:5)
+          { [{] (22:4-22:5)
+          pair [metric: 'Player Reviews'] (23:6-23:30)
+            property_identifier [metric] (23:6-23:12)
+            : [:] (23:12-23:13)
+            string ['Player Reviews'] (23:14-23:30)
+              ' ['] (23:14-23:15)
+              string_fragment [Player Reviews] (23:15-23:29)
+              ' ['] (23:29-23:30)
+          , [,] (23:30-23:31)
+          pair [A: 120] (24:6-24:12)
+            property_identifier [A] (24:6-24:7)
+            : [:] (24:7-24:8)
+            number [120] (24:9-24:12)
+          , [,] (24:12-24:13)
+          pair [B: 105] (25:6-25:12)
+            property_identifier [B] (25:6-25:7)
+            : [:] (25:7-25:8)
+            number [105] (25:9-25:12)
+          , [,] (25:12-25:13)
+          pair [CompA: 130] (26:6-26:16)
+            property_identifier [CompA] (26:6-26:11)
+            : [:] (26:11-26:12)
+            number [130] (26:13-26:16)
+          , [,] (26:16-26:17)
+          pair [CompB: 110] (27:6-27:16)
+            property_identifier [CompB] (27:6-27:11)
+            : [:] (27:11-27:12)
+            number [110] (27:13-27:16)
+          } [}] (28:4-28:5)
+        , [,] (28:5-28:6)
+        object [{ 
+      metric: 'Discord Activity', 
+      A: 130,
+      B: 115,
+      CompA: 140,
+      CompB: 125
+    }] (29:4-35:5)
+          { [{] (29:4-29:5)
+          pair [metric: 'Discord Activity'] (30:6-30:32)
+            property_identifier [metric] (30:6-30:12)
+            : [:] (30:12-30:13)
+            string ['Discord Activity'] (30:14-30:32)
+              ' ['] (30:14-30:15)
+              string_fragment [Discord Activity] (30:15-30:31)
+              ' ['] (30:31-30:32)
+          , [,] (30:32-30:33)
+          pair [A: 130] (31:6-31:12)
+            property_identifier [A] (31:6-31:7)
+            : [:] (31:7-31:8)
+            number [130] (31:9-31:12)
+          , [,] (31:12-31:13)
+          pair [B: 115] (32:6-32:12)
+            property_identifier [B] (32:6-32:7)
+            : [:] (32:7-32:8)
+            number [115] (32:9-32:12)
+          , [,] (32:12-32:13)
+          pair [CompA: 140] (33:6-33:16)
+            property_identifier [CompA] (33:6-33:11)
+            : [:] (33:11-33:12)
+            number [140] (33:13-33:16)
+          , [,] (33:16-33:17)
+          pair [CompB: 125] (34:6-34:16)
+            property_identifier [CompB] (34:6-34:11)
+            : [:] (34:11-34:12)
+            number [125] (34:13-34:16)
+          } [}] (35:4-35:5)
+        ] []] (36:2-36:3)
+    ; [;] (36:3-36:4)
+  comment [// Time Patterns Data (Daily Gaming Activity)] (38:2-38:47)
+  lexical_declaration [const timePatternData = [
+    { 
+      time: '00:00', 
+      engagement: 2200,    // Active players
+      viral: 3500,         // Stream viewers
+      competitorEngagement: 2400,
+      competitorViral: 3800
+    },
+    { 
+      time: '04:00', 
+      engagement: 1800,
+      viral: 2800,
+      competitorEngagement: 2000,
+      competitorViral: 3000
+    },
+    { 
+      time: '08:00', 
+      engagement: 3500,
+      viral: 5500,
+      competitorEngagement: 3800,
+      competitorViral: 5800
+    },
+    { 
+      time: '12:00', 
+      engagement: 4200,
+      viral: 6800,
+      competitorEngagement: 4500,
+      competitorViral: 7200
+    },
+    { 
+      time: '16:00', 
+      engagement: 5000,
+      viral: 8500,
+      competitorEngagement: 5400,
+      competitorViral: 9000
+    },
+    { 
+      time: '20:00', 
+      engagement: 4800,
+      viral: 7800,
+      competitorEngagement: 5200,
+      competitorViral: 8200
+    }
+  ];] (39:2-82:4)
+    const [const] (39:2-39:7)
+    variable_declarator [timePatternData = [
+    { 
+      time: '00:00', 
+      engagement: 2200,    // Active players
+      viral: 3500,         // Stream viewers
+      competitorEngagement: 2400,
+      competitorViral: 3800
+    },
+    { 
+      time: '04:00', 
+      engagement: 1800,
+      viral: 2800,
+      competitorEngagement: 2000,
+      competitorViral: 3000
+    },
+    { 
+      time: '08:00', 
+      engagement: 3500,
+      viral: 5500,
+      competitorEngagement: 3800,
+      competitorViral: 5800
+    },
+    { 
+      time: '12:00', 
+      engagement: 4200,
+      viral: 6800,
+      competitorEngagement: 4500,
+      competitorViral: 7200
+    },
+    { 
+      time: '16:00', 
+      engagement: 5000,
+      viral: 8500,
+      competitorEngagement: 5400,
+      competitorViral: 9000
+    },
+    { 
+      time: '20:00', 
+      engagement: 4800,
+      viral: 7800,
+      competitorEngagement: 5200,
+      competitorViral: 8200
+    }
+  ]] (39:8-82:3)
+      identifier [timePatternData] (39:8-39:23)
+      = [=] (39:24-39:25)
+      array [[
+    { 
+      time: '00:00', 
+      engagement: 2200,    // Active players
+      viral: 3500,         // Stream viewers
+      competitorEngagement: 2400,
+      competitorViral: 3800
+    },
+    { 
+      time: '04:00', 
+      engagement: 1800,
+      viral: 2800,
+      competitorEngagement: 2000,
+      competitorViral: 3000
+    },
+    { 
+      time: '08:00', 
+      engagement: 3500,
+      viral: 5500,
+      competitorEngagement: 3800,
+      competitorViral: 5800
+    },
+    { 
+      time: '12:00', 
+      engagement: 4200,
+      viral: 6800,
+      competitorEngagement: 4500,
+      competitorViral: 7200
+    },
+    { 
+      time: '16:00', 
+      engagement: 5000,
+      viral: 8500,
+      competitorEngagement: 5400,
+      competitorViral: 9000
+    },
+    { 
+      time: '20:00', 
+      engagement: 4800,
+      viral: 7800,
+      competitorEngagement: 5200,
+      competitorViral: 8200
+    }
+  ]] (39:26-82:3)
+        [ [[] (39:26-39:27)
+        object [{ 
+      time: '00:00', 
+      engagement: 2200,    // Active players
+      viral: 3500,         // Stream viewers
+      competitorEngagement: 2400,
+      competitorViral: 3800
+    }] (40:4-46:5)
+          { [{] (40:4-40:5)
+          pair [time: '00:00'] (41:6-41:19)
+            property_identifier [time] (41:6-41:10)
+            : [:] (41:10-41:11)
+            string ['00:00'] (41:12-41:19)
+              ' ['] (41:12-41:13)
+              string_fragment [00:00] (41:13-41:18)
+              ' ['] (41:18-41:19)
+          , [,] (41:19-41:20)
+          pair [engagement: 2200] (42:6-42:22)
+            property_identifier [engagement] (42:6-42:16)
+            : [:] (42:16-42:17)
+            number [2200] (42:18-42:22)
+          , [,] (42:22-42:23)
+          comment [// Active players] (42:27-42:44)
+          pair [viral: 3500] (43:6-43:17)
+            property_identifier [viral] (43:6-43:11)
+            : [:] (43:11-43:12)
+            number [3500] (43:13-43:17)
+          , [,] (43:17-43:18)
+          comment [// Stream viewers] (43:27-43:44)
+          pair [competitorEngagement: 2400] (44:6-44:32)
+            property_identifier [competitorEngagement] (44:6-44:26)
+            : [:] (44:26-44:27)
+            number [2400] (44:28-44:32)
+          , [,] (44:32-44:33)
+          pair [competitorViral: 3800] (45:6-45:27)
+            property_identifier [competitorViral] (45:6-45:21)
+            : [:] (45:21-45:22)
+            number [3800] (45:23-45:27)
+          } [}] (46:4-46:5)
+        , [,] (46:5-46:6)
+        object [{ 
+      time: '04:00', 
+      engagement: 1800,
+      viral: 2800,
+      competitorEngagement: 2000,
+      competitorViral: 3000
+    }] (47:4-53:5)
+          { [{] (47:4-47:5)
+          pair [time: '04:00'] (48:6-48:19)
+            property_identifier [time] (48:6-48:10)
+            : [:] (48:10-48:11)
+            string ['04:00'] (48:12-48:19)
+              ' ['] (48:12-48:13)
+              string_fragment [04:00] (48:13-48:18)
+              ' ['] (48:18-48:19)
+          , [,] (48:19-48:20)
+          pair [engagement: 1800] (49:6-49:22)
+            property_identifier [engagement] (49:6-49:16)
+            : [:] (49:16-49:17)
+            number [1800] (49:18-49:22)
+          , [,] (49:22-49:23)
+          pair [viral: 2800] (50:6-50:17)
+            property_identifier [viral] (50:6-50:11)
+            : [:] (50:11-50:12)
+            number [2800] (50:13-50:17)
+          , [,] (50:17-50:18)
+          pair [competitorEngagement: 2000] (51:6-51:32)
+            property_identifier [competitorEngagement] (51:6-51:26)
+            : [:] (51:26-51:27)
+            number [2000] (51:28-51:32)
+          , [,] (51:32-51:33)
+          pair [competitorViral: 3000] (52:6-52:27)
+            property_identifier [competitorViral] (52:6-52:21)
+            : [:] (52:21-52:22)
+            number [3000] (52:23-52:27)
+          } [}] (53:4-53:5)
+        , [,] (53:5-53:6)
+        object [{ 
+      time: '08:00', 
+      engagement: 3500,
+      viral: 5500,
+      competitorEngagement: 3800,
+      competitorViral: 5800
+    }] (54:4-60:5)
+          { [{] (54:4-54:5)
+          pair [time: '08:00'] (55:6-55:19)
+            property_identifier [time] (55:6-55:10)
+            : [:] (55:10-55:11)
+            string ['08:00'] (55:12-55:19)
+              ' ['] (55:12-55:13)
+              string_fragment [08:00] (55:13-55:18)
+              ' ['] (55:18-55:19)
+          , [,] (55:19-55:20)
+          pair [engagement: 3500] (56:6-56:22)
+            property_identifier [engagement] (56:6-56:16)
+            : [:] (56:16-56:17)
+            number [3500] (56:18-56:22)
+          , [,] (56:22-56:23)
+          pair [viral: 5500] (57:6-57:17)
+            property_identifier [viral] (57:6-57:11)
+            : [:] (57:11-57:12)
+            number [5500] (57:13-57:17)
+          , [,] (57:17-57:18)
+          pair [competitorEngagement: 3800] (58:6-58:32)
+            property_identifier [competitorEngagement] (58:6-58:26)
+            : [:] (58:26-58:27)
+            number [3800] (58:28-58:32)
+          , [,] (58:32-58:33)
+          pair [competitorViral: 5800] (59:6-59:27)
+            property_identifier [competitorViral] (59:6-59:21)
+            : [:] (59:21-59:22)
+            number [5800] (59:23-59:27)
+          } [}] (60:4-60:5)
+        , [,] (60:5-60:6)
+        object [{ 
+      time: '12:00', 
+      engagement: 4200,
+      viral: 6800,
+      competitorEngagement: 4500,
+      competitorViral: 7200
+    }] (61:4-67:5)
+          { [{] (61:4-61:5)
+          pair [time: '12:00'] (62:6-62:19)
+            property_identifier [time] (62:6-62:10)
+            : [:] (62:10-62:11)
+            string ['12:00'] (62:12-62:19)
+              ' ['] (62:12-62:13)
+              string_fragment [12:00] (62:13-62:18)
+              ' ['] (62:18-62:19)
+          , [,] (62:19-62:20)
+          pair [engagement: 4200] (63:6-63:22)
+            property_identifier [engagement] (63:6-63:16)
+            : [:] (63:16-63:17)
+            number [4200] (63:18-63:22)
+          , [,] (63:22-63:23)
+          pair [viral: 6800] (64:6-64:17)
+            property_identifier [viral] (64:6-64:11)
+            : [:] (64:11-64:12)
+            number [6800] (64:13-64:17)
+          , [,] (64:17-64:18)
+          pair [competitorEngagement: 4500] (65:6-65:32)
+            property_identifier [competitorEngagement] (65:6-65:26)
+            : [:] (65:26-65:27)
+            number [4500] (65:28-65:32)
+          , [,] (65:32-65:33)
+          pair [competitorViral: 7200] (66:6-66:27)
+            property_identifier [competitorViral] (66:6-66:21)
+            : [:] (66:21-66:22)
+            number [7200] (66:23-66:27)
+          } [}] (67:4-67:5)
+        , [,] (67:5-67:6)
+        object [{ 
+      time: '16:00', 
+      engagement: 5000,
+      viral: 8500,
+      competitorEngagement: 5400,
+      competitorViral: 9000
+    }] (68:4-74:5)
+          { [{] (68:4-68:5)
+          pair [time: '16:00'] (69:6-69:19)
+            property_identifier [time] (69:6-69:10)
+            : [:] (69:10-69:11)
+            string ['16:00'] (69:12-69:19)
+              ' ['] (69:12-69:13)
+              string_fragment [16:00] (69:13-69:18)
+              ' ['] (69:18-69:19)
+          , [,] (69:19-69:20)
+          pair [engagement: 5000] (70:6-70:22)
+            property_identifier [engagement] (70:6-70:16)
+            : [:] (70:16-70:17)
+            number [5000] (70:18-70:22)
+          , [,] (70:22-70:23)
+          pair [viral: 8500] (71:6-71:17)
+            property_identifier [viral] (71:6-71:11)
+            : [:] (71:11-71:12)
+            number [8500] (71:13-71:17)
+          , [,] (71:17-71:18)
+          pair [competitorEngagement: 5400] (72:6-72:32)
+            property_identifier [competitorEngagement] (72:6-72:26)
+            : [:] (72:26-72:27)
+            number [5400] (72:28-72:32)
+          , [,] (72:32-72:33)
+          pair [competitorViral: 9000] (73:6-73:27)
+            property_identifier [competitorViral] (73:6-73:21)
+            : [:] (73:21-73:22)
+            number [9000] (73:23-73:27)
+          } [}] (74:4-74:5)
+        , [,] (74:5-74:6)
+        object [{ 
+      time: '20:00', 
+      engagement: 4800,
+      viral: 7800,
+      competitorEngagement: 5200,
+      competitorViral: 8200
+    }] (75:4-81:5)
+          { [{] (75:4-75:5)
+          pair [time: '20:00'] (76:6-76:19)
+            property_identifier [time] (76:6-76:10)
+            : [:] (76:10-76:11)
+            string ['20:00'] (76:12-76:19)
+              ' ['] (76:12-76:13)
+              string_fragment [20:00] (76:13-76:18)
+              ' ['] (76:18-76:19)
+          , [,] (76:19-76:20)
+          pair [engagement: 4800] (77:6-77:22)
+            property_identifier [engagement] (77:6-77:16)
+            : [:] (77:16-77:17)
+            number [4800] (77:18-77:22)
+          , [,] (77:22-77:23)
+          pair [viral: 7800] (78:6-78:17)
+            property_identifier [viral] (78:6-78:11)
+            : [:] (78:11-78:12)
+            number [7800] (78:13-78:17)
+          , [,] (78:17-78:18)
+          pair [competitorEngagement: 5200] (79:6-79:32)
+            property_identifier [competitorEngagement] (79:6-79:26)
+            : [:] (79:26-79:27)
+            number [5200] (79:28-79:32)
+          , [,] (79:32-79:33)
+          pair [competitorViral: 8200] (80:6-80:27)
+            property_identifier [competitorViral] (80:6-80:21)
+            : [:] (80:21-80:22)
+            number [8200] (80:23-80:27)
+          } [}] (81:4-81:5)
+        ] []] (82:2-82:3)
+    ; [;] (82:3-82:4)
+  comment [// Platform Performance Data (Monthly Gaming Metrics)] (84:2-84:55)
+  lexical_declaration [const platformData = [
+    { 
+      date: '2024-01', 
+      youtube: 8500,      // YouTube Gaming views (K)
+      twitch: 6200,       // Twitch viewers (K)
+      steam: 4800,        // Steam activity (K)
+      competitorYoutube: 9000,
+      competitorTwitch: 6800
+    },
+    { 
+      date: '2024-02', 
+      youtube: 9200,
+      twitch: 7000,
+      steam: 5200,
+      competitorYoutube: 9800,
+      competitorTwitch: 7500
+    },
+    { 
+      date: '2024-03', 
+      youtube: 11000,
+      twitch: 8500,
+      steam: 6000,
+      competitorYoutube: 11500,
+      competitorTwitch: 9000
+    },
+    { 
+      date: '2024-04', 
+      youtube: 10500,
+      twitch: 8000,
+      steam: 5800,
+      competitorYoutube: 11000,
+      competitorTwitch: 8500
+    },
+    { 
+      date: '2024-05', 
+      youtube: 12000,
+      twitch: 9500,
+      steam: 7000,
+      competitorYoutube: 12500,
+      competitorTwitch: 10000
+    }
+  ];] (85:2-126:4)
+    const [const] (85:2-85:7)
+    variable_declarator [platformData = [
+    { 
+      date: '2024-01', 
+      youtube: 8500,      // YouTube Gaming views (K)
+      twitch: 6200,       // Twitch viewers (K)
+      steam: 4800,        // Steam activity (K)
+      competitorYoutube: 9000,
+      competitorTwitch: 6800
+    },
+    { 
+      date: '2024-02', 
+      youtube: 9200,
+      twitch: 7000,
+      steam: 5200,
+      competitorYoutube: 9800,
+      competitorTwitch: 7500
+    },
+    { 
+      date: '2024-03', 
+      youtube: 11000,
+      twitch: 8500,
+      steam: 6000,
+      competitorYoutube: 11500,
+      competitorTwitch: 9000
+    },
+    { 
+      date: '2024-04', 
+      youtube: 10500,
+      twitch: 8000,
+      steam: 5800,
+      competitorYoutube: 11000,
+      competitorTwitch: 8500
+    },
+    { 
+      date: '2024-05', 
+      youtube: 12000,
+      twitch: 9500,
+      steam: 7000,
+      competitorYoutube: 12500,
+      competitorTwitch: 10000
+    }
+  ]] (85:8-126:3)
+      identifier [platformData] (85:8-85:20)
+      = [=] (85:21-85:22)
+      array [[
+    { 
+      date: '2024-01', 
+      youtube: 8500,      // YouTube Gaming views (K)
+      twitch: 6200,       // Twitch viewers (K)
+      steam: 4800,        // Steam activity (K)
+      competitorYoutube: 9000,
+      competitorTwitch: 6800
+    },
+    { 
+      date: '2024-02', 
+      youtube: 9200,
+      twitch: 7000,
+      steam: 5200,
+      competitorYoutube: 9800,
+      competitorTwitch: 7500
+    },
+    { 
+      date: '2024-03', 
+      youtube: 11000,
+      twitch: 8500,
+      steam: 6000,
+      competitorYoutube: 11500,
+      competitorTwitch: 9000
+    },
+    { 
+      date: '2024-04', 
+      youtube: 10500,
+      twitch: 8000,
+      steam: 5800,
+      competitorYoutube: 11000,
+      competitorTwitch: 8500
+    },
+    { 
+      date: '2024-05', 
+      youtube: 12000,
+      twitch: 9500,
+      steam: 7000,
+      competitorYoutube: 12500,
+      competitorTwitch: 10000
+    }
+  ]] (85:23-126:3)
+        [ [[] (85:23-85:24)
+        object [{ 
+      date: '2024-01', 
+      youtube: 8500,      // YouTube Gaming views (K)
+      twitch: 6200,       // Twitch viewers (K)
+      steam: 4800,        // Steam activity (K)
+      competitorYoutube: 9000,
+      competitorTwitch: 6800
+    }] (86:4-93:5)
+          { [{] (86:4-86:5)
+          pair [date: '2024-01'] (87:6-87:21)
+            property_identifier [date] (87:6-87:10)
+            : [:] (87:10-87:11)
+            string ['2024-01'] (87:12-87:21)
+              ' ['] (87:12-87:13)
+              string_fragment [2024-01] (87:13-87:20)
+              ' ['] (87:20-87:21)
+          , [,] (87:21-87:22)
+          pair [youtube: 8500] (88:6-88:19)
+            property_identifier [youtube] (88:6-88:13)
+            : [:] (88:13-88:14)
+            number [8500] (88:15-88:19)
+          , [,] (88:19-88:20)
+          comment [// YouTube Gaming views (K)] (88:26-88:53)
+          pair [twitch: 6200] (89:6-89:18)
+            property_identifier [twitch] (89:6-89:12)
+            : [:] (89:12-89:13)
+            number [6200] (89:14-89:18)
+          , [,] (89:18-89:19)
+          comment [// Twitch viewers (K)] (89:26-89:47)
+          pair [steam: 4800] (90:6-90:17)
+            property_identifier [steam] (90:6-90:11)
+            : [:] (90:11-90:12)
+            number [4800] (90:13-90:17)
+          , [,] (90:17-90:18)
+          comment [// Steam activity (K)] (90:26-90:47)
+          pair [competitorYoutube: 9000] (91:6-91:29)
+            property_identifier [competitorYoutube] (91:6-91:23)
+            : [:] (91:23-91:24)
+            number [9000] (91:25-91:29)
+          , [,] (91:29-91:30)
+          pair [competitorTwitch: 6800] (92:6-92:28)
+            property_identifier [competitorTwitch] (92:6-92:22)
+            : [:] (92:22-92:23)
+            number [6800] (92:24-92:28)
+          } [}] (93:4-93:5)
+        , [,] (93:5-93:6)
+        object [{ 
+      date: '2024-02', 
+      youtube: 9200,
+      twitch: 7000,
+      steam: 5200,
+      competitorYoutube: 9800,
+      competitorTwitch: 7500
+    }] (94:4-101:5)
+          { [{] (94:4-94:5)
+          pair [date: '2024-02'] (95:6-95:21)
+            property_identifier [date] (95:6-95:10)
+            : [:] (95:10-95:11)
+            string ['2024-02'] (95:12-95:21)
+              ' ['] (95:12-95:13)
+              string_fragment [2024-02] (95:13-95:20)
+              ' ['] (95:20-95:21)
+          , [,] (95:21-95:22)
+          pair [youtube: 9200] (96:6-96:19)
+            property_identifier [youtube] (96:6-96:13)
+            : [:] (96:13-96:14)
+            number [9200] (96:15-96:19)
+          , [,] (96:19-96:20)
+          pair [twitch: 7000] (97:6-97:18)
+            property_identifier [twitch] (97:6-97:12)
+            : [:] (97:12-97:13)
+            number [7000] (97:14-97:18)
+          , [,] (97:18-97:19)
+          pair [steam: 5200] (98:6-98:17)
+            property_identifier [steam] (98:6-98:11)
+            : [:] (98:11-98:12)
+            number [5200] (98:13-98:17)
+          , [,] (98:17-98:18)
+          pair [competitorYoutube: 9800] (99:6-99:29)
+            property_identifier [competitorYoutube] (99:6-99:23)
+            : [:] (99:23-99:24)
+            number [9800] (99:25-99:29)
+          , [,] (99:29-99:30)
+          pair [competitorTwitch: 7500] (100:6-100:28)
+            property_identifier [competitorTwitch] (100:6-100:22)
+            : [:] (100:22-100:23)
+            number [7500] (100:24-100:28)
+          } [}] (101:4-101:5)
+        , [,] (101:5-101:6)
+        object [{ 
+      date: '2024-03', 
+      youtube: 11000,
+      twitch: 8500,
+      steam: 6000,
+      competitorYoutube: 11500,
+      competitorTwitch: 9000
+    }] (102:4-109:5)
+          { [{] (102:4-102:5)
+          pair [date: '2024-03'] (103:6-103:21)
+            property_identifier [date] (103:6-103:10)
+            : [:] (103:10-103:11)
+            string ['2024-03'] (103:12-103:21)
+              ' ['] (103:12-103:13)
+              string_fragment [2024-03] (103:13-103:20)
+              ' ['] (103:20-103:21)
+          , [,] (103:21-103:22)
+          pair [youtube: 11000] (104:6-104:20)
+            property_identifier [youtube] (104:6-104:13)
+            : [:] (104:13-104:14)
+            number [11000] (104:15-104:20)
+          , [,] (104:20-104:21)
+          pair [twitch: 8500] (105:6-105:18)
+            property_identifier [twitch] (105:6-105:12)
+            : [:] (105:12-105:13)
+            number [8500] (105:14-105:18)
+          , [,] (105:18-105:19)
+          pair [steam: 6000] (106:6-106:17)
+            property_identifier [steam] (106:6-106:11)
+            : [:] (106:11-106:12)
+            number [6000] (106:13-106:17)
+          , [,] (106:17-106:18)
+          pair [competitorYoutube: 11500] (107:6-107:30)
+            property_identifier [competitorYoutube] (107:6-107:23)
+            : [:] (107:23-107:24)
+            number [11500] (107:25-107:30)
+          , [,] (107:30-107:31)
+          pair [competitorTwitch: 9000] (108:6-108:28)
+            property_identifier [competitorTwitch] (108:6-108:22)
+            : [:] (108:22-108:23)
+            number [9000] (108:24-108:28)
+          } [}] (109:4-109:5)
+        , [,] (109:5-109:6)
+        object [{ 
+      date: '2024-04', 
+      youtube: 10500,
+      twitch: 8000,
+      steam: 5800,
+      competitorYoutube: 11000,
+      competitorTwitch: 8500
+    }] (110:4-117:5)
+          { [{] (110:4-110:5)
+          pair [date: '2024-04'] (111:6-111:21)
+            property_identifier [date] (111:6-111:10)
+            : [:] (111:10-111:11)
+            string ['2024-04'] (111:12-111:21)
+              ' ['] (111:12-111:13)
+              string_fragment [2024-04] (111:13-111:20)
+              ' ['] (111:20-111:21)
+          , [,] (111:21-111:22)
+          pair [youtube: 10500] (112:6-112:20)
+            property_identifier [youtube] (112:6-112:13)
+            : [:] (112:13-112:14)
+            number [10500] (112:15-112:20)
+          , [,] (112:20-112:21)
+          pair [twitch: 8000] (113:6-113:18)
+            property_identifier [twitch] (113:6-113:12)
+            : [:] (113:12-113:13)
+            number [8000] (113:14-113:18)
+          , [,] (113:18-113:19)
+          pair [steam: 5800] (114:6-114:17)
+            property_identifier [steam] (114:6-114:11)
+            : [:] (114:11-114:12)
+            number [5800] (114:13-114:17)
+          , [,] (114:17-114:18)
+          pair [competitorYoutube: 11000] (115:6-115:30)
+            property_identifier [competitorYoutube] (115:6-115:23)
+            : [:] (115:23-115:24)
+            number [11000] (115:25-115:30)
+          , [,] (115:30-115:31)
+          pair [competitorTwitch: 8500] (116:6-116:28)
+            property_identifier [competitorTwitch] (116:6-116:22)
+            : [:] (116:22-116:23)
+            number [8500] (116:24-116:28)
+          } [}] (117:4-117:5)
+        , [,] (117:5-117:6)
+        object [{ 
+      date: '2024-05', 
+      youtube: 12000,
+      twitch: 9500,
+      steam: 7000,
+      competitorYoutube: 12500,
+      competitorTwitch: 10000
+    }] (118:4-125:5)
+          { [{] (118:4-118:5)
+          pair [date: '2024-05'] (119:6-119:21)
+            property_identifier [date] (119:6-119:10)
+            : [:] (119:10-119:11)
+            string ['2024-05'] (119:12-119:21)
+              ' ['] (119:12-119:13)
+              string_fragment [2024-05] (119:13-119:20)
+              ' ['] (119:20-119:21)
+          , [,] (119:21-119:22)
+          pair [youtube: 12000] (120:6-120:20)
+            property_identifier [youtube] (120:6-120:13)
+            : [:] (120:13-120:14)
+            number [12000] (120:15-120:20)
+          , [,] (120:20-120:21)
+          pair [twitch: 9500] (121:6-121:18)
+            property_identifier [twitch] (121:6-121:12)
+            : [:] (121:12-121:13)
+            number [9500] (121:14-121:18)
+          , [,] (121:18-121:19)
+          pair [steam: 7000] (122:6-122:17)
+            property_identifier [steam] (122:6-122:11)
+            : [:] (122:11-122:12)
+            number [7000] (122:13-122:17)
+          , [,] (122:17-122:18)
+          pair [competitorYoutube: 12500] (123:6-123:30)
+            property_identifier [competitorYoutube] (123:6-123:23)
+            : [:] (123:23-123:24)
+            number [12500] (123:25-123:30)
+          , [,] (123:30-123:31)
+          pair [competitorTwitch: 10000] (124:6-124:29)
+            property_identifier [competitorTwitch] (124:6-124:22)
+            : [:] (124:22-124:23)
+            number [10000] (124:24-124:29)
+          } [}] (125:4-125:5)
+        ] []] (126:2-126:3)
+    ; [;] (126:3-126:4)
+  comment [// CTA Funnel Data (Player Conversion Funnel)] (128:2-128:47)
+  lexical_declaration [const funnelData = [
+    { 
+      stage: 'Game Page Views', 
+      value: 1000000,
+      competitorValue: 900000
+    },
+    { 
+      stage: 'Demo Downloads', 
+      value: 500000,
+      competitorValue: 450000
+    },
+    { 
+      stage: 'Full Game Purchase', 
+      value: 200000,
+      competitorValue: 180000
+    },
+    { 
+      stage: 'Active Players', 
+      value: 150000,
+      competitorValue: 130000
+    },
+    { 
+      stage: 'Community Members', 
+      value: 80000,
+      competitorValue: 70000
+    }
+  ];] (129:2-155:4)
+    const [const] (129:2-129:7)
+    variable_declarator [funnelData = [
+    { 
+      stage: 'Game Page Views', 
+      value: 1000000,
+      competitorValue: 900000
+    },
+    { 
+      stage: 'Demo Downloads', 
+      value: 500000,
+      competitorValue: 450000
+    },
+    { 
+      stage: 'Full Game Purchase', 
+      value: 200000,
+      competitorValue: 180000
+    },
+    { 
+      stage: 'Active Players', 
+      value: 150000,
+      competitorValue: 130000
+    },
+    { 
+      stage: 'Community Members', 
+      value: 80000,
+      competitorValue: 70000
+    }
+  ]] (129:8-155:3)
+      identifier [funnelData] (129:8-129:18)
+      = [=] (129:19-129:20)
+      array [[
+    { 
+      stage: 'Game Page Views', 
+      value: 1000000,
+      competitorValue: 900000
+    },
+    { 
+      stage: 'Demo Downloads', 
+      value: 500000,
+      competitorValue: 450000
+    },
+    { 
+      stage: 'Full Game Purchase', 
+      value: 200000,
+      competitorValue: 180000
+    },
+    { 
+      stage: 'Active Players', 
+      value: 150000,
+      competitorValue: 130000
+    },
+    { 
+      stage: 'Community Members', 
+      value: 80000,
+      competitorValue: 70000
+    }
+  ]] (129:21-155:3)
+        [ [[] (129:21-129:22)
+        object [{ 
+      stage: 'Game Page Views', 
+      value: 1000000,
+      competitorValue: 900000
+    }] (130:4-134:5)
+          { [{] (130:4-130:5)
+          pair [stage: 'Game Page Views'] (131:6-131:30)
+            property_identifier [stage] (131:6-131:11)
+            : [:] (131:11-131:12)
+            string ['Game Page Views'] (131:13-131:30)
+              ' ['] (131:13-131:14)
+              string_fragment [Game Page Views] (131:14-131:29)
+              ' ['] (131:29-131:30)
+          , [,] (131:30-131:31)
+          pair [value: 1000000] (132:6-132:20)
+            property_identifier [value] (132:6-132:11)
+            : [:] (132:11-132:12)
+            number [1000000] (132:13-132:20)
+          , [,] (132:20-132:21)
+          pair [competitorValue: 900000] (133:6-133:29)
+            property_identifier [competitorValue] (133:6-133:21)
+            : [:] (133:21-133:22)
+            number [900000] (133:23-133:29)
+          } [}] (134:4-134:5)
+        , [,] (134:5-134:6)
+        object [{ 
+      stage: 'Demo Downloads', 
+      value: 500000,
+      competitorValue: 450000
+    }] (135:4-139:5)
+          { [{] (135:4-135:5)
+          pair [stage: 'Demo Downloads'] (136:6-136:29)
+            property_identifier [stage] (136:6-136:11)
+            : [:] (136:11-136:12)
+            string ['Demo Downloads'] (136:13-136:29)
+              ' ['] (136:13-136:14)
+              string_fragment [Demo Downloads] (136:14-136:28)
+              ' ['] (136:28-136:29)
+          , [,] (136:29-136:30)
+          pair [value: 500000] (137:6-137:19)
+            property_identifier [value] (137:6-137:11)
+            : [:] (137:11-137:12)
+            number [500000] (137:13-137:19)
+          , [,] (137:19-137:20)
+          pair [competitorValue: 450000] (138:6-138:29)
+            property_identifier [competitorValue] (138:6-138:21)
+            : [:] (138:21-138:22)
+            number [450000] (138:23-138:29)
+          } [}] (139:4-139:5)
+        , [,] (139:5-139:6)
+        object [{ 
+      stage: 'Full Game Purchase', 
+      value: 200000,
+      competitorValue: 180000
+    }] (140:4-144:5)
+          { [{] (140:4-140:5)
+          pair [stage: 'Full Game Purchase'] (141:6-141:33)
+            property_identifier [stage] (141:6-141:11)
+            : [:] (141:11-141:12)
+            string ['Full Game Purchase'] (141:13-141:33)
+              ' ['] (141:13-141:14)
+              string_fragment [Full Game Purchase] (141:14-141:32)
+              ' ['] (141:32-141:33)
+          , [,] (141:33-141:34)
+          pair [value: 200000] (142:6-142:19)
+            property_identifier [value] (142:6-142:11)
+            : [:] (142:11-142:12)
+            number [200000] (142:13-142:19)
+          , [,] (142:19-142:20)
+          pair [competitorValue: 180000] (143:6-143:29)
+            property_identifier [competitorValue] (143:6-143:21)
+            : [:] (143:21-143:22)
+            number [180000] (143:23-143:29)
+          } [}] (144:4-144:5)
+        , [,] (144:5-144:6)
+        object [{ 
+      stage: 'Active Players', 
+      value: 150000,
+      competitorValue: 130000
+    }] (145:4-149:5)
+          { [{] (145:4-145:5)
+          pair [stage: 'Active Players'] (146:6-146:29)
+            property_identifier [stage] (146:6-146:11)
+            : [:] (146:11-146:12)
+            string ['Active Players'] (146:13-146:29)
+              ' ['] (146:13-146:14)
+              string_fragment [Active Players] (146:14-146:28)
+              ' ['] (146:28-146:29)
+          , [,] (146:29-146:30)
+          pair [value: 150000] (147:6-147:19)
+            property_identifier [value] (147:6-147:11)
+            : [:] (147:11-147:12)
+            number [150000] (147:13-147:19)
+          , [,] (147:19-147:20)
+          pair [competitorValue: 130000] (148:6-148:29)
+            property_identifier [competitorValue] (148:6-148:21)
+            : [:] (148:21-148:22)
+            number [130000] (148:23-148:29)
+          } [}] (149:4-149:5)
+        , [,] (149:5-149:6)
+        object [{ 
+      stage: 'Community Members', 
+      value: 80000,
+      competitorValue: 70000
+    }] (150:4-154:5)
+          { [{] (150:4-150:5)
+          pair [stage: 'Community Members'] (151:6-151:32)
+            property_identifier [stage] (151:6-151:11)
+            : [:] (151:11-151:12)
+            string ['Community Members'] (151:13-151:32)
+              ' ['] (151:13-151:14)
+              string_fragment [Community Members] (151:14-151:31)
+              ' ['] (151:31-151:32)
+          , [,] (151:32-151:33)
+          pair [value: 80000] (152:6-152:18)
+            property_identifier [value] (152:6-152:11)
+            : [:] (152:11-152:12)
+            number [80000] (152:13-152:18)
+          , [,] (152:18-152:19)
+          pair [competitorValue: 70000] (153:6-153:28)
+            property_identifier [competitorValue] (153:6-153:21)
+            : [:] (153:21-153:22)
+            number [70000] (153:23-153:28)
+          } [}] (154:4-154:5)
+        ] []] (155:2-155:3)
+    ; [;] (155:3-155:4)
+  comment [// ROI Comparison Data (Gaming Marketing ROI)] (157:2-157:47)
+  lexical_declaration [const roiData = [
+    { 
+      month: 'Jan', 
+      cost: 800000,         // Marketing spend
+      revenue: 1500000,     // Game sales + IAP
+      profit: 700000,
+      competitorCost: 900000,
+      competitorRevenue: 1600000,
+      competitorProfit: 700000
+    },
+    { 
+      month: 'Feb', 
+      cost: 850000,
+      revenue: 1700000,
+      profit: 850000,
+      competitorCost: 950000,
+      competitorRevenue: 1800000,
+      competitorProfit: 850000
+    },
+    { 
+      month: 'Mar', 
+      cost: 900000,
+      revenue: 2000000,
+      profit: 1100000,
+      competitorCost: 1000000,
+      competitorRevenue: 2200000,
+      competitorProfit: 1200000
+    },
+    { 
+      month: 'Apr', 
+      cost: 1000000,
+      revenue: 2500000,
+      profit: 1500000,
+      competitorCost: 1100000,
+      competitorRevenue: 2700000,
+      competitorProfit: 1600000
+    },
+    { 
+      month: 'May', 
+      cost: 1200000,
+      revenue: 3000000,
+      profit: 1800000,
+      competitorCost: 1300000,
+      competitorRevenue: 3200000,
+      competitorProfit: 1900000
+    }
+  ];] (158:2-204:4)
+    const [const] (158:2-158:7)
+    variable_declarator [roiData = [
+    { 
+      month: 'Jan', 
+      cost: 800000,         // Marketing spend
+      revenue: 1500000,     // Game sales + IAP
+      profit: 700000,
+      competitorCost: 900000,
+      competitorRevenue: 1600000,
+      competitorProfit: 700000
+    },
+    { 
+      month: 'Feb', 
+      cost: 850000,
+      revenue: 1700000,
+      profit: 850000,
+      competitorCost: 950000,
+      competitorRevenue: 1800000,
+      competitorProfit: 850000
+    },
+    { 
+      month: 'Mar', 
+      cost: 900000,
+      revenue: 2000000,
+      profit: 1100000,
+      competitorCost: 1000000,
+      competitorRevenue: 2200000,
+      competitorProfit: 1200000
+    },
+    { 
+      month: 'Apr', 
+      cost: 1000000,
+      revenue: 2500000,
+      profit: 1500000,
+      competitorCost: 1100000,
+      competitorRevenue: 2700000,
+      competitorProfit: 1600000
+    },
+    { 
+      month: 'May', 
+      cost: 1200000,
+      revenue: 3000000,
+      profit: 1800000,
+      competitorCost: 1300000,
+      competitorRevenue: 3200000,
+      competitorProfit: 1900000
+    }
+  ]] (158:8-204:3)
+      identifier [roiData] (158:8-158:15)
+      = [=] (158:16-158:17)
+      array [[
+    { 
+      month: 'Jan', 
+      cost: 800000,         // Marketing spend
+      revenue: 1500000,     // Game sales + IAP
+      profit: 700000,
+      competitorCost: 900000,
+      competitorRevenue: 1600000,
+      competitorProfit: 700000
+    },
+    { 
+      month: 'Feb', 
+      cost: 850000,
+      revenue: 1700000,
+      profit: 850000,
+      competitorCost: 950000,
+      competitorRevenue: 1800000,
+      competitorProfit: 850000
+    },
+    { 
+      month: 'Mar', 
+      cost: 900000,
+      revenue: 2000000,
+      profit: 1100000,
+      competitorCost: 1000000,
+      competitorRevenue: 2200000,
+      competitorProfit: 1200000
+    },
+    { 
+      month: 'Apr', 
+      cost: 1000000,
+      revenue: 2500000,
+      profit: 1500000,
+      competitorCost: 1100000,
+      competitorRevenue: 2700000,
+      competitorProfit: 1600000
+    },
+    { 
+      month: 'May', 
+      cost: 1200000,
+      revenue: 3000000,
+      profit: 1800000,
+      competitorCost: 1300000,
+      competitorRevenue: 3200000,
+      competitorProfit: 1900000
+    }
+  ]] (158:18-204:3)
+        [ [[] (158:18-158:19)
+        object [{ 
+      month: 'Jan', 
+      cost: 800000,         // Marketing spend
+      revenue: 1500000,     // Game sales + IAP
+      profit: 700000,
+      competitorCost: 900000,
+      competitorRevenue: 1600000,
+      competitorProfit: 700000
+    }] (159:4-167:5)
+          { [{] (159:4-159:5)
+          pair [month: 'Jan'] (160:6-160:18)
+            property_identifier [month] (160:6-160:11)
+            : [:] (160:11-160:12)
+            string ['Jan'] (160:13-160:18)
+              ' ['] (160:13-160:14)
+              string_fragment [Jan] (160:14-160:17)
+              ' ['] (160:17-160:18)
+          , [,] (160:18-160:19)
+          pair [cost: 800000] (161:6-161:18)
+            property_identifier [cost] (161:6-161:10)
+            : [:] (161:10-161:11)
+            number [800000] (161:12-161:18)
+          , [,] (161:18-161:19)
+          comment [// Marketing spend] (161:28-161:46)
+          pair [revenue: 1500000] (162:6-162:22)
+            property_identifier [revenue] (162:6-162:13)
+            : [:] (162:13-162:14)
+            number [1500000] (162:15-162:22)
+          , [,] (162:22-162:23)
+          comment [// Game sales + IAP] (162:28-162:47)
+          pair [profit: 700000] (163:6-163:20)
+            property_identifier [profit] (163:6-163:12)
+            : [:] (163:12-163:13)
+            number [700000] (163:14-163:20)
+          , [,] (163:20-163:21)
+          pair [competitorCost: 900000] (164:6-164:28)
+            property_identifier [competitorCost] (164:6-164:20)
+            : [:] (164:20-164:21)
+            number [900000] (164:22-164:28)
+          , [,] (164:28-164:29)
+          pair [competitorRevenue: 1600000] (165:6-165:32)
+            property_identifier [competitorRevenue] (165:6-165:23)
+            : [:] (165:23-165:24)
+            number [1600000] (165:25-165:32)
+          , [,] (165:32-165:33)
+          pair [competitorProfit: 700000] (166:6-166:30)
+            property_identifier [competitorProfit] (166:6-166:22)
+            : [:] (166:22-166:23)
+            number [700000] (166:24-166:30)
+          } [}] (167:4-167:5)
+        , [,] (167:5-167:6)
+        object [{ 
+      month: 'Feb', 
+      cost: 850000,
+      revenue: 1700000,
+      profit: 850000,
+      competitorCost: 950000,
+      competitorRevenue: 1800000,
+      competitorProfit: 850000
+    }] (168:4-176:5)
+          { [{] (168:4-168:5)
+          pair [month: 'Feb'] (169:6-169:18)
+            property_identifier [month] (169:6-169:11)
+            : [:] (169:11-169:12)
+            string ['Feb'] (169:13-169:18)
+              ' ['] (169:13-169:14)
+              string_fragment [Feb] (169:14-169:17)
+              ' ['] (169:17-169:18)
+          , [,] (169:18-169:19)
+          pair [cost: 850000] (170:6-170:18)
+            property_identifier [cost] (170:6-170:10)
+            : [:] (170:10-170:11)
+            number [850000] (170:12-170:18)
+          , [,] (170:18-170:19)
+          pair [revenue: 1700000] (171:6-171:22)
+            property_identifier [revenue] (171:6-171:13)
+            : [:] (171:13-171:14)
+            number [1700000] (171:15-171:22)
+          , [,] (171:22-171:23)
+          pair [profit: 850000] (172:6-172:20)
+            property_identifier [profit] (172:6-172:12)
+            : [:] (172:12-172:13)
+            number [850000] (172:14-172:20)
+          , [,] (172:20-172:21)
+          pair [competitorCost: 950000] (173:6-173:28)
+            property_identifier [competitorCost] (173:6-173:20)
+            : [:] (173:20-173:21)
+            number [950000] (173:22-173:28)
+          , [,] (173:28-173:29)
+          pair [competitorRevenue: 1800000] (174:6-174:32)
+            property_identifier [competitorRevenue] (174:6-174:23)
+            : [:] (174:23-174:24)
+            number [1800000] (174:25-174:32)
+          , [,] (174:32-174:33)
+          pair [competitorProfit: 850000] (175:6-175:30)
+            property_identifier [competitorProfit] (175:6-175:22)
+            : [:] (175:22-175:23)
+            number [850000] (175:24-175:30)
+          } [}] (176:4-176:5)
+        , [,] (176:5-176:6)
+        object [{ 
+      month: 'Mar', 
+      cost: 900000,
+      revenue: 2000000,
+      profit: 1100000,
+      competitorCost: 1000000,
+      competitorRevenue: 2200000,
+      competitorProfit: 1200000
+    }] (177:4-185:5)
+          { [{] (177:4-177:5)
+          pair [month: 'Mar'] (178:6-178:18)
+            property_identifier [month] (178:6-178:11)
+            : [:] (178:11-178:12)
+            string ['Mar'] (178:13-178:18)
+              ' ['] (178:13-178:14)
+              string_fragment [Mar] (178:14-178:17)
+              ' ['] (178:17-178:18)
+          , [,] (178:18-178:19)
+          pair [cost: 900000] (179:6-179:18)
+            property_identifier [cost] (179:6-179:10)
+            : [:] (179:10-179:11)
+            number [900000] (179:12-179:18)
+          , [,] (179:18-179:19)
+          pair [revenue: 2000000] (180:6-180:22)
+            property_identifier [revenue] (180:6-180:13)
+            : [:] (180:13-180:14)
+            number [2000000] (180:15-180:22)
+          , [,] (180:22-180:23)
+          pair [profit: 1100000] (181:6-181:21)
+            property_identifier [profit] (181:6-181:12)
+            : [:] (181:12-181:13)
+            number [1100000] (181:14-181:21)
+          , [,] (181:21-181:22)
+          pair [competitorCost: 1000000] (182:6-182:29)
+            property_identifier [competitorCost] (182:6-182:20)
+            : [:] (182:20-182:21)
+            number [1000000] (182:22-182:29)
+          , [,] (182:29-182:30)
+          pair [competitorRevenue: 2200000] (183:6-183:32)
+            property_identifier [competitorRevenue] (183:6-183:23)
+            : [:] (183:23-183:24)
+            number [2200000] (183:25-183:32)
+          , [,] (183:32-183:33)
+          pair [competitorProfit: 1200000] (184:6-184:31)
+            property_identifier [competitorProfit] (184:6-184:22)
+            : [:] (184:22-184:23)
+            number [1200000] (184:24-184:31)
+          } [}] (185:4-185:5)
+        , [,] (185:5-185:6)
+        object [{ 
+      month: 'Apr', 
+      cost: 1000000,
+      revenue: 2500000,
+      profit: 1500000,
+      competitorCost: 1100000,
+      competitorRevenue: 2700000,
+      competitorProfit: 1600000
+    }] (186:4-194:5)
+          { [{] (186:4-186:5)
+          pair [month: 'Apr'] (187:6-187:18)
+            property_identifier [month] (187:6-187:11)
+            : [:] (187:11-187:12)
+            string ['Apr'] (187:13-187:18)
+              ' ['] (187:13-187:14)
+              string_fragment [Apr] (187:14-187:17)
+              ' ['] (187:17-187:18)
+          , [,] (187:18-187:19)
+          pair [cost: 1000000] (188:6-188:19)
+            property_identifier [cost] (188:6-188:10)
+            : [:] (188:10-188:11)
+            number [1000000] (188:12-188:19)
+          , [,] (188:19-188:20)
+          pair [revenue: 2500000] (189:6-189:22)
+            property_identifier [revenue] (189:6-189:13)
+            : [:] (189:13-189:14)
+            number [2500000] (189:15-189:22)
+          , [,] (189:22-189:23)
+          pair [profit: 1500000] (190:6-190:21)
+            property_identifier [profit] (190:6-190:12)
+            : [:] (190:12-190:13)
+            number [1500000] (190:14-190:21)
+          , [,] (190:21-190:22)
+          pair [competitorCost: 1100000] (191:6-191:29)
+            property_identifier [competitorCost] (191:6-191:20)
+            : [:] (191:20-191:21)
+            number [1100000] (191:22-191:29)
+          , [,] (191:29-191:30)
+          pair [competitorRevenue: 2700000] (192:6-192:32)
+            property_identifier [competitorRevenue] (192:6-192:23)
+            : [:] (192:23-192:24)
+            number [2700000] (192:25-192:32)
+          , [,] (192:32-192:33)
+          pair [competitorProfit: 1600000] (193:6-193:31)
+            property_identifier [competitorProfit] (193:6-193:22)
+            : [:] (193:22-193:23)
+            number [1600000] (193:24-193:31)
+          } [}] (194:4-194:5)
+        , [,] (194:5-194:6)
+        object [{ 
+      month: 'May', 
+      cost: 1200000,
+      revenue: 3000000,
+      profit: 1800000,
+      competitorCost: 1300000,
+      competitorRevenue: 3200000,
+      competitorProfit: 1900000
+    }] (195:4-203:5)
+          { [{] (195:4-195:5)
+          pair [month: 'May'] (196:6-196:18)
+            property_identifier [month] (196:6-196:11)
+            : [:] (196:11-196:12)
+            string ['May'] (196:13-196:18)
+              ' ['] (196:13-196:14)
+              string_fragment [May] (196:14-196:17)
+              ' ['] (196:17-196:18)
+          , [,] (196:18-196:19)
+          pair [cost: 1200000] (197:6-197:19)
+            property_identifier [cost] (197:6-197:10)
+            : [:] (197:10-197:11)
+            number [1200000] (197:12-197:19)
+          , [,] (197:19-197:20)
+          pair [revenue: 3000000] (198:6-198:22)
+            property_identifier [revenue] (198:6-198:13)
+            : [:] (198:13-198:14)
+            number [3000000] (198:15-198:22)
+          , [,] (198:22-198:23)
+          pair [profit: 1800000] (199:6-199:21)
+            property_identifier [profit] (199:6-199:12)
+            : [:] (199:12-199:13)
+            number [1800000] (199:14-199:21)
+          , [,] (199:21-199:22)
+          pair [competitorCost: 1300000] (200:6-200:29)
+            property_identifier [competitorCost] (200:6-200:20)
+            : [:] (200:20-200:21)
+            number [1300000] (200:22-200:29)
+          , [,] (200:29-200:30)
+          pair [competitorRevenue: 3200000] (201:6-201:32)
+            property_identifier [competitorRevenue] (201:6-201:23)
+            : [:] (201:23-201:24)
+            number [3200000] (201:25-201:32)
+          , [,] (201:32-201:33)
+          pair [competitorProfit: 1900000] (202:6-202:31)
+            property_identifier [competitorProfit] (202:6-202:22)
+            : [:] (202:22-202:23)
+            number [1900000] (202:24-202:31)
+          } [}] (203:4-203:5)
+        ] []] (204:2-204:3)
+    ; [;] (204:3-204:4)

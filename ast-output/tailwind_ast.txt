@@ -1,0 +1,593 @@
+AST for temp_dir\ARTGuru-AI-main\app\tailwind.css
+==================================================
+stylesheet [@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  @font-face {
+    font-family: 'Tiempos-Heading';
+    src: url('/fonts/tiempos-heading.otf') format('opentype');
+    font-display: swap;
+  }
+  
+  @font-face {
+    font-family: 'Tiempos-Regular';
+    src: url('/fonts/tiempos-text.otf') format('opentype');
+    font-display: swap;
+  }
+  
+  @font-face {
+    font-family: 'Sohne';
+    src: url('/fonts/sohne.otf') format('opentype');
+    font-display: swap;
+  }
+}
+
+html,
+body {
+  @apply bg-white dark:bg-gray-950;
+  @media (prefers-color-scheme: dark) {
+    color-scheme: dark;
+  }
+}
+
+@layer base {
+  /* width */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: rgb(243 244 246); /* gray-100 */
+    border-radius: 8px;
+    margin: 2px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: rgb(209 213 219); /* gray-300 */
+    border-radius: 8px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    min-height: 40px;
+  }
+
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgb(156 163 175); /* gray-400 */
+  }
+
+  /* For Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(209 213 219) rgb(243 244 246);
+  }
+}] (0:0-67:1)
+  at_rule [@tailwind base;] (0:0-0:15)
+    at_keyword [@tailwind] (0:0-0:9)
+    keyword_query [base] (0:10-0:14)
+    ; [;] (0:14-0:15)
+  at_rule [@tailwind components;] (1:0-1:21)
+    at_keyword [@tailwind] (1:0-1:9)
+    keyword_query [components] (1:10-1:20)
+    ; [;] (1:20-1:21)
+  at_rule [@tailwind utilities;] (2:0-2:20)
+    at_keyword [@tailwind] (2:0-2:9)
+    keyword_query [utilities] (2:10-2:19)
+    ; [;] (2:19-2:20)
+  at_rule [@layer base {
+  @font-face {
+    font-family: 'Tiempos-Heading';
+    src: url('/fonts/tiempos-heading.otf') format('opentype');
+    font-display: swap;
+  }
+  
+  @font-face {
+    font-family: 'Tiempos-Regular';
+    src: url('/fonts/tiempos-text.otf') format('opentype');
+    font-display: swap;
+  }
+  
+  @font-face {
+    font-family: 'Sohne';
+    src: url('/fonts/sohne.otf') format('opentype');
+    font-display: swap;
+  }
+}] (4:0-22:1)
+    at_keyword [@layer] (4:0-4:6)
+    keyword_query [base] (4:7-4:11)
+    block [{
+  @font-face {
+    font-family: 'Tiempos-Heading';
+    src: url('/fonts/tiempos-heading.otf') format('opentype');
+    font-display: swap;
+  }
+  
+  @font-face {
+    font-family: 'Tiempos-Regular';
+    src: url('/fonts/tiempos-text.otf') format('opentype');
+    font-display: swap;
+  }
+  
+  @font-face {
+    font-family: 'Sohne';
+    src: url('/fonts/sohne.otf') format('opentype');
+    font-display: swap;
+  }
+}] (4:12-22:1)
+      { [{] (4:12-4:13)
+      at_rule [@font-face {
+    font-family: 'Tiempos-Heading';
+    src: url('/fonts/tiempos-heading.otf') format('opentype');
+    font-display: swap;
+  }] (5:2-9:3)
+        at_keyword [@font-face] (5:2-5:12)
+        block [{
+    font-family: 'Tiempos-Heading';
+    src: url('/fonts/tiempos-heading.otf') format('opentype');
+    font-display: swap;
+  }] (5:13-9:3)
+          { [{] (5:13-5:14)
+          declaration [font-family: 'Tiempos-Heading';] (6:4-6:35)
+            property_name [font-family] (6:4-6:15)
+            : [:] (6:15-6:16)
+            string_value ['Tiempos-Heading'] (6:17-6:34)
+              ' ['] (6:17-6:18)
+              ' ['] (6:33-6:34)
+            ; [;] (6:34-6:35)
+          declaration [src: url('/fonts/tiempos-heading.otf') format('opentype');] (7:4-7:62)
+            property_name [src] (7:4-7:7)
+            : [:] (7:7-7:8)
+            call_expression [url('/fonts/tiempos-heading.otf')] (7:9-7:42)
+              function_name [url] (7:9-7:12)
+              arguments [('/fonts/tiempos-heading.otf')] (7:12-7:42)
+                ( [(] (7:12-7:13)
+                string_value ['/fonts/tiempos-heading.otf'] (7:13-7:41)
+                  ' ['] (7:13-7:14)
+                  ' ['] (7:40-7:41)
+                ) [)] (7:41-7:42)
+            call_expression [format('opentype')] (7:43-7:61)
+              function_name [format] (7:43-7:49)
+              arguments [('opentype')] (7:49-7:61)
+                ( [(] (7:49-7:50)
+                string_value ['opentype'] (7:50-7:60)
+                  ' ['] (7:50-7:51)
+                  ' ['] (7:59-7:60)
+                ) [)] (7:60-7:61)
+            ; [;] (7:61-7:62)
+          declaration [font-display: swap;] (8:4-8:23)
+            property_name [font-display] (8:4-8:16)
+            : [:] (8:16-8:17)
+            plain_value [swap] (8:18-8:22)
+            ; [;] (8:22-8:23)
+          } [}] (9:2-9:3)
+      at_rule [@font-face {
+    font-family: 'Tiempos-Regular';
+    src: url('/fonts/tiempos-text.otf') format('opentype');
+    font-display: swap;
+  }] (11:2-15:3)
+        at_keyword [@font-face] (11:2-11:12)
+        block [{
+    font-family: 'Tiempos-Regular';
+    src: url('/fonts/tiempos-text.otf') format('opentype');
+    font-display: swap;
+  }] (11:13-15:3)
+          { [{] (11:13-11:14)
+          declaration [font-family: 'Tiempos-Regular';] (12:4-12:35)
+            property_name [font-family] (12:4-12:15)
+            : [:] (12:15-12:16)
+            string_value ['Tiempos-Regular'] (12:17-12:34)
+              ' ['] (12:17-12:18)
+              ' ['] (12:33-12:34)
+            ; [;] (12:34-12:35)
+          declaration [src: url('/fonts/tiempos-text.otf') format('opentype');] (13:4-13:59)
+            property_name [src] (13:4-13:7)
+            : [:] (13:7-13:8)
+            call_expression [url('/fonts/tiempos-text.otf')] (13:9-13:39)
+              function_name [url] (13:9-13:12)
+              arguments [('/fonts/tiempos-text.otf')] (13:12-13:39)
+                ( [(] (13:12-13:13)
+                string_value ['/fonts/tiempos-text.otf'] (13:13-13:38)
+                  ' ['] (13:13-13:14)
+                  ' ['] (13:37-13:38)
+                ) [)] (13:38-13:39)
+            call_expression [format('opentype')] (13:40-13:58)
+              function_name [format] (13:40-13:46)
+              arguments [('opentype')] (13:46-13:58)
+                ( [(] (13:46-13:47)
+                string_value ['opentype'] (13:47-13:57)
+                  ' ['] (13:47-13:48)
+                  ' ['] (13:56-13:57)
+                ) [)] (13:57-13:58)
+            ; [;] (13:58-13:59)
+          declaration [font-display: swap;] (14:4-14:23)
+            property_name [font-display] (14:4-14:16)
+            : [:] (14:16-14:17)
+            plain_value [swap] (14:18-14:22)
+            ; [;] (14:22-14:23)
+          } [}] (15:2-15:3)
+      at_rule [@font-face {
+    font-family: 'Sohne';
+    src: url('/fonts/sohne.otf') format('opentype');
+    font-display: swap;
+  }] (17:2-21:3)
+        at_keyword [@font-face] (17:2-17:12)
+        block [{
+    font-family: 'Sohne';
+    src: url('/fonts/sohne.otf') format('opentype');
+    font-display: swap;
+  }] (17:13-21:3)
+          { [{] (17:13-17:14)
+          declaration [font-family: 'Sohne';] (18:4-18:25)
+            property_name [font-family] (18:4-18:15)
+            : [:] (18:15-18:16)
+            string_value ['Sohne'] (18:17-18:24)
+              ' ['] (18:17-18:18)
+              ' ['] (18:23-18:24)
+            ; [;] (18:24-18:25)
+          declaration [src: url('/fonts/sohne.otf') format('opentype');] (19:4-19:52)
+            property_name [src] (19:4-19:7)
+            : [:] (19:7-19:8)
+            call_expression [url('/fonts/sohne.otf')] (19:9-19:32)
+              function_name [url] (19:9-19:12)
+              arguments [('/fonts/sohne.otf')] (19:12-19:32)
+                ( [(] (19:12-19:13)
+                string_value ['/fonts/sohne.otf'] (19:13-19:31)
+                  ' ['] (19:13-19:14)
+                  ' ['] (19:30-19:31)
+                ) [)] (19:31-19:32)
+            call_expression [format('opentype')] (19:33-19:51)
+              function_name [format] (19:33-19:39)
+              arguments [('opentype')] (19:39-19:51)
+                ( [(] (19:39-19:40)
+                string_value ['opentype'] (19:40-19:50)
+                  ' ['] (19:40-19:41)
+                  ' ['] (19:49-19:50)
+                ) [)] (19:50-19:51)
+            ; [;] (19:51-19:52)
+          declaration [font-display: swap;] (20:4-20:23)
+            property_name [font-display] (20:4-20:16)
+            : [:] (20:16-20:17)
+            plain_value [swap] (20:18-20:22)
+            ; [;] (20:22-20:23)
+          } [}] (21:2-21:3)
+      } [}] (22:0-22:1)
+  rule_set [html,
+body {
+  @apply bg-white dark:bg-gray-950;
+  @media (prefers-color-scheme: dark) {
+    color-scheme: dark;
+  }
+}] (24:0-30:1)
+    selectors [html,
+body] (24:0-25:4)
+      tag_name [html] (24:0-24:4)
+      , [,] (24:4-24:5)
+      tag_name [body] (25:0-25:4)
+    block [{
+  @apply bg-white dark:bg-gray-950;
+  @media (prefers-color-scheme: dark) {
+    color-scheme: dark;
+  }
+}] (25:5-30:1)
+      { [{] (25:5-25:6)
+      postcss_statement [@apply bg-white dark:bg-gray-950;] (26:2-26:35)
+        at_keyword [@apply] (26:2-26:8)
+        plain_value [bg-white] (26:9-26:17)
+        plain_value [dark:bg-gray-950] (26:18-26:34)
+        ; [;] (26:34-26:35)
+      media_statement [@media (prefers-color-scheme: dark) {
+    color-scheme: dark;
+  }] (27:2-29:3)
+        @media [@media] (27:2-27:8)
+        feature_query [(prefers-color-scheme: dark)] (27:9-27:37)
+          ( [(] (27:9-27:10)
+          feature_name [prefers-color-scheme] (27:10-27:30)
+          : [:] (27:30-27:31)
+          plain_value [dark] (27:32-27:36)
+          ) [)] (27:36-27:37)
+        block [{
+    color-scheme: dark;
+  }] (27:38-29:3)
+          { [{] (27:38-27:39)
+          declaration [color-scheme: dark;] (28:4-28:23)
+            property_name [color-scheme] (28:4-28:16)
+            : [:] (28:16-28:17)
+            plain_value [dark] (28:18-28:22)
+            ; [;] (28:22-28:23)
+          } [}] (29:2-29:3)
+      } [}] (30:0-30:1)
+  at_rule [@layer base {
+  /* width */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: rgb(243 244 246); /* gray-100 */
+    border-radius: 8px;
+    margin: 2px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: rgb(209 213 219); /* gray-300 */
+    border-radius: 8px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    min-height: 40px;
+  }
+
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgb(156 163 175); /* gray-400 */
+  }
+
+  /* For Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(209 213 219) rgb(243 244 246);
+  }
+}] (32:0-67:1)
+    at_keyword [@layer] (32:0-32:6)
+    keyword_query [base] (32:7-32:11)
+    block [{
+  /* width */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: rgb(243 244 246); /* gray-100 */
+    border-radius: 8px;
+    margin: 2px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: rgb(209 213 219); /* gray-300 */
+    border-radius: 8px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    min-height: 40px;
+  }
+
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgb(156 163 175); /* gray-400 */
+  }
+
+  /* For Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(209 213 219) rgb(243 244 246);
+  }
+}] (32:12-67:1)
+      { [{] (32:12-32:13)
+      comment [/* width */] (33:2-33:13)
+      rule_set [::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }] (34:2-37:3)
+        selectors [::-webkit-scrollbar] (34:2-34:21)
+          pseudo_element_selector [::-webkit-scrollbar] (34:2-34:21)
+            :: [::] (34:2-34:4)
+            tag_name [-webkit-scrollbar] (34:4-34:21)
+        block [{
+    width: 8px;
+    height: 8px;
+  }] (34:22-37:3)
+          { [{] (34:22-34:23)
+          declaration [width: 8px;] (35:4-35:15)
+            property_name [width] (35:4-35:9)
+            : [:] (35:9-35:10)
+            integer_value [8px] (35:11-35:14)
+              unit [px] (35:12-35:14)
+            ; [;] (35:14-35:15)
+          declaration [height: 8px;] (36:4-36:16)
+            property_name [height] (36:4-36:10)
+            : [:] (36:10-36:11)
+            integer_value [8px] (36:12-36:15)
+              unit [px] (36:13-36:15)
+            ; [;] (36:15-36:16)
+          } [}] (37:2-37:3)
+      comment [/* Track */] (39:2-39:13)
+      rule_set [::-webkit-scrollbar-track {
+    background: rgb(243 244 246); /* gray-100 */
+    border-radius: 8px;
+    margin: 2px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }] (40:2-46:3)
+        selectors [::-webkit-scrollbar-track] (40:2-40:27)
+          pseudo_element_selector [::-webkit-scrollbar-track] (40:2-40:27)
+            :: [::] (40:2-40:4)
+            tag_name [-webkit-scrollbar-track] (40:4-40:27)
+        block [{
+    background: rgb(243 244 246); /* gray-100 */
+    border-radius: 8px;
+    margin: 2px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }] (40:28-46:3)
+          { [{] (40:28-40:29)
+          declaration [background: rgb(243 244 246);] (41:4-41:33)
+            property_name [background] (41:4-41:14)
+            : [:] (41:14-41:15)
+            call_expression [rgb(243 244 246)] (41:16-41:32)
+              function_name [rgb] (41:16-41:19)
+              arguments [(243 244 246)] (41:19-41:32)
+                ( [(] (41:19-41:20)
+                integer_value [243] (41:20-41:23)
+                integer_value [244] (41:24-41:27)
+                integer_value [246] (41:28-41:31)
+                ) [)] (41:31-41:32)
+            ; [;] (41:32-41:33)
+          comment [/* gray-100 */] (41:34-41:48)
+          declaration [border-radius: 8px;] (42:4-42:23)
+            property_name [border-radius] (42:4-42:17)
+            : [:] (42:17-42:18)
+            integer_value [8px] (42:19-42:22)
+              unit [px] (42:20-42:22)
+            ; [;] (42:22-42:23)
+          declaration [margin: 2px;] (43:4-43:16)
+            property_name [margin] (43:4-43:10)
+            : [:] (43:10-43:11)
+            integer_value [2px] (43:12-43:15)
+              unit [px] (43:13-43:15)
+            ; [;] (43:15-43:16)
+          declaration [border: 2px solid transparent;] (44:4-44:34)
+            property_name [border] (44:4-44:10)
+            : [:] (44:10-44:11)
+            integer_value [2px] (44:12-44:15)
+              unit [px] (44:13-44:15)
+            plain_value [solid] (44:16-44:21)
+            plain_value [transparent] (44:22-44:33)
+            ; [;] (44:33-44:34)
+          declaration [background-clip: padding-box;] (45:4-45:33)
+            property_name [background-clip] (45:4-45:19)
+            : [:] (45:19-45:20)
+            plain_value [padding-box] (45:21-45:32)
+            ; [;] (45:32-45:33)
+          } [}] (46:2-46:3)
+      comment [/* Handle */] (48:2-48:14)
+      rule_set [::-webkit-scrollbar-thumb {
+    background: rgb(209 213 219); /* gray-300 */
+    border-radius: 8px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    min-height: 40px;
+  }] (49:2-55:3)
+        selectors [::-webkit-scrollbar-thumb] (49:2-49:27)
+          pseudo_element_selector [::-webkit-scrollbar-thumb] (49:2-49:27)
+            :: [::] (49:2-49:4)
+            tag_name [-webkit-scrollbar-thumb] (49:4-49:27)
+        block [{
+    background: rgb(209 213 219); /* gray-300 */
+    border-radius: 8px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    min-height: 40px;
+  }] (49:28-55:3)
+          { [{] (49:28-49:29)
+          declaration [background: rgb(209 213 219);] (50:4-50:33)
+            property_name [background] (50:4-50:14)
+            : [:] (50:14-50:15)
+            call_expression [rgb(209 213 219)] (50:16-50:32)
+              function_name [rgb] (50:16-50:19)
+              arguments [(209 213 219)] (50:19-50:32)
+                ( [(] (50:19-50:20)
+                integer_value [209] (50:20-50:23)
+                integer_value [213] (50:24-50:27)
+                integer_value [219] (50:28-50:31)
+                ) [)] (50:31-50:32)
+            ; [;] (50:32-50:33)
+          comment [/* gray-300 */] (50:34-50:48)
+          declaration [border-radius: 8px;] (51:4-51:23)
+            property_name [border-radius] (51:4-51:17)
+            : [:] (51:17-51:18)
+            integer_value [8px] (51:19-51:22)
+              unit [px] (51:20-51:22)
+            ; [;] (51:22-51:23)
+          declaration [border: 2px solid transparent;] (52:4-52:34)
+            property_name [border] (52:4-52:10)
+            : [:] (52:10-52:11)
+            integer_value [2px] (52:12-52:15)
+              unit [px] (52:13-52:15)
+            plain_value [solid] (52:16-52:21)
+            plain_value [transparent] (52:22-52:33)
+            ; [;] (52:33-52:34)
+          declaration [background-clip: padding-box;] (53:4-53:33)
+            property_name [background-clip] (53:4-53:19)
+            : [:] (53:19-53:20)
+            plain_value [padding-box] (53:21-53:32)
+            ; [;] (53:32-53:33)
+          declaration [min-height: 40px;] (54:4-54:21)
+            property_name [min-height] (54:4-54:14)
+            : [:] (54:14-54:15)
+            integer_value [40px] (54:16-54:20)
+              unit [px] (54:18-54:20)
+            ; [;] (54:20-54:21)
+          } [}] (55:2-55:3)
+      comment [/* Handle on hover */] (57:2-57:23)
+      rule_set [::-webkit-scrollbar-thumb:hover {
+    background: rgb(156 163 175); /* gray-400 */
+  }] (58:2-60:3)
+        selectors [::-webkit-scrollbar-thumb:hover] (58:2-58:33)
+          pseudo_class_selector [::-webkit-scrollbar-thumb:hover] (58:2-58:33)
+            pseudo_element_selector [::-webkit-scrollbar-thumb] (58:2-58:27)
+              :: [::] (58:2-58:4)
+              tag_name [-webkit-scrollbar-thumb] (58:4-58:27)
+            : [:] (58:27-58:28)
+            class_name [hover] (58:28-58:33)
+        block [{
+    background: rgb(156 163 175); /* gray-400 */
+  }] (58:34-60:3)
+          { [{] (58:34-58:35)
+          declaration [background: rgb(156 163 175);] (59:4-59:33)
+            property_name [background] (59:4-59:14)
+            : [:] (59:14-59:15)
+            call_expression [rgb(156 163 175)] (59:16-59:32)
+              function_name [rgb] (59:16-59:19)
+              arguments [(156 163 175)] (59:19-59:32)
+                ( [(] (59:19-59:20)
+                integer_value [156] (59:20-59:23)
+                integer_value [163] (59:24-59:27)
+                integer_value [175] (59:28-59:31)
+                ) [)] (59:31-59:32)
+            ; [;] (59:32-59:33)
+          comment [/* gray-400 */] (59:34-59:48)
+          } [}] (60:2-60:3)
+      comment [/* For Firefox */] (62:2-62:19)
+      rule_set [* {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(209 213 219) rgb(243 244 246);
+  }] (63:2-66:3)
+        selectors [*] (63:2-63:3)
+          universal_selector [*] (63:2-63:3)
+            * [*] (63:2-63:3)
+        block [{
+    scrollbar-width: thin;
+    scrollbar-color: rgb(209 213 219) rgb(243 244 246);
+  }] (63:4-66:3)
+          { [{] (63:4-63:5)
+          declaration [scrollbar-width: thin;] (64:4-64:26)
+            property_name [scrollbar-width] (64:4-64:19)
+            : [:] (64:19-64:20)
+            plain_value [thin] (64:21-64:25)
+            ; [;] (64:25-64:26)
+          declaration [scrollbar-color: rgb(209 213 219) rgb(243 244 246);] (65:4-65:55)
+            property_name [scrollbar-color] (65:4-65:19)
+            : [:] (65:19-65:20)
+            call_expression [rgb(209 213 219)] (65:21-65:37)
+              function_name [rgb] (65:21-65:24)
+              arguments [(209 213 219)] (65:24-65:37)
+                ( [(] (65:24-65:25)
+                integer_value [209] (65:25-65:28)
+                integer_value [213] (65:29-65:32)
+                integer_value [219] (65:33-65:36)
+                ) [)] (65:36-65:37)
+            call_expression [rgb(243 244 246)] (65:38-65:54)
+              function_name [rgb] (65:38-65:41)
+              arguments [(243 244 246)] (65:41-65:54)
+                ( [(] (65:41-65:42)
+                integer_value [243] (65:42-65:45)
+                integer_value [244] (65:46-65:49)
+                integer_value [246] (65:50-65:53)
+                ) [)] (65:53-65:54)
+            ; [;] (65:54-65:55)
+          } [}] (66:2-66:3)
+      } [}] (67:0-67:1)

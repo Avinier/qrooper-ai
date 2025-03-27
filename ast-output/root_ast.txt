@@ -1,0 +1,376 @@
+AST for temp_dir\ARTGuru-AI-main\app\root.tsx
+==================================================
+program [import {
+  Meta,
+  Outlet,
+  Scripts,
+  ScrollRestoration,
+} from "@remix-run/react";
+
+import "./tailwind.css";
+
+export function Layout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <Meta />
+      </head>
+      <body>
+        {children}
+        <ScrollRestoration />
+        <Scripts />
+      </body>
+    </html>
+  );
+}
+
+export default function App() {
+  return <Outlet />;
+}
+] (0:0-29:0)
+  import_statement [import {
+  Meta,
+  Outlet,
+  Scripts,
+  ScrollRestoration,
+} from "@remix-run/react";] (0:0-5:26)
+    import [import] (0:0-0:6)
+    import_clause [{
+  Meta,
+  Outlet,
+  Scripts,
+  ScrollRestoration,
+}] (0:7-5:1)
+      named_imports [{
+  Meta,
+  Outlet,
+  Scripts,
+  ScrollRestoration,
+}] (0:7-5:1)
+        { [{] (0:7-0:8)
+        import_specifier [Meta] (1:2-1:6)
+          identifier [Meta] (1:2-1:6)
+        , [,] (1:6-1:7)
+        import_specifier [Outlet] (2:2-2:8)
+          identifier [Outlet] (2:2-2:8)
+        , [,] (2:8-2:9)
+        import_specifier [Scripts] (3:2-3:9)
+          identifier [Scripts] (3:2-3:9)
+        , [,] (3:9-3:10)
+        import_specifier [ScrollRestoration] (4:2-4:19)
+          identifier [ScrollRestoration] (4:2-4:19)
+        , [,] (4:19-4:20)
+        } [}] (5:0-5:1)
+    from [from] (5:2-5:6)
+    string ["@remix-run/react"] (5:7-5:25)
+      " ["] (5:7-5:8)
+      string_fragment [@remix-run/react] (5:8-5:24)
+      " ["] (5:24-5:25)
+    ; [;] (5:25-5:26)
+  import_statement [import "./tailwind.css";] (7:0-7:24)
+    import [import] (7:0-7:6)
+    string ["./tailwind.css"] (7:7-7:23)
+      " ["] (7:7-7:8)
+      string_fragment [./tailwind.css] (7:8-7:22)
+      " ["] (7:22-7:23)
+    ; [;] (7:23-7:24)
+  export_statement [export function Layout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <Meta />
+      </head>
+      <body>
+        {children}
+        <ScrollRestoration />
+        <Scripts />
+      </body>
+    </html>
+  );
+}] (9:0-24:1)
+    export [export] (9:0-9:6)
+    function_declaration [function Layout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <Meta />
+      </head>
+      <body>
+        {children}
+        <ScrollRestoration />
+        <Scripts />
+      </body>
+    </html>
+  );
+}] (9:7-24:1)
+      function [function] (9:7-9:15)
+      identifier [Layout] (9:16-9:22)
+      formal_parameters [({ children }: { children: React.ReactNode })] (9:22-9:67)
+        ( [(] (9:22-9:23)
+        required_parameter [{ children }: { children: React.ReactNode }] (9:23-9:66)
+          object_pattern [{ children }] (9:23-9:35)
+            { [{] (9:23-9:24)
+            shorthand_property_identifier_pattern [children] (9:25-9:33)
+            } [}] (9:34-9:35)
+          type_annotation [: { children: React.ReactNode }] (9:35-9:66)
+            : [:] (9:35-9:36)
+            object_type [{ children: React.ReactNode }] (9:37-9:66)
+              { [{] (9:37-9:38)
+              property_signature [children: React.ReactNode] (9:39-9:64)
+                property_identifier [children] (9:39-9:47)
+                type_annotation [: React.ReactNode] (9:47-9:64)
+                  : [:] (9:47-9:48)
+                  nested_type_identifier [React.ReactNode] (9:49-9:64)
+                    identifier [React] (9:49-9:54)
+                    . [.] (9:54-9:55)
+                    type_identifier [ReactNode] (9:55-9:64)
+              } [}] (9:65-9:66)
+        ) [)] (9:66-9:67)
+      statement_block [{
+  return (
+    <html lang="en">
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <Meta />
+      </head>
+      <body>
+        {children}
+        <ScrollRestoration />
+        <Scripts />
+      </body>
+    </html>
+  );
+}] (9:68-24:1)
+        { [{] (9:68-9:69)
+        return_statement [return (
+    <html lang="en">
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <Meta />
+      </head>
+      <body>
+        {children}
+        <ScrollRestoration />
+        <Scripts />
+      </body>
+    </html>
+  );] (10:2-23:4)
+          return [return] (10:2-10:8)
+          parenthesized_expression [(
+    <html lang="en">
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <Meta />
+      </head>
+      <body>
+        {children}
+        <ScrollRestoration />
+        <Scripts />
+      </body>
+    </html>
+  )] (10:9-23:3)
+            ( [(] (10:9-10:10)
+            type_assertion [<html lang="en">
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <Meta />
+      </head>
+      <body>
+        {children}
+        <ScrollRestoration] (11:4-19:26)
+              type_arguments [<html] (11:4-11:9)
+                < [<] (11:4-11:5)
+                type_identifier [html] (11:5-11:9)
+                > [] (11:9-11:9)
+              assignment_expression [lang="en">
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <Meta />
+      </head>
+      <body>
+        {children}
+        <ScrollRestoration] (11:10-19:26)
+                identifier [lang] (11:10-11:14)
+                = [=] (11:14-11:15)
+                binary_expression ["en">
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <Meta />
+      </head>
+      <body>
+        {children}
+        <ScrollRestoration] (11:15-19:26)
+                  string ["en"] (11:15-11:19)
+                    " ["] (11:15-11:16)
+                    string_fragment [en] (11:16-11:18)
+                    " ["] (11:18-11:19)
+                  > [>] (11:19-11:20)
+                  type_assertion [<head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <Meta />
+      </head>
+      <body>
+        {children}
+        <ScrollRestoration] (12:6-19:26)
+                    type_arguments [<head>] (12:6-12:12)
+                      < [<] (12:6-12:7)
+                      type_identifier [head] (12:7-12:11)
+                      > [>] (12:11-12:12)
+                    type_assertion [<meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <Meta />
+      </head>
+      <body>
+        {children}
+        <ScrollRestoration] (13:8-19:26)
+                      type_arguments [<meta] (13:8-13:13)
+                        < [<] (13:8-13:9)
+                        type_identifier [meta] (13:9-13:13)
+                        > [] (13:13-13:13)
+                      assignment_expression [charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <Meta />
+      </head>
+      <body>
+        {children}
+        <ScrollRestoration] (13:14-19:26)
+                        identifier [charSet] (13:14-13:21)
+                        = [=] (13:21-13:22)
+                        binary_expression ["utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <Meta />
+      </head>
+      <body>
+        {children}
+        <ScrollRestoration] (13:22-19:26)
+                          binary_expression ["utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <Meta] (13:22-15:13)
+                            string ["utf-8"] (13:22-13:29)
+                              " ["] (13:22-13:23)
+                              string_fragment [utf-8] (13:23-13:28)
+                              " ["] (13:28-13:29)
+                            / [/] (13:30-13:31)
+                            ERROR [>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <] (13:31-15:9)
+                              > [>] (13:31-13:32)
+                              < [<] (14:8-14:9)
+                              type_parameter [meta name="viewport" content="width=device-width, initial-scale=1"] (14:9-14:75)
+                                type_identifier [meta] (14:9-14:13)
+                                ERROR [name] (14:14-14:18)
+                                  identifier [name] (14:14-14:18)
+                                default_type [="viewport" content="width=device-width, initial-scale=1"] (14:18-14:75)
+                                  = [=] (14:18-14:19)
+                                  ERROR ["viewport" content=] (14:19-14:38)
+                                    literal_type ["viewport"] (14:19-14:29)
+                                      string ["viewport"] (14:19-14:29)
+                                        " ["] (14:19-14:20)
+                                        string_fragment [viewport] (14:20-14:28)
+                                        " ["] (14:28-14:29)
+                                    identifier [content] (14:30-14:37)
+                                    = [=] (14:37-14:38)
+                                  literal_type ["width=device-width, initial-scale=1"] (14:38-14:75)
+                                    string ["width=device-width, initial-scale=1"] (14:38-14:75)
+                                      " ["] (14:38-14:39)
+                                      string_fragment [width=device-width, initial-scale=1] (14:39-14:74)
+                                      " ["] (14:74-14:75)
+                              / [/] (14:76-14:77)
+                              regex_pattern [>] (14:77-14:78)
+                              < [<] (15:8-15:9)
+                            identifier [Meta] (15:9-15:13)
+                          / [/] (15:14-15:15)
+                          ERROR [>] (15:15-15:16)
+                            > [>] (15:15-15:16)
+                          type_assertion [</head>
+      <body>
+        {children}
+        <ScrollRestoration] (16:6-19:26)
+                            type_arguments [</head>] (16:6-16:13)
+                              < [<] (16:6-16:7)
+                              ERROR [/] (16:7-16:8)
+                                / [/] (16:7-16:8)
+                              type_identifier [head] (16:8-16:12)
+                              > [>] (16:12-16:13)
+                            type_assertion [<body>
+        {children}
+        <ScrollRestoration] (17:6-19:26)
+                              type_arguments [<body>] (17:6-17:12)
+                                < [<] (17:6-17:7)
+                                type_identifier [body] (17:7-17:11)
+                                > [>] (17:11-17:12)
+                              binary_expression [{children}
+        <ScrollRestoration] (18:8-19:26)
+                                object [{children}] (18:8-18:18)
+                                  { [{] (18:8-18:9)
+                                  shorthand_property_identifier [children] (18:9-18:17)
+                                  } [}] (18:17-18:18)
+                                < [<] (19:8-19:9)
+                                identifier [ScrollRestoration] (19:9-19:26)
+            ERROR [/>
+        <Scripts />
+      </body>
+    </html>] (19:27-22:11)
+              / [/] (19:27-19:28)
+              > [>] (19:28-19:29)
+              type_arguments [<Scripts />] (20:8-20:19)
+                < [<] (20:8-20:9)
+                type_identifier [Scripts] (20:9-20:16)
+                ERROR [/] (20:17-20:18)
+                  / [/] (20:17-20:18)
+                > [>] (20:18-20:19)
+              type_arguments [</body>] (21:6-21:13)
+                < [<] (21:6-21:7)
+                ERROR [/] (21:7-21:8)
+                  / [/] (21:7-21:8)
+                type_identifier [body] (21:8-21:12)
+                > [>] (21:12-21:13)
+              type_parameters [</html>] (22:4-22:11)
+                < [<] (22:4-22:5)
+                ERROR [/] (22:5-22:6)
+                  / [/] (22:5-22:6)
+                type_parameter [html] (22:6-22:10)
+                  type_identifier [html] (22:6-22:10)
+                > [>] (22:10-22:11)
+            ) [)] (23:2-23:3)
+          ; [;] (23:3-23:4)
+        } [}] (24:0-24:1)
+  export_statement [export default function App() {
+  return <Outlet />;
+}] (26:0-28:1)
+    export [export] (26:0-26:6)
+    default [default] (26:7-26:14)
+    function_declaration [function App() {
+  return <Outlet />;
+}] (26:15-28:1)
+      function [function] (26:15-26:23)
+      identifier [App] (26:24-26:27)
+      formal_parameters [()] (26:27-26:29)
+        ( [(] (26:27-26:28)
+        ) [)] (26:28-26:29)
+      statement_block [{
+  return <Outlet />;
+}] (26:30-28:1)
+        { [{] (26:30-26:31)
+        ERROR [return <Outlet />;] (27:2-27:20)
+          return [return] (27:2-27:8)
+          type_arguments [<Outlet] (27:9-27:16)
+            < [<] (27:9-27:10)
+            type_identifier [Outlet] (27:10-27:16)
+            > [] (27:16-27:16)
+          / [/] (27:17-27:18)
+          regex_pattern [>;] (27:18-27:20)
+        } [}] (28:0-28:1)
