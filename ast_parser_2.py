@@ -1,6 +1,8 @@
 from pathlib import Path
+from tree_sitter import Parser
 from tree_sitter_languages import get_parser
-
+from file_parsing import process_zip
+import asyncio
 
 class TreeSitterParser:
     def __init__(self):
@@ -40,7 +42,8 @@ class TreeSitterParser:
 
         for ext, lang_name in self.supported_languages.items():
             try:
-                parser = get_parser(lang_name)
+                parser = Parser()  # Create a new parser instance
+                parser.set_language(get_parser(lang_name))  # Set the language
                 parsers[ext] = parser
                 print(f"Successfully loaded {lang_name} parser")
             except Exception as e:
@@ -138,20 +141,27 @@ class TreeSitterParser:
                 )
 
 
-# def main():
-#     if len(sys.argv) < 2:
-#         print("Usage: python ast_generator.py <path_to_zip>")
-#         return
-#
-#     parser = TreeSitterParser()
-#     zip_path = Path(sys.argv[1])
-#
-#     if zip_path.suffix.lower() != '.zip':
-#         print("Error: Input must be a ZIP file")
-#         return
-#
-#     parser.process_zip(zip_path)
-#
-#
-# if __name__ == "__main__":
-#     main()
+async def main():
+    test_zip = "test2.zip"  
+    parser = TreeSitterParser()
+    zip_path = Path(test_zip)
+
+    if not zip_path.exists():
+        print(f"Error: Test file {test_zip} not found")
+        return
+
+    def file_filter(file_path):
+        ext = Path(file_path).suffix.lower()
+        return ext in parser.supported_languages
+
+    results = await process_zip(
+        str(zip_path),
+        processing_func=parser.parse_file,
+        file_filter=file_filter
+    )
+    print(f"Successfully processed {test_zip}")
+    print(f"Processed {len(results)} files")
+
+
+if __name__ == "__main__":
+    asyncio.run(main())

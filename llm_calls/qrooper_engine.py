@@ -22,11 +22,11 @@ class Qrooper:
             zip_path, query
         )
         
-        if not relevant_files:
+        if not relevant_files or not isinstance(relevant_files, list):
             return "qrooper error: No relevant files found for this query"
             
         # Step 2: Retrieve AST contents for relevant files
-        ast_contents = await self.retrieve_ast_contents(relevant_files)
+        ast_contents = await self.retrieve_ast_contents(relevant_files[0] if isinstance(relevant_files[0], list) else relevant_files)
         
         # Step 3: Analyze with LLM for final answer
         return await self.analyze_with_llm(ast_contents, query)
@@ -35,15 +35,19 @@ class Qrooper:
         """Retrieve AST file contents from storage"""
         contents = {}
         
+        if isinstance(file_paths, str):
+            file_paths = [file_paths]
+            
         for rel_path in file_paths:
-            # Convert file path to AST file path
-            ast_path = self.ast_output_dir / f"{rel_path}_ast.txt"
+            # Convert backslashes to forward slashes and append _ast
+            ast_filename = rel_path.replace('\\', '/') + '_ast.txt'
+            ast_path = self.ast_output_dir / ast_filename
             
             try:
                 with open(ast_path, 'r', encoding='utf-8') as f:
                     contents[rel_path] = f.read()
             except Exception as e:
-                print(f"Error reading AST for {rel_path}: {e}")
+                print(f"Error reading AST for file {rel_path}: {e}")
                 contents[rel_path] = None
                 
         return contents
@@ -88,12 +92,12 @@ class Qrooper:
 
 if __name__ == "__main__":
     async def main():
-        qrooper = Qrooper(api_key="fw_3ZYVTdrvNUzJcNyGe4P4fjLY")
+        qrooper = Qrooper()
         result = await qrooper.parse_query(
-            zip_path="test2.zip",
+            zip_path="E:/Projects.py/Qode-Store-V1/qodestore-rag/test2.zip",
             query="Where are database connections being created in the code?"
         )
-        print("\nFinal Analysis:")
+        print("\nFINAL QROOPER ANALYSIS:")
         print(result)
 
     asyncio.run(main())
