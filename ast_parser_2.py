@@ -1,13 +1,26 @@
 from pathlib import Path
-from tree_sitter import Parser
-from tree_sitter_languages import get_parser
-from file_parsing import process_zip
-import asyncio
+from tree_sitter_languages import get_language, get_parser
+import sys
+
 
 class TreeSitterParser:
-    def __init__(self):
+    # Singleton instance
+    _instance = None
+    
+    def __new__(cls, output_dir="ast-output"):
+        if cls._instance is None:
+            print("Initializing TreeSitterParser singleton instance")
+            cls._instance = super(TreeSitterParser, cls).__new__(cls)
+            cls._instance._initialized = False
+        return cls._instance
+    
+    def __init__(self, output_dir="ast-output"):
+        # Only initialize once
+        if self._initialized:
+            return
+            
         # Directory to store AST outputs
-        self.output_dir = Path("ast-output")
+        self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
         # Supported languages mapping (file extension -> tree-sitter language name)
@@ -35,6 +48,8 @@ class TreeSitterParser:
 
         # Initialize parsers
         self.parsers = self._setup_parsers()
+        self._initialized = True
+        print("TreeSitterParser initialization complete")
 
     def _setup_parsers(self):
         """Initialize available parsers dynamically"""
@@ -42,13 +57,11 @@ class TreeSitterParser:
 
         for ext, lang_name in self.supported_languages.items():
             try:
-                parser = Parser()  # Create a new parser instance
-                parser.set_language(get_parser(lang_name))  # Set the language
+                parser = get_parser(lang_name)
                 parsers[ext] = parser
                 print(f"Successfully loaded {lang_name} parser")
             except Exception as e:
                 print(f"Failed to load {lang_name} parser: {str(e)}")
-
         return parsers
 
     def _write_tree(self, node, file, level=0):
@@ -67,16 +80,40 @@ class TreeSitterParser:
         for child in node.children:
             self._write_tree(child, file, level + 1)
 
+    def cleanup_ast_file(self, output_file):
+        try:
+            with open(output_file, 'r', encoding='utf-8') as f:
+                content = f.read()
+
+            # Pattern to look for: node_types like program/document/ERROR/stylesheet/module
+            # followed by a [ with code content and ending with ] (coordinates)
+            import re
+
+            pattern = r'((?:program|document|ERROR|stylesheet|module)\s+)\[(.*?)\](\s+\(\d+:\d+-\d+:\d+\))'
+
+            # Replace each match with just the node type, empty brackets, and coordinates
+            cleaned_content = re.sub(pattern, r'\1[]\3', content, flags=re.DOTALL)
+
+            # Write the cleaned content back to the file
+            with open(output_file, 'w', encoding='utf-8') as f:
+                f.write(cleaned_content)
+
+            print(f"Cleaned up AST file: {output_file}")
+            return True
+
+        except Exception as e:
+            print(f"Error cleaning up AST file {output_file}: {str(e)}")
+            return False
+
     def parse_file(self, file_path, zip_root=None, original_path=None):
         """Parse a single file and save its AST, preserving original directory structure
-        
+
         Args:
             file_path: Path to the file to parse (the actual file on disk)
             zip_root: Root directory where zip was extracted
             original_path: Original path within the zip (to preserve structure)
         """
         file_path = Path(file_path)
-
         if not file_path.exists():
             print(f"File {file_path} does not exist")
             return False
@@ -98,7 +135,7 @@ class TreeSitterParser:
             if zip_root and original_path:
                 # Use the original path from within the zip
                 output_file = self.output_dir / original_path
-                # Add the _ast.txt suffix
+                # Add the *ast.txt suffix
                 output_file = output_file.with_name(f"{output_file.stem}_ast.txt")
             else:
                 # Fallback to the original behavior
@@ -112,13 +149,15 @@ class TreeSitterParser:
                 f.write(f"AST for {original_path or file_path}\n{'=' * 50}\n")
                 self._write_tree(tree.root_node, f)
 
+            # Clean up the AST file to remove actual code content
+            self.cleanup_ast_file(output_file)
+
             print(f"Saved AST to {output_file}")
             return True
 
         except Exception as e:
             print(f"Error parsing {file_path}: {str(e)}")
             return False
-
 
     def parse_directory(self, directory_path):
         """Parse all supported files in a directory, preserving directory structure"""
@@ -141,27 +180,21 @@ class TreeSitterParser:
                 )
 
 
-async def main():
-    test_zip = "test2.zip"  
-    parser = TreeSitterParser()
-    zip_path = Path(test_zip)
-
-    if not zip_path.exists():
-        print(f"Error: Test file {test_zip} not found")
+#deprecated
+def main():
+    if len(sys.argv) < 2:
+        print("Usage: python ast_parser_2.py <path_to_zip>")
         return
 
-    def file_filter(file_path):
-        ext = Path(file_path).suffix.lower()
-        return ext in parser.supported_languages
+    parser = TreeSitterParser()
+    zip_path = Path(sys.argv[1])
 
-    results = await process_zip(
-        str(zip_path),
-        processing_func=parser.parse_file,
-        file_filter=file_filter
-    )
-    print(f"Successfully processed {test_zip}")
-    print(f"Processed {len(results)} files")
+    if zip_path.suffix.lower() != '.zip':
+        print("Error: Input must be a ZIP file")
+        return
+
+    parser.process_zip(zip_path)
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()

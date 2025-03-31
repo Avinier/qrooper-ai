@@ -5,6 +5,7 @@ import zipfile
 import shutil
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
+import time
 
 async def read_file(file_path, semaphore):
     """Read file with concurrency control"""
@@ -52,6 +53,16 @@ async def parallel_file_processing(file_paths, processing_func):
             if results[i] is not None
         ]
 
+async def concurrent_file_processing(file_paths : list[str], max_concurrent=50)-> list[tuple[str, bytes]]:
+    """Process files concurrently using async I/O with semaphore"""
+    semaphore = asyncio.Semaphore(max_concurrent)
+    results = await asyncio.gather(
+        *(read_file(path, semaphore) for path in file_paths)
+    )
+    
+    # Filter out failed reads
+    return [result for result in results if result[1] is not None]
+
 async def process_zip(zip_file_path: str, processing_func, file_filter=None) -> dict:
     """Generic zip file processing"""
     extract_dir = await extract_zip(zip_file_path)
@@ -74,4 +85,29 @@ async def process_zip(zip_file_path: str, processing_func, file_filter=None) -> 
             
         return all_results
     finally:
-        shutil.rmtree(extract_dir)
+        # Add a delay to allow files to be released
+        await asyncio.sleep(1)
+        try_cleanup(extract_dir, max_retries=3)
+
+
+async def try_cleanup(path, max_retries=3, retry_delay=1):
+    """Try to clean up a directory with retries on failure"""
+    for attempt in range(max_retries):
+        try:
+            if os.path.exists(path):
+                # On Windows, sometimes we need to handle read-only attributes
+                for root, dirs, files in os.walk(path, topdown=False):
+                    for file in files:
+                        file_path = os.path.join(root, file)
+                        try:
+                            os.chmod(file_path, 0o777)  # Make file writable
+                        except:
+                            pass
+                shutil.rmtree(path)
+                return  # Success, exit the function
+        except Exception as e:
+            print(f"Cleanup attempt {attempt+1}/{max_retries} failed: {e}")
+            if attempt < max_retries - 1:  # Wait before retrying
+                await asyncio.sleep(retry_delay)  # Use asyncio.sleep instead of time.sleep
+            else:
+                print(f"Failed to clean up {path} after {max_retries} attempts")

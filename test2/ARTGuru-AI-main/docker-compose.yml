@@ -1,0 +1,25 @@
+services:
+  levelmind-hackathon:
+    image: remix-dev_quantumsenses
+
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+    environment:
+      - NODE_ENV=development
+    command: npm run dev
+    networks:
+      - traefik-net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.levelmind-hackathon.rule=Host(`byters.quantumsenses.com`)"
+      - "traefik.http.routers.levelmind-hackathon.entrypoints=https"
+      - "traefik.http.routers.levelmind-hackathon.tls.certresolver=letsencrypt"
+      - "traefik.http.services.levelmind-hackathon.loadbalancer.server.port=5173"
+
+networks:
+  traefik-net:
+    external: true
+
+volumes:
+  node_modules:

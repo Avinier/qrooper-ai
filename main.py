@@ -1,19 +1,27 @@
+#TODO:
+# - check why all files aren't being parsed in ast-output
+# - see whether code should be taken from github api or node.text.decode in ast
 import asyncio
 import sys
+import os
 from llm_calls.qrooper_engine import Qrooper
-from generate_ast import ASTGenerator
+from generate_ast import main as ast_parse_file
 
 async def main(zip_path, query):
     # Generate AST files if needed
-    ast_generator = ASTGenerator()
-    await ast_generator.generate_from_zip(zip_path)
+    ast_output_dir = "ast-output"
+    if not os.path.exists(ast_output_dir):
+        print(f"AST output directory not found. Generating AST files for {zip_path}...")
+        ast_result = await ast_parse_file(zip_path)
+        print(f"AST generation result: {ast_result}")
+    else:
+        print(f"Using existing AST files in {ast_output_dir}")
 
     # Process query with Qrooper
     qrooper = Qrooper(
-        api_key="fw_3ZYVTdrvNUzJcNyGe4P4fjLY",
-        ast_output_dir="ast-output"
+        ast_output_dir=ast_output_dir
     )
-    result = await qrooper.parse_query(zip_path, query)
+    result = await qrooper._parse_query(zip_path, query)
     
     print("\n" + "="*50)
     print(f"Query: {query}")

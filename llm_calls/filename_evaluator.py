@@ -16,6 +16,21 @@ headers = {
     "Authorization": f"Bearer {api_key}",
 }
 
+FILENAME_EVAL_PROMPT = """You are a code file evaluator. Your task is to analyze file paths and determine which ones are relevant to a specific query.
+
+        For the query: "{query}"
+
+        Analyze these files and return ONLY a JSON array of file paths that are relevant. Include a file if you think it might contain relevant code. Your response must be a markdown code block with 'json' language specifier containing an array of strings.
+        IMPORTANT: Use forward slashes (/) instead of backslashes (\\) in all file paths.
+
+        Files to analyze:
+        {file_list}
+
+        Remember: Respond ONLY with a code block like this:
+        ```json
+        ["file1/path.py", "file2/path.py"]
+    ```
+    """
 
 async def call_llm_api(prompt):
     """Async wrapper for LLM API call using thread pool"""
@@ -57,23 +72,7 @@ async def process_filename_batch(batch_files, query):
     normalized_files = [f.replace('\\', '/') for f in batch_files]
     file_list = "\n".join([f"- {f}" for f in normalized_files])
 
-    FILENAME_EVAL_PROMPT = f"""You are a code file evaluator. Your task is to analyze file paths and determine which ones are relevant to a specific query.
-
-        For the query: "{query}"
-
-        Analyze these files and return ONLY a JSON array of file paths that are relevant. Include a file if you think it might contain relevant code. Your response must be a markdown code block with 'json' language specifier containing an array of strings.
-        IMPORTANT: Use forward slashes (/) instead of backslashes (\\) in all file paths.
-
-        Files to analyze:
-        {file_list}
-
-        Remember: Respond ONLY with a code block like this:
-        ```json
-        ["file1/path.py", "file2/path.py"]
-    ```
-    """
-
-    response = await call_llm_api(FILENAME_EVAL_PROMPT)
+    response = await call_llm_api(FILENAME_EVAL_PROMPT.format(query=query, file_list=file_list))
 
     if not response:
         print("[filename_eval.process_filename_batch] No response from LLM")

@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  @font-face {
+    font-family: 'Tiempos-Heading';
+    src: url('/fonts/tiempos-heading.otf') format('opentype');
+    font-display: swap;
+  }
+  
+  @font-face {
+    font-family: 'Tiempos-Regular';
+    src: url('/fonts/tiempos-text.otf') format('opentype');
+    font-display: swap;
+  }
+  
+  @font-face {
+    font-family: 'Sohne';
+    src: url('/fonts/sohne.otf') format('opentype');
+    font-display: swap;
+  }
+}
+
+html,
+body {
+  @apply bg-white dark:bg-gray-950;
+  @media (prefers-color-scheme: dark) {
+    color-scheme: dark;
+  }
+}
+
+@layer base {
+  /* width */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: rgb(243 244 246); /* gray-100 */
+    border-radius: 8px;
+    margin: 2px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: rgb(209 213 219); /* gray-300 */
+    border-radius: 8px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    min-height: 40px;
+  }
+
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgb(156 163 175); /* gray-400 */
+  }
+
+  /* For Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(209 213 219) rgb(243 244 246);
+  }
+}
