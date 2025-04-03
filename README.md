@@ -9,6 +9,7 @@ My implementation of an LLM-pipeline for codebases
 - [ ] Merkle Tree Hash Mapping
 - [ ] Semantic/Prompt Caching
 - [ ] DB Syncing
+- [ ] caching everywhere. (file processing, i/o)
 - [ ] System Prompting + zod
 - [ ] (maybe) finetune llm for ast i/o
 
